@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: nginx:alpine
+    volumes:
+      - ../frontend/build:/usr/share/nginx/html:ro
+      - ./nginx.tunnel.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - web
+    restart: unless-stopped
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    # Get this token from Cloudflare Zero Trust -> Access -> Tunnels -> "Create a tunnel" -> Docker
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    environment:
+      - TUNNEL_TRANSPORT_PROTOCOL=auto
+    depends_on:
+      - frontend
+    networks:
+      - web
+
+networks:
+  web:
+    driver: bridge

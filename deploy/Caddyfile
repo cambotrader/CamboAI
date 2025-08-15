@@ -1,0 +1,22 @@
+{
+	# Optional global options
+	email you@example.com
+}
+
+# Public domain provided via DOMAIN env var
+{$DOMAIN} {
+	encode zstd gzip
+
+	# Frontend (served by nginx inside the frontend container)
+	reverse_proxy frontend:80
+
+	# Route API and WebSockets to backend
+	@api path /api/*
+	handle @api {
+		reverse_proxy backend:8000
+	}
+	@ws path /ws/*
+	handle @ws {
+		reverse_proxy backend:8000
+	}
+}

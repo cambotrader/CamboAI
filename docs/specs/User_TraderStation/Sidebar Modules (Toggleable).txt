@@ -1,0 +1,139 @@
+Sidebar Modules (Toggleable)
+Module Name	Function
+📊 Chart Engine	Plotly/TradingView chart + pattern overlays
+🧠 AI Strategist War Room	Persona-based debate and consensus synthesis
+📈 Pattern Recognition	Full candlestick & chart pattern detection engine
+🔍 Scanner	Order flow, sentiment pulse, macro map triggers
+📦 Options Intelligence	OI, delta, theta, gamma, IV + strategy builder
+🎯 Trade Plan Generator	Entry, exit, SL/TP, confidence score, options overlays, “Why It Works” logic
+💬 Debate Room	Multi-AI discussion space with real-time consensus building
+💡 TTG Mari Emotional Grid	Trader identity, myth arc matching, narrative layering
+🌐 MacroMap	Economic data, Fed signals, institutional overlays
+🎨 Display Mode	Inline / tab / window spawner logic🧩 Checkbox logic for displaying any module inline or as separate tab
+
+🗂 Tab-to-tab symbol syncing with color-routing overlay
+
+📘 Full documentation suite (blueprint, README, to-do list)
+
+🧠 TTG DeepResearch upgrade for expanded final summary and trade justification
+
+📊 Display engine routing via DisplayMode: inline, tab, pop-up
+
+📦 Module folding, spawning, and hierarchy structuring inside Copilot How AI Detects Institutional Activity
+🔍 1. Order Flow & Market Microstructure Analysis
+Tracks Level 2 and Level 3 data to identify bid/ask stacking, spoofing, and iceberg orders
+
+Monitors Time & Sales for large block trades and sweep orders
+
+Detects liquidity shifts and quote stuffing often used by market makers
+
+📦 2. Dark Pool & Unusual Options Flow
+Flags off-exchange trades that bypass public order books
+
+Identifies unusual options activity (e.g. large call/put sweeps, multi-leg strategies)
+
+Uses delta/gamma modeling to infer dealer hedging behavior
+
+📊 3. Sentiment & Narrative Intelligence
+Scrapes social media, news, earnings calls, and analyst reports using NLP
+
+Detects tone shifts in institutional language (e.g. JPMorgan, Goldman Sachs)
+
+Tracks media narrative arcs that often precede institutional positioning
+
+🛰️ 4. Alternative Data Signals
+Analyzes satellite imagery, credit card data, web traffic, and supply chain metrics
+
+Detects macro positioning by hedge funds using global data overlays
+
+Monitors sector rotation and fund flows across ETFs and indices
+
+🧬 5. Predictive Modeling & Pattern Recognition
+Uses historical analogs to detect institutional accumulation/distribution zones
+
+Applies ML to identify signature trade footprints of specific funds or banks
+
+Models volatility regimes and risk-on/risk-off transitions
+
+🧠 Real-World Examples
+Bridgewater Associates uses machine learning to forecast asset prices and macro shifts
+
+Man Group applies AI to detect insider trading and market manipulation
+
+Two Sigma and Jump Trading use AI for high-frequency execution and liquidity modeling
+
+BlackRock’s Aladdin system optimizes portfolios using AI-driven risk analytics
+Integration Blueprint — Institutional Detection Capabilities per AI PersonaInstitutional Signal Toolkit Injected AcrosTrade Plan Generator
+Now every trade setup includes:
+
+🛠️ Institutional Behavior Snapshots:
+
+Dark Pool accumulation levels
+
+Time & Sales footprints of large block execution
+
+Options volume ratios skewed toward sweep vs block
+
+DOM pressure points from spoof/absorb techniques
+
+Market maker pin zones + dealer neutralization behavior
+
+📊 Tactical Overlays:
+
+IV zones and gamma acceleration levels
+
+Dealer hedging triggers above strike price
+
+Bid wall resilience tracked by market depthFull Spectrum of Market Participants Participant Type	Role in Market	Detection Signals Used by AI
+🏦 Market Makers	Provide liquidity, manage spreads	DOM spoofing, bid/ask stack, quote stuffing, gamma pin zones
+📈 Hedge Funds	Tactical, aggressive capital deployment	Dark pool blocks, options sweeps, 13F filings, sentiment divergence
+🧳 Institutions	Pension funds, mutual funds, insurers	ETF flows, sector rotation, macro overlays, earnings posture
+🧠 Wall Street Banks	Macro drivers, liquidity providers	Desk commentary, rate forecasts, CPI/FOMC tone, repo market behavior
+🧑‍💼 Retail Traders	Momentum chasers, sentiment amplifiers	Reddit/Twitter buzz, Robinhood flow, meme stock activity
+🧠 Prop Trading Firms	High-frequency, arbitrage, volatility	Microstructure anomalies, latency footprints, volume bursts
+🧠 Algo Bots / HFTs	Speed-based liquidity and arbitrage	Tick-level pattern detection, quote flickering, spread compression
+🧠 Quant Funds	Model-driven, statistical arbitrage	Volatility regime shifts, correlation breakdowns, synthetic exposure
+🧠 Sovereign Wealth Funds	Long-term macro allocators	Currency overlays, commodity shifts, geopolitical triggers
+🧠 Central Banks	Policy setters, liquidity injectors	Fed minutes, ECB tone, BOJ yield control, FX interventions
+🧠 Corporate Buybacks	Price support via repurchases	Insider filings, volume anomalies, earnings timing correlation
+🧠 Insiders / Executives	Strategic buyers/sellers	Form 4 filings, insider sentiment trackers
+🧠 Analyst Desks	Narrative shapers	Upgrade/downgrade matrices, earnings preview tone
+🧠 Options Dealers	Gamma hedgers, volatility managers	Gamma exposure maps, delta skew, IV crush zones
+🧠 ETF Arbitrageurs	NAV vs market price exploiters	ETF premium/discount tracking, basket flow anomalies
+🧠 Liquidity Providers	Passive order book builders	Spread modeling, passive fill ratios
+🧠 Short Sellers	Downside pressure agents	Short interest spikes, borrow cost surges, put flow clusters
+🧠 Social Influencers / Finfluencers	Sentiment amplifiers	YouTube tone, TikTok trends, Twitter virality scoring
+🧠 AI Trading Systems	Model-driven execution engines	Pattern mimicry, synthetic flow detection, ML footprint tracingScanner Tab Injection
+✅ Capabilities Added:
+🔍 Detects influence from:
+
+Market Makers
+
+Hedge Funds
+
+Institutions
+
+Wall Street Banks
+
+Retail
+
+HFTs / Algo Bots
+
+Sovereign Wealth Funds
+
+Short Sellers
+
+Central Banks
+
+Insider Activity
+
+Prop Firms
+
+ETF Arbitrage Desks
+
+Corporate Buybacks
+
+Social Finfluencers
+
+Quant ModelsTactical OverlaysConfidence MeterOption Strategy RecommendationTrade Setup SnapshotScan Engine Activated: Entire Options Market
+for the can i use all click up notion jira miro slack github for charting i want to use all plotly highchart into react ui and trading view tc2000 ninjatrader thinkorswim street smart mt5mt4 das trader trendspider as widget api for embedded chart or login if api is not available can you give me the whole complete full prompt for this project i mean everything i talk or mention so i can have bolt ai or zencoder or other to do it for me do not leave out anything if you forget go back to the beginning

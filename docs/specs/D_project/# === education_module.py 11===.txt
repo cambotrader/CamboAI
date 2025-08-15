@@ -1,0 +1,192 @@
+# === education_module.py ===
+
+# --- Imports ---
+from modules.patterns import (
+    get_chart_patterns,
+    get_candlestick_patterns,
+    get_advanced_patterns
+)
+from modules.indicators import get_all_indicators
+from modules.market_breadth import get_breadth_metrics
+from modules.macro import get_macro_events
+from modules.volatility import get_volatility_metrics
+from modules.institutional import (
+    get_institutional_tactics,
+    get_market_maker_tactics,
+    get_detection_tips
+)
+from modules.execution import get_execution_mechanics
+from modules.styles import get_trading_styles
+from modules.intermarket import get_intermarket_matrix
+from modules.psychology import (
+    get_trader_psychology,
+    get_journaling_prompts,
+    get_performance_drills
+)
+from modules.sentiment import get_sentiment_metrics
+from modules.economic_data import get_economic_indicators
+from modules.ai_strategy import (
+    generate_strategy_from_prompt,
+    get_strategy_templates
+)
+
+# --- Voice Routing ---
+def interpret_command(command_text):
+    command_text = command_text.lower()
+    if "pattern" in command_text:
+        return get_chart_patterns() | get_candlestick_patterns()
+    elif "indicator" in command_text:
+        return get_all_indicators()
+    elif "breadth" in command_text:
+        return get_breadth_metrics()
+    elif "macro" in command_text or "fed" in command_text:
+        return get_macro_events()
+    elif "volatility" in command_text or "vix" in command_text:
+        return get_volatility_metrics()
+    elif "institution" in command_text or "smart money" in command_text:
+        return get_institutional_tactics()
+    elif "market maker" in command_text:
+        return get_market_maker_tactics()
+    elif "execution" in command_text or "order flow" in command_text:
+        return get_execution_mechanics()
+    elif "style" in command_text or "scalp" in command_text:
+        return get_trading_styles()
+    elif "intermarket" in command_text or "correlation" in command_text:
+        return get_intermarket_matrix()
+    elif "psychology" in command_text or "discipline" in command_text:
+        return get_trader_psychology()
+    elif "journal" in command_text or "review" in command_text:
+        return get_journaling_prompts()
+    elif "performance" in command_text:
+        return get_performance_drills()
+    elif "sentiment" in command_text:
+        return get_sentiment_metrics()
+    elif "economic" in command_text or "calendar" in command_text:
+        return get_economic_indicators()
+    elif "generate strategy" in command_text:
+        return generate_strategy_from_prompt(command_text)
+    elif "templates" in command_text:
+        return get_strategy_templates()
+    else:
+        return {"message": "Command not recognized. Try asking about patterns, indicators, macro events, psychology, or execution."}
+
+# --- UI Helpers ---
+def get_all_topics_by_level(level="beginner"):
+    return {
+        "Patterns": get_chart_patterns() if level == "beginner" else get_advanced_patterns(),
+        "Indicators": get_all_indicators(),
+        "Breadth": get_breadth_metrics(),
+        "Macro": get_macro_events(),
+        "Volatility": get_volatility_metrics(),
+        "Institutional": get_institutional_tactics(),
+        "Market Makers": get_market_maker_tactics(),
+        "Execution": get_execution_mechanics(),
+        "Styles": get_trading_styles(),
+        "Intermarket": get_intermarket_matrix(),
+        "Psychology": get_trader_psychology(),
+        "Sentiment": get_sentiment_metrics(),
+        "Economic Data": get_economic_indicators()
+    }
+
+# === End of education_module.py ===
+# === Education Tab Stubs ===
+
+def pattern_glossary():
+    """Returns a glossary of chart patterns."""
+    return {
+        "Head and Shoulders": "Reversal pattern signaling trend exhaustion.",
+        "Cup and Handle": "Bullish continuation with consolidation dip.",
+        "Double Top": "Bearish reversal after two failed highs.",
+        "Flag": "Short-term consolidation before breakout.",
+        "Triangle": "Compression pattern -" breakout direction varies."
+    }
+
+def tutorial_content():
+    """Returns a list of tutorial sections."""    return [
+        "Intro to Market Structure",
+        "Understanding Sentiment Zones",
+        "Using FinBERT Bias Detection",
+        "Symbolic Commentary Overlays",
+        "Executing Trades with Discipline"
+    ]
+# === Education Tab Stubs ===
+def pattern_glossary():
+    """Returns a glossary of chart patterns."""
+    return {
+        "Head and Shoulders": "Reversal pattern signaling trend exhaustion.",
+        "Cup and Handle": "Bullish continuation with consolidation dip.",
+        "Double Top": "Bearish reversal after two failed highs.",
+        "Flag": "Short-term consolidation before breakout.",
+        "Triangle": "Compression pattern -" breakout direction varies."
+    }
+def tutorial_content():
+    """Returns a list of tutorial sections."""
+    return [
+        "Intro to Market Structure",
+        "Understanding Sentiment Zones",
+        "Using FinBERT Bias Detection",
+        "Symbolic Commentary Overlays",
+        "Executing Trades with Discipline"
+    ]
+
+# === Education Tab Stubs ===
+def pattern_glossary():
+    """Returns a glossary of chart patterns."""
+    return {
+        "Head and Shoulders": "Reversal pattern signaling trend exhaustion.",
+        "Cup and Handle": "Bullish continuation with consolidation dip.",
+        "Double Top": "Bearish reversal after two failed highs.",
+        "Flag": "Short-term consolidation before breakout.",
+        "Triangle": "Compression pattern - breakout direction varies."
+    }
+def tutorial_content():
+    """Returns a list of tutorial sections."""
+    return [
+        "Intro to Market Structure",
+        "Understanding Sentiment Zones",
+        "Using FinBERT Bias Detection",
+        "Symbolic Commentary Overlays",
+        "Executing Trades with Discipline"
+    ]
+# === Education Tab Stubs ===
+def pattern_glossary():
+    """Returns a glossary of chart patterns."""
+    return {
+        "Head and Shoulders": "Reversal pattern signaling trend exhaustion.",
+        "Cup and Handle": "Bullish continuation with consolidation dip.",
+        "Double Top": "Bearish reversal after two failed highs.",
+        "Flag": "Short-term consolidation before breakout.",
+        "Triangle": "Compression pattern - breakout direction varies."
+    }
+def tutorial_content():
+    """Returns a list of tutorial sections."""
+    return [
+        "Intro to Market Structure",
+        "Understanding Sentiment Zones",
+        "Using FinBERT Bias Detection",
+        "Symbolic Commentary Overlays",
+        "Executing Trades with Discipline"
+    ]
+
+
+# === Education Tab Stubs ===
+
+def pattern_glossary():
+    """Returns a glossary of chart patterns."""
+    return {
+        "Head and Shoulders": "Reversal pattern signaling trend exhaustion.",
+        "Cup and Handle": "Bullish continuation with consolidation dip.",
+        "Double Top": "Bearish reversal after two failed highs.",
+        "Flag": "Short-term consolidation before breakout.",
+        "Triangle": "Compression pattern - breakout direction varies."
+    }
+
+def tutorial_content():
+    """Returns a list of tutorial sections."""
+    return [
+        "Intro to Market Structure",
+        "Understanding Sentiment Zones",
+        "Using FinBERT Bias Detection",
+        "Symbolic Commentary Overlays",
+        "Executing Trades with Discipline"
+    ]

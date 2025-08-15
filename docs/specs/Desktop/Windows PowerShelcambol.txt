@@ -1,0 +1,2727 @@
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
+
+Loading personal and system profiles took 2845ms.
+(base) PS C:\Users\johnl> # Navigate to your project directory
+(base) PS C:\Users\johnl> cd "C:\Users\johnl\GitHub\CamboStationVision"
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> # Create the unified dashboard file
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> New-Item -Name "unified_dashboard.py" -ItemType File
+
+
+    Directory: C:\Users\johnl\GitHub\CamboStationVision
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----         7/22/2025   8:09 PM              0 unified_dash
+                                                  board.py
+
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> # === CamboStationVision™ Unified Dashboard ===
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> # Multi-Page Sidebar Navigation | All Features Integrated
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> import streamlit as st
+import : The term 'import' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ import streamlit as st
++ ~~~~~~
+    + CategoryInfo          : ObjectNotFound: (import:String)
+    [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> import pandas as pd
+import : The term 'import' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ import pandas as pd
++ ~~~~~~
+    + CategoryInfo          : ObjectNotFound: (import:String)
+    [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> import numpy as np
+import : The term 'import' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ import numpy as np
++ ~~~~~~
+    + CategoryInfo          : ObjectNotFound: (import:String)
+    [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> import yfinance as yf
+import : The term 'import' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ import yfinance as yf
++ ~~~~~~
+    + CategoryInfo          : ObjectNotFound: (import:String)
+    [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> import plotly.graph_objects as go
+import : The term 'import' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ import plotly.graph_objects as go
++ ~~~~~~
+    + CategoryInfo          : ObjectNotFound: (import:String)
+    [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> import time
+
+import : The term 'import' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ import time
++ ~~~~~~
+    + CategoryInfo          : ObjectNotFound: (import:String)
+    [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> from datetime import datetime
+At line:1 char:1
++ from datetime import datetime
++ ~~~~
+The 'from' keyword is not supported in this version of the
+language.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : ReservedKeywordNotAllowed
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> import streamlit.components.v1 as components
+import : The term 'import' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ import streamlit.components.v1 as components
++ ~~~~~~
+    + CategoryInfo          : ObjectNotFound: (import:String)
+    [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> # === Page Configuration ===
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> st.set_page_config(
+>>     page_title="CamboStationVision™ - Trading Command Center",
+>>     page_icon="🚀",
+>>     layout="wide",
+>>     initial_sidebar_state="expanded"
+>> )
+At line:2 char:62
++     page_title="CamboStationVision™ - Trading Command
+Center",
++
+ ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> # === Custom CSS Styling ===
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> st.markdown("""
+>> <style>
+>>     .main-header {
+>>         font-size: 2.5rem;
+>>         font-weight: bold;
+>>         color: #00ff88;
+>>         text-align: center;
+>>         margin-bottom: 2rem;
+>>         text-shadow: 2px 2px 4px rgba(0,255,136,0.3);
+>>     }
+>>     .section-header {
+>>         font-size: 1.5rem;
+>>         color: #ff6b6b;
+>>         border-bottom: 2px solid #ff6b6b;
+>>         padding-bottom: 0.5rem;
+>>         margin: 1rem 0;
+>>     }
+>>     .metric-card {
+>>         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+>>         padding: 1rem;
+>>         border-radius: 10px;
+>>         margin: 0.5rem 0;
+>>         color: white;
+>>         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+>>     }
+>>     .strategy-card {
+>>         background: rgba(255, 255, 255, 0.05);
+>>         border: 1px solid rgba(255, 255, 255, 0.1);
+>>         border-radius: 8px;
+>>         padding: 1rem;
+>>         margin: 0.5rem 0;
+>>     }
+>> </style>
+>> """, unsafe_allow_html=True)
+At line:34 char:5
++ """, unsafe_allow_html=True)
++     ~
+Missing expression after ','.
+At line:34 char:6
++ """, unsafe_allow_html=True)
++      ~~~~~~~~~~~~~~~~~~~~~~
+Unexpected token 'unsafe_allow_html=True' in expression or
+statement.
+At line:34 char:5
++ """, unsafe_allow_html=True)
++     ~
+Missing closing ')' in expression.
+At line:34 char:28
++ """, unsafe_allow_html=True)
++                            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> # === Sidebar Navigation ===
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> st.sidebar.markdown("# 🚀 CamboStation")
+st.sidebar.markdown : The term 'st.sidebar.markdown' is not
+recognized as the name of a cmdlet, function, script file, or
+operable program. Check the spelling of the name, or if a
+path was included, verify that the path is correct and try
+again.
+At line:1 char:1
++ st.sidebar.markdown("# 🚀 CamboStation")
++ ~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (st.sidebar.mar
+   kdown:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> st.sidebar.markdown("### Navigation Menu")
+st.sidebar.markdown : The term 'st.sidebar.markdown' is not
+recognized as the name of a cmdlet, function, script file, or
+operable program. Check the spelling of the name, or if a
+path was included, verify that the path is correct and try
+again.
+At line:1 char:1
++ st.sidebar.markdown("### Navigation Menu")
++ ~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (st.sidebar.mar
+   kdown:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> # Navigation options
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> pages = {
+>>     "🏠 Dashboard Home": "home",
+>>     "📈 Trading Charts": "charts",
+>>     "🧠 AI Analysis": "ai_analysis",
+>>     "⚡ Strategy Lab": "strategies",
+>>     "📚 Education Center": "education",
+>>     "📰 News & Sentiment": "news",
+>>     "🎯 Execution Center": "execution",
+>>     "⚙️ Settings": "settings"
+>> }
+At line:2 char:24
++     "🏠 Dashboard Home": "home",
++                        ~
+Unexpected token ':' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : UnexpectedToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> selected_page = st.sidebar.selectbox("Select Page", list(pages.keys()))
+At line:1 char:52
++ selected_page = st.sidebar.selectbox("Select Page",
+list(pages.keys() ...
++                                                    ~
+Missing expression after ','.
+At line:1 char:53
++ selected_page = st.sidebar.selectbox("Select Page",
+list(pages.keys() ...
++                                                     ~~~~
+Unexpected token 'list' in expression or statement.
+At line:1 char:52
++ selected_page = st.sidebar.selectbox("Select Page",
+list(pages.keys() ...
++                                                    ~
+Missing closing ')' in expression.
+At line:1 char:69
++ ... lected_page = st.sidebar.selectbox("Select Page",
+list(pages.keys()))
++
+          ~
+An expression was expected after '('.
+At line:1 char:71
++ ... lected_page = st.sidebar.selectbox("Select Page",
+list(pages.keys()))
++
+            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> current_page = pages[selected_page]
+current_page : The term 'current_page' is not recognized as
+the name of a cmdlet, function, script file, or operable
+program. Check the spelling of the name, or if a path was
+included, verify that the path is correct and try again.
+At line:1 char:1
++ current_page = pages[selected_page]
++ ~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (current_page:S
+   tring) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> # Sidebar Status Panel
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> st.sidebar.markdown("---")
+st.sidebar.markdown : The term 'st.sidebar.markdown' is not
+recognized as the name of a cmdlet, function, script file, or
+operable program. Check the spelling of the name, or if a
+path was included, verify that the path is correct and try
+again.
+At line:1 char:1
++ st.sidebar.markdown("---")
++ ~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (st.sidebar.mar
+   kdown:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> st.sidebar.markdown("### 📊 System Status")
+st.sidebar.markdown : The term 'st.sidebar.markdown' is not
+recognized as the name of a cmdlet, function, script file, or
+operable program. Check the spelling of the name, or if a
+path was included, verify that the path is correct and try
+again.
+At line:1 char:1
++ st.sidebar.markdown("### 📊 System Status")
++ ~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (st.sidebar.mar
+   kdown:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> st.sidebar.success("🟢 All Systems Online")
+st.sidebar.success : The term 'st.sidebar.success' is not
+recognized as the name of a cmdlet, function, script file, or
+operable program. Check the spelling of the name, or if a
+path was included, verify that the path is correct and try
+again.
+At line:1 char:1
++ st.sidebar.success("🟢 All Systems Online")
++ ~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (st.sidebar.suc
+   cess:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> st.sidebar.info(f"🕒 {datetime.now().strftime('%H:%M:%S')}")
+f🕒 {datetime.now().strftime('%H:%M:%S')} : The term 'f🕒
+{datetime.now().strftime('%H:%M:%S')}' is not recognized as
+the name of a cmdlet, function, script file, or operable
+program. Check the spelling of the name, or if a path was
+included, verify that the path is correct and try again.
+At line:1 char:17
++ st.sidebar.info(f"🕒 {datetime.now().strftime('%H:%M:%S')}")
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (f🕒 {datetime.
+   n...me('%H:%M:%S')}:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> st.sidebar.metric("Active Strategies", "4", "↗️ +1")
+st.sidebar.metric : The term 'st.sidebar.metric' is not
+recognized as the name of a cmdlet, function, script file, or
+operable program. Check the spelling of the name, or if a
+path was included, verify that the path is correct and try
+again.
+At line:1 char:1
++ st.sidebar.metric("Active Strategies", "4", "↗️ +1")
++ ~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (st.sidebar.met
+   ric:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> # === MAIN CONTENT AREA ===
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> # === HOME PAGE ===
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> if current_page == "home":
+At line:1 char:3
++ if current_page == "home":
++   ~
+Missing '(' after 'if' in if statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingOpenParenthesisInIfState
+   ment
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     st.markdown('<h1 class="main-header">🚀 CamboStationVision™ Command Center</h1>', unsafe_allow_html=True)
+At line:1 char:86
++ ... ss="main-header">🚀 CamboStationVision™ Command
+Center</h1>', unsafe_ ...
++
+     ~
+Missing expression after ','.
+At line:1 char:87
++ ... >🚀 CamboStationVision™ Command Center</h1>',
+unsafe_allow_html=True)
++
+~~~~~~~~~~~~~~~~~~~~~~
+Unexpected token 'unsafe_allow_html=True' in expression or
+statement.
+At line:1 char:86
++ ... ss="main-header">🚀 CamboStationVision™ Command
+Center</h1>', unsafe_ ...
++
+     ~
+Missing closing ')' in expression.
+At line:1 char:109
++ ... >🚀 CamboStationVision™ Command Center</h1>',
+unsafe_allow_html=True)
++
+            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     # Quick Stats Row
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     col1, col2, col3, col4 = st.columns(4)
+At line:1 char:9
++     col1, col2, col3, col4 = st.columns(4)
++         ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     with col1:
+with : The term 'with' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:5
++     with col1:
++     ~~~~
+    + CategoryInfo          : ObjectNotFound: (with:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         st.metric("Portfolio Value", "$125,430", "↗️ +2.3%")
+st.metric : The term 'st.metric' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:9
++         st.metric("Portfolio Value", "$125,430", "↗️ +2.3%")
++         ~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (st.metric:Stri
+   ng) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     with col2:
+with : The term 'with' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:5
++     with col2:
++     ~~~~
+    + CategoryInfo          : ObjectNotFound: (with:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         st.metric("Active Positions", "7", "↗️ +2")
+st.metric : The term 'st.metric' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:9
++         st.metric("Active Positions", "7", "↗️ +2")
++         ~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (st.metric:Stri
+   ng) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     with col3:
+with : The term 'with' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:5
++     with col3:
++     ~~~~
+    + CategoryInfo          : ObjectNotFound: (with:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         st.metric("Win Rate", "73.2%", "↗️ +1.1%")
+st.metric : The term 'st.metric' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:9
++         st.metric("Win Rate", "73.2%", "↗️ +1.1%")
++         ~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (st.metric:Stri
+   ng) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     with col4:
+with : The term 'with' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:5
++     with col4:
++     ~~~~
+    + CategoryInfo          : ObjectNotFound: (with:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         st.metric("AI Confidence", "87%", "↗️ +5%")
+st.metric : The term 'st.metric' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:9
++         st.metric("AI Confidence", "87%", "↗️ +5%")
++         ~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (st.metric:Stri
+   ng) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     st.markdown("---")
+st.markdown : The term 'st.markdown' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:5
++     st.markdown("---")
++     ~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (st.markdown:St
+   ring) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     # Quick Access Panels
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     col1, col2 = st.columns(2)
+At line:1 char:9
++     col1, col2 = st.columns(2)
++         ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     with col1:
+with : The term 'with' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:5
++     with col1:
++     ~~~~
+    + CategoryInfo          : ObjectNotFound: (with:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         st.markdown('<div class="section-header">📈 Market Overview</div>', unsafe_allow_html=True)
+At line:1 char:76
++ ... kdown('<div class="section-header">📈 Market
+Overview</div>', unsafe_ ...
++
+     ~
+Missing expression after ','.
+At line:1 char:77
++ ... s="section-header">📈 Market Overview</div>',
+unsafe_allow_html=True)
++
+~~~~~~~~~~~~~~~~~~~~~~
+Unexpected token 'unsafe_allow_html=True' in expression or
+statement.
+At line:1 char:76
++ ... kdown('<div class="section-header">📈 Market
+Overview</div>', unsafe_ ...
++
+     ~
+Missing closing ')' in expression.
+At line:1 char:99
++ ... s="section-header">📈 Market Overview</div>',
+unsafe_allow_html=True)
++
+            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         # Sample market data
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         market_data = {
+>>             "SPY": {"price": 421.17, "change": "+0.85%", "status": "🟢"},
+>>             "QQQ": {"price": 367.23, "change": "-0.23%", "status": "🔴"},
+>>             "IWM": {"price": 198.45, "change": "+1.12%", "status": "🟢"},
+>>             "VIX": {"price": 18.67, "change": "-2.34%", "status": "🟢"}
+>>         }
+At line:2 char:18
++             "SPY": {"price": 421.17, "change": "+0.85%",
+"status": "  ...
++                  ~
+Unexpected token ':' in expression or statement.
+At line:2 char:28
++             "SPY": {"price": 421.17, "change": "+0.85%",
+"status": "  ...
++                            ~
+Unexpected token ':' in expression or statement.
+At line:3 char:28
++             "QQQ": {"price": 367.23, "change": "-0.23%",
+"status": "  ...
++                            ~
+Unexpected token ':' in expression or statement.
+At line:4 char:28
++             "IWM": {"price": 198.45, "change": "+1.12%",
+"status": "  ...
++                            ~
+Unexpected token ':' in expression or statement.
+At line:5 char:28
++             "VIX": {"price": 18.67, "change": "-2.34%",
+"status": "🟢 ...
++                            ~
+Unexpected token ':' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : UnexpectedToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         for symbol, data in market_data.items():
+At line:1 char:12
++         for symbol, data in market_data.items():
++            ~
+Missing opening '(' after keyword 'for'.
+At line:1 char:19
++         for symbol, data in market_data.items():
++                   ~
+Missing argument in parameter list.
+At line:1 char:47
++         for symbol, data in market_data.items():
++                                               ~
+An expression was expected after '('.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingOpenParenthesisAfterKeyw
+   ord
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>             st.markdown(f"""
+>>             <div class="metric-card">
+>>                 <strong>{symbol}</strong> {data['status']}<br>
+>>                 ${data['price']} ({data['change']})
+>>             </div>
+>>             """, unsafe_allow_html=True)
+At line:6 char:16
++             """, unsafe_allow_html=True)
++                ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     with col2:
+with : The term 'with' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:5
++     with col2:
++     ~~~~
+    + CategoryInfo          : ObjectNotFound: (with:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         st.markdown('<div class="section-header">🎯 Active Signals</div>', unsafe_allow_html=True)
+At line:1 char:75
++ ... rkdown('<div class="section-header">🎯 Active
+Signals</div>', unsafe_ ...
++
+     ~
+Missing expression after ','.
+At line:1 char:76
++ ... ss="section-header">🎯 Active Signals</div>',
+unsafe_allow_html=True)
++
+~~~~~~~~~~~~~~~~~~~~~~
+Unexpected token 'unsafe_allow_html=True' in expression or
+statement.
+At line:1 char:75
++ ... rkdown('<div class="section-header">🎯 Active
+Signals</div>', unsafe_ ...
++
+     ~
+Missing closing ')' in expression.
+At line:1 char:98
++ ... ss="section-header">🎯 Active Signals</div>',
+unsafe_allow_html=True)
++
+            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         signals = [
+signals : The term 'signals' is not recognized as the name of
+a cmdlet, function, script file, or operable program. Check
+the spelling of the name, or if a path was included, verify
+that the path is correct and try again.
+At line:1 char:9
++         signals = [
++         ~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (signals:String
+   ) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>             {"symbol": "AAPL", "signal": "BUY", "strength": "85%", "type": "Momentum"},
+>>             {"symbol": "TSLA", "signal": "HOLD", "strength": "72%", "type": "AI Sentiment"},
+>>             {"symbol": "NVDA", "signal": "BUY", "strength": "91%", "type": "Breakout"},
+>>             {"symbol": "MSFT", "signal": "SELL", "strength": "68%", "type": "Mean Reversion"}
+At line:1 char:22
++             {"symbol": "AAPL", "signal": "BUY", "strength":
+"85%", "t ...
++                      ~
+Unexpected token ':' in expression or statement.
+At line:2 char:22
++             {"symbol": "TSLA", "signal": "HOLD",
+"strength": "72%", " ...
++                      ~
+Unexpected token ':' in expression or statement.
+At line:3 char:22
++             {"symbol": "NVDA", "signal": "BUY", "strength":
+"91%", "t ...
++                      ~
+Unexpected token ':' in expression or statement.
+At line:4 char:22
++             {"symbol": "MSFT", "signal": "SELL",
+"strength": "68%", " ...
++                      ~
+Unexpected token ':' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : UnexpectedToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         ]
+] : The term ']' is not recognized as the name of a cmdlet,
+function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:9
++         ]
++         ~
+    + CategoryInfo          : ObjectNotFound: (]:String) [],
+   CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         for signal in signals:
+At line:1 char:12
++         for signal in signals:
++            ~
+Missing opening '(' after keyword 'for'.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingOpenParenthesisAfterKeyw
+   ord
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>             color = "🟢" if signal["signal"] == "BUY" else "🔴" if signal["signal"] == "SELL" else "🟡"
+color : The term 'color' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:13
++             color = "🟢" if signal["signal"] == "BUY" else
+"🔴" if si ...
++             ~~~~~
+    + CategoryInfo          : ObjectNotFound: (color:String)
+   [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>             st.markdown(f"""
+>>             <div class="strategy-card">
+>>                 <strong>{signal['symbol']}</strong> {color} {signal['signal']}<br>
+>>                 {signal['type']} • Strength: {signal['strength']}
+>>             </div>
+>>             """, unsafe_allow_html=True)
+At line:6 char:16
++             """, unsafe_allow_html=True)
++                ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> # === TRADING CHARTS PAGE ===
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> elif current_page == "charts":
+elif : The term 'elif' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ elif current_page == "charts":
++ ~~~~
+    + CategoryInfo          : ObjectNotFound: (elif:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     st.markdown('<h1 class="main-header">📈 Trading Charts & Analysis</h1>', unsafe_allow_html=True)
+At line:1 char:77
++ ... ('<h1 class="main-header">📈 Trading Charts &
+Analysis</h1>', unsafe_ ...
++
+     ~
+Missing expression after ','.
+At line:1 char:78
++ ... n-header">📈 Trading Charts & Analysis</h1>',
+unsafe_allow_html=True)
++
+~~~~~~~~~~~~~~~~~~~~~~
+Unexpected token 'unsafe_allow_html=True' in expression or
+statement.
+At line:1 char:77
++ ... ('<h1 class="main-header">📈 Trading Charts &
+Analysis</h1>', unsafe_ ...
++
+     ~
+Missing closing ')' in expression.
+At line:1 char:100
++ ... n-header">📈 Trading Charts & Analysis</h1>',
+unsafe_allow_html=True)
++
+            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     # Ticker Input
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     col1, col2, col3 = st.columns([2, 1, 1])
+At line:1 char:9
++     col1, col2, col3 = st.columns([2, 1, 1])
++         ~
+Missing argument in parameter list.
+At line:1 char:36
++     col1, col2, col3 = st.columns([2, 1, 1])
++                                    ~
+Missing type name after '['.
+At line:1 char:37
++     col1, col2, col3 = st.columns([2, 1, 1])
++                                     ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     with col1:
+with : The term 'with' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:5
++     with col1:
++     ~~~~
+    + CategoryInfo          : ObjectNotFound: (with:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         ticker = st.text_input("Enter Ticker Symbol", value="AAPL", placeholder="e.g. AAPL, TSLA").upper()
+At line:1 char:54
++         ticker = st.text_input("Enter Ticker Symbol",
+value="AAPL", p ...
++                                                      ~
+Missing expression after ','.
+At line:1 char:55
++ ...    ticker = st.text_input("Enter Ticker Symbol",
+value="AAPL", placeh ...
++
+~~~~~~~~~~~~
+Unexpected token 'value="AAPL"' in expression or statement.
+At line:1 char:54
++         ticker = st.text_input("Enter Ticker Symbol",
+value="AAPL", p ...
++                                                      ~
+Missing closing ')' in expression.
+At line:1 char:98
++ ...  Ticker Symbol", value="AAPL", placeholder="e.g. AAPL,
+TSLA").upper()
++
+    ~
+Unexpected token ')' in expression or statement.
+At line:1 char:106
++ ...  Ticker Symbol", value="AAPL", placeholder="e.g. AAPL,
+TSLA").upper()
++
+            ~
+An expression was expected after '('.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     with col2:
+with : The term 'with' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:5
++     with col2:
++     ~~~~
+    + CategoryInfo          : ObjectNotFound: (with:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         timeframe = st.selectbox("Timeframe", ["1d", "5d", "1mo", "3mo", "6mo", "1y", "2y"])
+At line:1 char:48
++         timeframe = st.selectbox("Timeframe", ["1d", "5d",
+"1mo", "3m ...
++                                                ~
+Missing type name after '['.
+At line:1 char:46
++         timeframe = st.selectbox("Timeframe", ["1d", "5d",
+"1mo", "3m ...
++                                              ~
+Missing expression after ','.
+At line:1 char:47
++         timeframe = st.selectbox("Timeframe", ["1d", "5d",
+"1mo", "3m ...
++                                               ~~~~~
+Unexpected token '["1d"' in expression or statement.
+At line:1 char:46
++         timeframe = st.selectbox("Timeframe", ["1d", "5d",
+"1mo", "3m ...
++                                              ~
+Missing closing ')' in expression.
+At line:1 char:92
++ ... selectbox("Timeframe", ["1d", "5d", "1mo", "3mo",
+"6mo", "1y", "2y"])
++
+            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingTypename
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     with col3:
+with : The term 'with' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:5
++     with col3:
++     ~~~~
+    + CategoryInfo          : ObjectNotFound: (with:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         chart_type = st.selectbox("Chart Type", ["Candlestick", "Line", "OHLC"])
+At line:1 char:50
++         chart_type = st.selectbox("Chart Type",
+["Candlestick", "Line ...
++                                                  ~
+Missing type name after '['.
+At line:1 char:48
++         chart_type = st.selectbox("Chart Type",
+["Candlestick", "Line ...
++                                                ~
+Missing expression after ','.
+At line:1 char:49
++ ...        chart_type = st.selectbox("Chart Type",
+["Candlestick", "Line" ...
++
+~~~~~~~~~~~~~~
+Unexpected token '["Candlestick"' in expression or statement.
+At line:1 char:48
++         chart_type = st.selectbox("Chart Type",
+["Candlestick", "Line ...
++                                                ~
+Missing closing ')' in expression.
+At line:1 char:80
++ ... rt_type = st.selectbox("Chart Type", ["Candlestick",
+"Line", "OHLC"])
++
+            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingTypename
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     if ticker:
+At line:1 char:7
++     if ticker:
++       ~
+Missing '(' after 'if' in if statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingOpenParenthesisInIfState
+   ment
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         try:
+try: : The term 'try:' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:9
++         try:
++         ~~~~
+    + CategoryInfo          : ObjectNotFound: (try::String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>             # Download data
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>             df = yf.download(ticker, period=timeframe, progress=False)
+At line:1 char:36
++             df = yf.download(ticker, period=timeframe,
+progress=False ...
++                                    ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>            
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>             if not df.empty:
+At line:1 char:15
++             if not df.empty:
++               ~
+Missing '(' after 'if' in if statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingOpenParenthesisInIfState
+   ment
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                 # Technical Indicators
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                 st.markdown('<div class="section-header">📊 Technical Indicators</div>', unsafe_allow_html=True)
+At line:1 char:89
++ ... ('<div class="section-header">📊 Technical
+Indicators</div>', unsafe_ ...
++
+     ~
+Missing expression after ','.
+At line:1 char:90
++ ... ction-header">📊 Technical Indicators</div>',
+unsafe_allow_html=True)
++
+~~~~~~~~~~~~~~~~~~~~~~
+Unexpected token 'unsafe_allow_html=True' in expression or
+statement.
+At line:1 char:89
++ ... ('<div class="section-header">📊 Technical
+Indicators</div>', unsafe_ ...
++
+     ~
+Missing closing ')' in expression.
+At line:1 char:112
++ ... ction-header">📊 Technical Indicators</div>',
+unsafe_allow_html=True)
++
+            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>            
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                 col1, col2, col3, col4 = st.columns(4)
+At line:1 char:21
++                 col1, col2, col3, col4 = st.columns(4)
++                     ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>            
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                 with col1:
+with : The term 'with' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:17
++                 with col1:
++                 ~~~~
+    + CategoryInfo          : ObjectNotFound: (with:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                     current_price = df['Close'].iloc[-1]
+current_price : The term 'current_price' is not recognized as
+the name of a cmdlet, function, script file, or operable
+program. Check the spelling of the name, or if a path was
+included, verify that the path is correct and try again.
+At line:1 char:21
++                     current_price = df['Close'].iloc[-1]
++                     ~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (current_price:
+   String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                     prev_price = df['Close'].iloc[-2]
+prev_price : The term 'prev_price' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:21
++                     prev_price = df['Close'].iloc[-2]
++                     ~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (prev_price:Str
+   ing) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                     change = ((current_price - prev_price) / prev_price) * 100
+At line:1 char:61
++                     change = ((current_price - prev_price)
+/ prev_pri ...
++
+~
+You must provide a value expression following the '/'
+operator.
+At line:1 char:62
++ ...            change = ((current_price - prev_price) /
+prev_price) * 100
++
+~~~~~~~~~~
+Unexpected token 'prev_price' in expression or statement.
+At line:1 char:61
++                     change = ((current_price - prev_price)
+/ prev_pri ...
++
+~
+Missing closing ')' in expression.
+At line:1 char:72
++ ...            change = ((current_price - prev_price) /
+prev_price) * 100
++
+      ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                     st.metric("Current Price", f"${current_price:.2f}", f"{change:+.2f}%")
+At line:1 char:47
++                     st.metric("Current Price",
+f"${current_price:.2f} ...
++                                               ~
+Missing expression after ','.
+At line:1 char:48
++ ...            st.metric("Current Price",
+f"${current_price:.2f}", f"{cha ...
++
+~~~~~~~~~~~~~~~~~~~~~~~
+Unexpected token 'f"${current_price:.2f}"' in expression or
+statement.
+At line:1 char:47
++                     st.metric("Current Price",
+f"${current_price:.2f} ...
++                                               ~
+Missing closing ')' in expression.
+At line:1 char:90
++ ... t.metric("Current Price", f"${current_price:.2f}",
+f"{change:+.2f}%")
++
+            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>            
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                 with col2:
+with : The term 'with' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:17
++                 with col2:
++                 ~~~~
+    + CategoryInfo          : ObjectNotFound: (with:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                     ma20 = df['Close'].rolling(20).mean().iloc[-1]
+Method invocation failed because [System.Int32] does not
+contain a method named 'mean'.
+At line:1 char:21
++                     ma20 =
+df['Close'].rolling(20).mean().iloc[-1]
++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (:) [], Runti
+   meException
+    + FullyQualifiedErrorId : MethodNotFound
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                     st.metric("MA20", f"${ma20:.2f}")
+At line:1 char:38
++                     st.metric("MA20", f"${ma20:.2f}")
++                                      ~
+Missing expression after ','.
+At line:1 char:39
++                     st.metric("MA20", f"${ma20:.2f}")
++                                       ~~~~~~~~~~~~~~
+Unexpected token 'f"${ma20:.2f}"' in expression or statement.
+At line:1 char:38
++                     st.metric("MA20", f"${ma20:.2f}")
++                                      ~
+Missing closing ')' in expression.
+At line:1 char:53
++                     st.metric("MA20", f"${ma20:.2f}")
++                                                     ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>            
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                 with col3:
+with : The term 'with' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:17
++                 with col3:
++                 ~~~~
+    + CategoryInfo          : ObjectNotFound: (with:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                     ma50 = df['Close'].rolling(50).mean().iloc[-1]
+Method invocation failed because [System.Int32] does not
+contain a method named 'mean'.
+At line:1 char:21
++                     ma50 =
+df['Close'].rolling(50).mean().iloc[-1]
++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (:) [], Runti
+   meException
+    + FullyQualifiedErrorId : MethodNotFound
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                     st.metric("MA50", f"${ma50:.2f}")
+At line:1 char:38
++                     st.metric("MA50", f"${ma50:.2f}")
++                                      ~
+Missing expression after ','.
+At line:1 char:39
++                     st.metric("MA50", f"${ma50:.2f}")
++                                       ~~~~~~~~~~~~~~
+Unexpected token 'f"${ma50:.2f}"' in expression or statement.
+At line:1 char:38
++                     st.metric("MA50", f"${ma50:.2f}")
++                                      ~
+Missing closing ')' in expression.
+At line:1 char:53
++                     st.metric("MA50", f"${ma50:.2f}")
++                                                     ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>            
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                 with col4:
+with : The term 'with' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:17
++                 with col4:
++                 ~~~~
+    + CategoryInfo          : ObjectNotFound: (with:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                     volume = df['Volume'].iloc[-1]
+Get-Volume : A positional parameter cannot be found that
+accepts argument 'df[Volume].iloc[-1]'.
+At line:1 char:21
++                     volume = df['Volume'].iloc[-1]
++                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Get-Volum
+   e], ParameterBindingException
+    + FullyQualifiedErrorId : PositionalParameterNotFound,Get
+   -Volume
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                     st.metric("Volume", f"{volume:,.0f}")
+At line:1 char:40
++                     st.metric("Volume", f"{volume:,.0f}")
++                                        ~
+Missing expression after ','.
+At line:1 char:41
++                     st.metric("Volume", f"{volume:,.0f}")
++                                         ~~~~~~~~~~~~~~~~
+Unexpected token 'f"{volume:,.0f}"' in expression or
+statement.
+At line:1 char:40
++                     st.metric("Volume", f"{volume:,.0f}")
++                                        ~
+Missing closing ')' in expression.
+At line:1 char:57
++                     st.metric("Volume", f"{volume:,.0f}")
++                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>            
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                 # Chart
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                 st.markdown('<div class="section-header">📈 Price Chart</div>', unsafe_allow_html=True)
+At line:1 char:80
++ ... .markdown('<div class="section-header">📈 Price
+Chart</div>', unsafe_ ...
++
+     ~
+Missing expression after ','.
+At line:1 char:81
++ ... class="section-header">📈 Price Chart</div>',
+unsafe_allow_html=True)
++
+~~~~~~~~~~~~~~~~~~~~~~
+Unexpected token 'unsafe_allow_html=True' in expression or
+statement.
+At line:1 char:80
++ ... .markdown('<div class="section-header">📈 Price
+Chart</div>', unsafe_ ...
++
+     ~
+Missing closing ')' in expression.
+At line:1 char:103
++ ... class="section-header">📈 Price Chart</div>',
+unsafe_allow_html=True)
++
+            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>            
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                 fig = go.Figure()
+At line:1 char:33
++                 fig = go.Figure()
++                                 ~
+An expression was expected after '('.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedExpression
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>            
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                 if chart_type == "Candlestick":
+At line:1 char:19
++                 if chart_type == "Candlestick":
++                   ~
+Missing '(' after 'if' in if statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingOpenParenthesisInIfState
+   ment
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                     fig.add_trace(go.Candlestick(
+>>                         x=df.index,
+>>                         open=df['Open'],
+>>                         high=df['High'],
+>>                         low=df['Low'],
+>>                         close=df['Close'],
+>>                         name=ticker
+>>                     ))
+At line:2 char:35
++                         x=df.index,
++                                   ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                 else:
+else: : The term 'else:' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:17
++                 else:
++                 ~~~~~
+    + CategoryInfo          : ObjectNotFound: (else::String)
+   [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                     fig.add_trace(go.Scatter(
+>>                         x=df.index,
+>>                         y=df['Close'],
+>>                         mode='lines',
+>>                         name=f'{ticker} Close',
+>>                         line=dict(color='#00ff88', width=2)
+>>                     ))
+At line:2 char:35
++                         x=df.index,
++                                   ~
+Missing argument in parameter list.
+At line:6 char:50
++                         line=dict(color='#00ff88', width=2)
++                                                  ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>            
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                 # Add moving averages
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                 if len(df) >= 20:
+At line:1 char:19
++                 if len(df) >= 20:
++                   ~
+Missing '(' after 'if' in if statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingOpenParenthesisInIfState
+   ment
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                     fig.add_trace(go.Scatter(
+>>                         x=df.index,
+>>                         y=df['Close'].rolling(20).mean(),
+>>                         mode='lines',
+>>                         name='MA20',
+>>                         line=dict(color='orange', width=1)
+>>                     ))
+At line:2 char:35
++                         x=df.index,
++                                   ~
+Missing argument in parameter list.
+At line:6 char:49
++                         line=dict(color='orange', width=1)
++                                                 ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>            
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                 if len(df) >= 50:
+At line:1 char:19
++                 if len(df) >= 50:
++                   ~
+Missing '(' after 'if' in if statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingOpenParenthesisInIfState
+   ment
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                     fig.add_trace(go.Scatter(
+>>                         x=df.index,
+>>                         y=df['Close'].rolling(50).mean(),
+>>                         mode='lines',
+>>                         name='MA50',
+>>                         line=dict(color='red', width=1)
+>>                     ))
+At line:2 char:35
++                         x=df.index,
++                                   ~
+Missing argument in parameter list.
+At line:6 char:46
++                         line=dict(color='red', width=1)
++                                              ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>            
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                 fig.update_layout(
+>>                     title=f"{ticker} - {timeframe.upper()} Chart",
+>>                     xaxis_title="Date",
+>>                     yaxis_title="Price ($)",
+>>                     template="plotly_dark",
+>>                     height=600
+>>                 )
+At line:2 char:66
++                     title=f"{ticker} - {timeframe.upper()}
+Chart",
++
+     ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>            
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                 st.plotly_chart(fig, use_container_width=True)
+At line:1 char:36
++                 st.plotly_chart(fig,
+use_container_width=True)
++                                    ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>            
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         except Exception as e:
+except : The term 'except' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:9
++         except Exception as e:
++         ~~~~~~
+    + CategoryInfo          : ObjectNotFound: (except:String)
+    [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>             st.error(f"Error loading data for {ticker}: {str(e)}")
+fError loading data for {ticker}: {str(e)} : The term 'fError
+loading data for {ticker}: {str(e)}' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:22
++             st.error(f"Error loading data for {ticker}:
+{str(e)}")
++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (fError loading
+    ...cker}: {str(e)}:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> # === AI ANALYSIS PAGE ===
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> elif current_page == "ai_analysis":
+elif : The term 'elif' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ elif current_page == "ai_analysis":
++ ~~~~
+    + CategoryInfo          : ObjectNotFound: (elif:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     st.markdown('<h1 class="main-header">🧠 AI Analysis Center</h1>', unsafe_allow_html=True)
+At line:1 char:70
++ ... arkdown('<h1 class="main-header">🧠 AI Analysis
+Center</h1>', unsafe_ ...
++
+     ~
+Missing expression after ','.
+At line:1 char:71
++ ... ss="main-header">🧠 AI Analysis Center</h1>',
+unsafe_allow_html=True)
++
+~~~~~~~~~~~~~~~~~~~~~~
+Unexpected token 'unsafe_allow_html=True' in expression or
+statement.
+At line:1 char:70
++ ... arkdown('<h1 class="main-header">🧠 AI Analysis
+Center</h1>', unsafe_ ...
++
+     ~
+Missing closing ')' in expression.
+At line:1 char:93
++ ... ss="main-header">🧠 AI Analysis Center</h1>',
+unsafe_allow_html=True)
++
+            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     # AI Analysis Input
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     ticker = st.text_input("Analyze Ticker", value="AAPL", placeholder="Enter symbol for AI analysis").upper()
+At line:1 char:45
++     ticker = st.text_input("Analyze Ticker", value="AAPL",
+placeholde ...
++                                             ~
+Missing expression after ','.
+At line:1 char:46
++     ticker = st.text_input("Analyze Ticker", value="AAPL",
+placeholde ...
++                                              ~~~~~~~~~~~~
+Unexpected token 'value="AAPL"' in expression or statement.
+At line:1 char:45
++     ticker = st.text_input("Analyze Ticker", value="AAPL",
+placeholde ...
++                                             ~
+Missing closing ')' in expression.
+At line:1 char:102
++ ... r", value="AAPL", placeholder="Enter symbol for AI
+analysis").upper()
++
+    ~
+Unexpected token ')' in expression or statement.
+At line:1 char:110
++ ... r", value="AAPL", placeholder="Enter symbol for AI
+analysis").upper()
++
+            ~
+An expression was expected after '('.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     if ticker:
+At line:1 char:7
++     if ticker:
++       ~
+Missing '(' after 'if' in if statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingOpenParenthesisInIfState
+   ment
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         col1, col2 = st.columns(2)
+At line:1 char:13
++         col1, col2 = st.columns(2)
++             ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         with col1:
+with : The term 'with' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:9
++         with col1:
++         ~~~~
+    + CategoryInfo          : ObjectNotFound: (with:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>             st.markdown('<div class="section-header">🤖 AI Pattern Detection</div>', unsafe_allow_html=True)
+At line:1 char:85
++ ... ('<div class="section-header">🤖 AI Pattern
+Detection</div>', unsafe_ ...
++
+     ~
+Missing expression after ','.
+At line:1 char:86
++ ... ction-header">🤖 AI Pattern Detection</div>',
+unsafe_allow_html=True)
++
+~~~~~~~~~~~~~~~~~~~~~~
+Unexpected token 'unsafe_allow_html=True' in expression or
+statement.
+At line:1 char:85
++ ... ('<div class="section-header">🤖 AI Pattern
+Detection</div>', unsafe_ ...
++
+     ~
+Missing closing ')' in expression.
+At line:1 char:108
++ ... ction-header">🤖 AI Pattern Detection</div>',
+unsafe_allow_html=True)
++
+            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>            
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>             if st.button("🔍 Run AI Analysis", type="primary"):
+At line:1 char:15
++             if st.button("🔍 Run AI Analysis",
+type="primary"):
++               ~
+Missing '(' after 'if' in if statement.
+At line:1 char:47
++             if st.button("🔍 Run AI Analysis",
+type="primary"):
++                                               ~
+Missing expression after ','.
+At line:1 char:48
++             if st.button("🔍 Run AI Analysis",
+type="primary"):
++
+~~~~~~~~~~~~~~
+Unexpected token 'type="primary"' in expression or statement.
+At line:1 char:47
++             if st.button("🔍 Run AI Analysis",
+type="primary"):
++                                               ~
+Missing closing ')' in expression.
+At line:1 char:62
++             if st.button("🔍 Run AI Analysis",
+type="primary"):
++
+ ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingOpenParenthesisInIfState
+   ment
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                 with st.spinner("AI analyzing patterns..."):
+with : The term 'with' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:17
++                 with st.spinner("AI analyzing patterns..."):
++                 ~~~~
+    + CategoryInfo          : ObjectNotFound: (with:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                     time.sleep(2)  # Simulate processing
+time.sleep : The term 'time.sleep' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:21
++                     time.sleep(2)  # Simulate processing
++                     ~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (time.sleep:Str
+   ing) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>            
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                     # Mock AI results
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                     patterns = [
+patterns : The term 'patterns' is not recognized as the name
+of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:21
++                     patterns = [
++                     ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (patterns:Strin
+   g) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                         {"pattern": "Bullish Flag", "confidence": "87%", "timeframe": "4H"},
+>>                         {"pattern": "Volume Breakout", "confidence": "92%", "timeframe": "1D"},
+>>                         {"pattern": "RSI Divergence", "confidence": "74%", "timeframe": "1H"}
+At line:1 char:35
++                         {"pattern": "Bullish Flag",
+"confidence": "87 ...
++                                   ~
+Unexpected token ':' in expression or statement.
+At line:2 char:35
++                         {"pattern": "Volume Breakout",
+"confidence":  ...
++                                   ~
+Unexpected token ':' in expression or statement.
+At line:3 char:35
++                         {"pattern": "RSI Divergence",
+"confidence": " ...
++                                   ~
+Unexpected token ':' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : UnexpectedToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                     ]
+] : The term ']' is not recognized as the name of a cmdlet,
+function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:21
++                     ]
++                     ~
+    + CategoryInfo          : ObjectNotFound: (]:String) [],
+   CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>            
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                     for pattern in patterns:
+At line:1 char:24
++                     for pattern in patterns:
++                        ~
+Missing opening '(' after keyword 'for'.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingOpenParenthesisAfterKeyw
+   ord
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>                         st.success(f"✅ {pattern['pattern']} - {pattern['confidence']} confidence ({pattern['timeframe']})")
+f✅ {pattern['pattern']} - {pattern['confidence']} confidence
+({pattern['timeframe']}) : The term 'f✅ {pattern['pattern']}
+- {pattern['confidence']} confidence
+({pattern['timeframe']})' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:36
++ ...  st.success(f"✅ {pattern['pattern']} -
+{pattern['confidence']} confid ...
++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (f✅ {pattern['p
+   a...['timeframe']}):String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         with col2:
+with : The term 'with' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:9
++         with col2:
++         ~~~~
+    + CategoryInfo          : ObjectNotFound: (with:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>             st.markdown('<div class="section-header">📊 Sentiment Analysis</div>', unsafe_allow_html=True)
+At line:1 char:83
++ ... wn('<div class="section-header">📊 Sentiment
+Analysis</div>', unsafe_ ...
++
+     ~
+Missing expression after ','.
+At line:1 char:84
++ ... section-header">📊 Sentiment Analysis</div>',
+unsafe_allow_html=True)
++
+~~~~~~~~~~~~~~~~~~~~~~
+Unexpected token 'unsafe_allow_html=True' in expression or
+statement.
+At line:1 char:83
++ ... wn('<div class="section-header">📊 Sentiment
+Analysis</div>', unsafe_ ...
++
+     ~
+Missing closing ')' in expression.
+At line:1 char:106
++ ... section-header">📊 Sentiment Analysis</div>',
+unsafe_allow_html=True)
++
+            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>            
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>             # Mock sentiment data
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>             sentiment_score = np.random.randint(60, 95)
+sentiment_score : The term 'sentiment_score' is not
+recognized as the name of a cmdlet, function, script file, or
+operable program. Check the spelling of the name, or if a
+path was included, verify that the path is correct and try
+again.
+At line:1 char:13
++             sentiment_score = np.random.randint(60, 95)
++             ~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (sentiment_scor
+   e:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>             sentiment_color = "🟢" if sentiment_score > 70 else "🟡" if sentiment_score > 50 else "🔴"
+At line:1 char:89
++ ... 🟢" if sentiment_score > 70 else "🟡" if
+sentiment_score > 50 else "  ...
++
+ ~~~~
+The output stream for this command is already redirected.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : StreamAlreadyRedirected
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>            
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>             st.metric("Overall Sentiment", f"{sentiment_score}%", f"{sentiment_color}")
+At line:1 char:43
++             st.metric("Overall Sentiment",
+f"{sentiment_score}%", f"{ ...
++                                           ~
+Missing expression after ','.
+At line:1 char:44
++ ...          st.metric("Overall Sentiment",
+f"{sentiment_score}%", f"{sen ...
++
+~~~~~~~~~~~~~~~~~~~~~
+Unexpected token 'f"{sentiment_score}%"' in expression or
+statement.
+At line:1 char:43
++             st.metric("Overall Sentiment",
+f"{sentiment_score}%", f"{ ...
++                                           ~
+Missing closing ')' in expression.
+At line:1 char:87
++ ... ric("Overall Sentiment", f"{sentiment_score}%",
+f"{sentiment_color}")
++
+            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> # === STRATEGY LAB PAGE ===
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> elif current_page == "strategies":
+elif : The term 'elif' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ elif current_page == "strategies":
++ ~~~~
+    + CategoryInfo          : ObjectNotFound: (elif:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     st.markdown('<h1 class="main-header">⚡ Strategy Lab</h1>', unsafe_allow_html=True)
+At line:1 char:63
++ ...    st.markdown('<h1 class="main-header">⚡ Strategy
+Lab</h1>', unsafe_ ...
++
+     ~
+Missing expression after ','.
+At line:1 char:64
++ ... <h1 class="main-header">⚡ Strategy Lab</h1>',
+unsafe_allow_html=True)
++
+~~~~~~~~~~~~~~~~~~~~~~
+Unexpected token 'unsafe_allow_html=True' in expression or
+statement.
+At line:1 char:63
++ ...    st.markdown('<h1 class="main-header">⚡ Strategy
+Lab</h1>', unsafe_ ...
++
+     ~
+Missing closing ')' in expression.
+At line:1 char:86
++ ... <h1 class="main-header">⚡ Strategy Lab</h1>',
+unsafe_allow_html=True)
++
+            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     st.info("🚀 Strategy Lab - Connect your existing strategy modules here!")
+st.info : The term 'st.info' is not recognized as the name of
+a cmdlet, function, script file, or operable program. Check
+the spelling of the name, or if a path was included, verify
+that the path is correct and try again.
+At line:1 char:5
++     st.info("🚀 Strategy Lab - Connect your existing
+strategy modules ...
++     ~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (st.info:String
+   ) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     # Mock strategy performance
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     performance_data = {
+>>         "Strategy": ["Momentum", "Mean Reversion", "Breakout Hunter", "AI Sentiment"],
+>>         "Win Rate": ["78%", "65%", "82%", "71%"],
+>>         "Avg Return": ["4.2%", "2.8%", "6.1%", "3.9%"],
+>>         "Sharpe Ratio": ["1.85", "1.42", "2.01", "1.67"]
+>>     }
+At line:2 char:19
++         "Strategy": ["Momentum", "Mean Reversion",
+"Breakout Hunter", ...
++                   ~
+Unexpected token ':' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : UnexpectedToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     df_performance = pd.DataFrame(performance_data)
+performance_data : The term 'performance_data' is not
+recognized as the name of a cmdlet, function, script file, or
+operable program. Check the spelling of the name, or if a
+path was included, verify that the path is correct and try
+again.
+At line:1 char:35
++     df_performance = pd.DataFrame(performance_data)
++                                   ~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (performance_da
+   ta:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     st.dataframe(df_performance, use_container_width=True)
+At line:1 char:32
++     st.dataframe(df_performance, use_container_width=True)
++                                ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> # === EDUCATION CENTER PAGE ===
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> elif current_page == "education":
+elif : The term 'elif' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ elif current_page == "education":
++ ~~~~
+    + CategoryInfo          : ObjectNotFound: (elif:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     st.markdown('<h1 class="main-header">📚 Education Center</h1>', unsafe_allow_html=True)
+At line:1 char:68
++ ... .markdown('<h1 class="main-header">📚 Education
+Center</h1>', unsafe_ ...
++
+     ~
+Missing expression after ','.
+At line:1 char:69
++ ... lass="main-header">📚 Education Center</h1>',
+unsafe_allow_html=True)
++
+~~~~~~~~~~~~~~~~~~~~~~
+Unexpected token 'unsafe_allow_html=True' in expression or
+statement.
+At line:1 char:68
++ ... .markdown('<h1 class="main-header">📚 Education
+Center</h1>', unsafe_ ...
++
+     ~
+Missing closing ')' in expression.
+At line:1 char:91
++ ... lass="main-header">📚 Education Center</h1>',
+unsafe_allow_html=True)
++
+            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     modules = [
+modules : The term 'modules' is not recognized as the name of
+a cmdlet, function, script file, or operable program. Check
+the spelling of the name, or if a path was included, verify
+that the path is correct and try again.
+At line:1 char:5
++     modules = [
++     ~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (modules:String
+   ) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         "🔰 Trading Basics",
+>>         "📊 Technical Analysis",
+>>         "🧠 AI Trading Strategies",
+>>         "💰 Risk Management"
+🔰 Trading Basics
+📊 Technical Analysis
+🧠 AI Trading Strategies
+💰 Risk Management
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     ]
+] : The term ']' is not recognized as the name of a cmdlet,
+function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:5
++     ]
++     ~
+    + CategoryInfo          : ObjectNotFound: (]:String) [],
+   CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     selected_module = st.selectbox("Choose Module", modules)
+At line:1 char:52
++     selected_module = st.selectbox("Choose Module", modules)
++                                                    ~
+Missing expression after ','.
+At line:1 char:53
++     selected_module = st.selectbox("Choose Module", modules)
++                                                     ~~~~~~~
+Unexpected token 'modules' in expression or statement.
+At line:1 char:52
++     selected_module = st.selectbox("Choose Module", modules)
++                                                    ~
+Missing closing ')' in expression.
+At line:1 char:60
++     selected_module = st.selectbox("Choose Module", modules)
++                                                            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     if "Trading Basics" in selected_module:
+At line:1 char:7
++     if "Trading Basics" in selected_module:
++       ~
+Missing '(' after 'if' in if statement.
+At line:1 char:25
++     if "Trading Basics" in selected_module:
++                         ~~
+Unexpected token 'in' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingOpenParenthesisInIfState
+   ment
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         st.markdown("""
+>>         ### Welcome to Trading Fundamentals
+>>
+>>         **Key Concepts:**
+>>         - **Bull Market**: Rising prices and optimistic sentiment
+>>         - **Bear Market**: Falling prices and pessimistic sentiment
+>>         - **Support**: Price level where buying interest emerges
+>>         - **Resistance**: Price level where selling pressure increases
+>>         """)
+st.markdown : The term 'st.markdown' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:9
++         st.markdown("""
++         ~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (st.markdown:St
+   ring) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> # === NEWS & SENTIMENT PAGE ===
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> elif current_page == "news":
+elif : The term 'elif' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ elif current_page == "news":
++ ~~~~
+    + CategoryInfo          : ObjectNotFound: (elif:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     st.markdown('<h1 class="main-header">📰 News & Market Sentiment</h1>', unsafe_allow_html=True)
+At line:1 char:75
++ ... wn('<h1 class="main-header">📰 News & Market
+Sentiment</h1>', unsafe_ ...
++
+     ~
+Missing expression after ','.
+At line:1 char:76
++ ... ain-header">📰 News & Market Sentiment</h1>',
+unsafe_allow_html=True)
++
+~~~~~~~~~~~~~~~~~~~~~~
+Unexpected token 'unsafe_allow_html=True' in expression or
+statement.
+At line:1 char:75
++ ... wn('<h1 class="main-header">📰 News & Market
+Sentiment</h1>', unsafe_ ...
++
+     ~
+Missing closing ')' in expression.
+At line:1 char:98
++ ... ain-header">📰 News & Market Sentiment</h1>',
+unsafe_allow_html=True)
++
+            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     # Mock news data
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     news_items = [
+news_items : The term 'news_items' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:5
++     news_items = [
++     ~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (news_items:Str
+   ing) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         {"headline": "Fed Signals Potential Rate Cut", "sentiment": "Bullish", "time": "2 hours ago"},
+>>         {"headline": "Tech Stocks Rally on AI Breakthrough", "sentiment": "Bullish", "time": "4 hours ago"},
+>>         {"headline": "Energy Sector Faces Headwinds", "sentiment": "Bearish", "time": "6 hours ago"}
+At line:1 char:20
++         {"headline": "Fed Signals Potential Rate Cut",
+"sentiment": " ...
++                    ~
+Unexpected token ':' in expression or statement.
+At line:2 char:20
++         {"headline": "Tech Stocks Rally on AI
+Breakthrough", "sentime ...
++                    ~
+Unexpected token ':' in expression or statement.
+At line:3 char:20
++         {"headline": "Energy Sector Faces Headwinds",
+"sentiment": "B ...
++                    ~
+Unexpected token ':' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : UnexpectedToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     ]
+] : The term ']' is not recognized as the name of a cmdlet,
+function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:5
++     ]
++     ~
+    + CategoryInfo          : ObjectNotFound: (]:String) [],
+   CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     for news in news_items:
+At line:1 char:8
++     for news in news_items:
++        ~
+Missing opening '(' after keyword 'for'.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingOpenParenthesisAfterKeyw
+   ord
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         sentiment_color = "🟢" if news["sentiment"] == "Bullish" else "🔴"
+
+sentiment_color : The term 'sentiment_color' is not
+recognized as the name of a cmdlet, function, script file, or
+operable program. Check the spelling of the name, or if a
+path was included, verify that the path is correct and try
+again.
+At line:1 char:9
++         sentiment_color = "🟢" if news["sentiment"] ==
+"Bullish" else ...
++         ~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (sentiment_colo
+   r:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         st.markdown(f"**{news['headline']}** {sentiment_color} {news['sentiment']} • {news['time']}")
+f**{news['headline']}** {sentiment_color} {news['sentiment']}
+• {news['time']} : The term 'f**{news['headline']}**
+{sentiment_color} {news['sentiment']} • {news['time']}' is
+not recognized as the name of a cmdlet, function, script
+file, or operable program. Check the spelling of the name, or
+if a path was included, verify that the path is correct and
+try again.
+At line:1 char:21
++ ... st.markdown(f"**{news['headline']}** {sentiment_color}
+{news['sentime ...
++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (f**{news['head
+   l... {news['time']}:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> # === EXECUTION CENTER PAGE ===
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> elif current_page == "execution":
+elif : The term 'elif' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ elif current_page == "execution":
++ ~~~~
+    + CategoryInfo          : ObjectNotFound: (elif:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     st.markdown('<h1 class="main-header">🎯 Execution Center</h1>', unsafe_allow_html=True)
+At line:1 char:68
++ ... .markdown('<h1 class="main-header">🎯 Execution
+Center</h1>', unsafe_ ...
++
+     ~
+Missing expression after ','.
+At line:1 char:69
++ ... lass="main-header">🎯 Execution Center</h1>',
+unsafe_allow_html=True)
++
+~~~~~~~~~~~~~~~~~~~~~~
+Unexpected token 'unsafe_allow_html=True' in expression or
+statement.
+At line:1 char:68
++ ... .markdown('<h1 class="main-header">🎯 Execution
+Center</h1>', unsafe_ ...
++
+     ~
+Missing closing ')' in expression.
+At line:1 char:91
++ ... lass="main-header">🎯 Execution Center</h1>',
+unsafe_allow_html=True)
++
+            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     col1, col2 = st.columns(2)
+At line:1 char:9
++     col1, col2 = st.columns(2)
++         ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     with col1:
+with : The term 'with' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:5
++     with col1:
++     ~~~~
+    + CategoryInfo          : ObjectNotFound: (with:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         st.markdown("### 📝 Order Entry")
+st.markdown : The term 'st.markdown' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:9
++         st.markdown("### 📝 Order Entry")
++         ~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (st.markdown:St
+   ring) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         symbol = st.text_input("Symbol", value="AAPL")
+At line:1 char:41
++         symbol = st.text_input("Symbol", value="AAPL")
++                                         ~
+Missing expression after ','.
+At line:1 char:42
++         symbol = st.text_input("Symbol", value="AAPL")
++                                          ~~~~~~~~~~~~
+Unexpected token 'value="AAPL"' in expression or statement.
+At line:1 char:41
++         symbol = st.text_input("Symbol", value="AAPL")
++                                         ~
+Missing closing ')' in expression.
+At line:1 char:54
++         symbol = st.text_input("Symbol", value="AAPL")
++                                                      ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         action = st.selectbox("Action", ["BUY", "SELL"])
+At line:1 char:42
++         action = st.selectbox("Action", ["BUY", "SELL"])
++                                          ~
+Missing type name after '['.
+At line:1 char:40
++         action = st.selectbox("Action", ["BUY", "SELL"])
++                                        ~
+Missing expression after ','.
+At line:1 char:41
++         action = st.selectbox("Action", ["BUY", "SELL"])
++                                         ~~~~~~
+Unexpected token '["BUY"' in expression or statement.
+At line:1 char:40
++         action = st.selectbox("Action", ["BUY", "SELL"])
++                                        ~
+Missing closing ')' in expression.
+At line:1 char:56
++         action = st.selectbox("Action", ["BUY", "SELL"])
++                                                        ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingTypename
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         quantity = st.number_input("Quantity", min_value=1, value=100)
+At line:1 char:47
++         quantity = st.number_input("Quantity", min_value=1,
+value=100 ...
++                                               ~
+Missing expression after ','.
+At line:1 char:48
++         quantity = st.number_input("Quantity", min_value=1,
+value=100 ...
++                                                ~~~~~~~~~~~
+Unexpected token 'min_value=1' in expression or statement.
+At line:1 char:47
++         quantity = st.number_input("Quantity", min_value=1,
+value=100 ...
++                                               ~
+Missing closing ')' in expression.
+At line:1 char:70
++ ...        quantity = st.number_input("Quantity",
+min_value=1, value=100)
++
+            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         if st.button("🚀 Submit Order"):
+At line:1 char:11
++         if st.button("🚀 Submit Order"):
++           ~
+Missing '(' after 'if' in if statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingOpenParenthesisInIfState
+   ment
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>             st.success(f"✅ {action} order for {quantity} shares of {symbol} submitted!")
+f✅ {action} order for {quantity} shares of {symbol}
+submitted! : The term 'f✅ {action} order for {quantity}
+shares of {symbol} submitted!' is not recognized as the name
+of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:24
++ ...  st.success(f"✅ {action} order for {quantity} shares of
+{symbol} subm ...
++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (f✅ {action} or
+   d...bol} submitted!:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     with col2:
+with : The term 'with' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:5
++     with col2:
++     ~~~~
+    + CategoryInfo          : ObjectNotFound: (with:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         st.markdown("### 📊 Portfolio")
+st.markdown : The term 'st.markdown' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:9
++         st.markdown("### 📊 Portfolio")
++         ~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (st.markdown:St
+   ring) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         positions = {
+>>             "Symbol": ["AAPL", "TSLA", "NVDA"],
+>>             "Shares": [100, 50, 25],
+>>             "P&L": ["+$475", "-$257", "+$620"]
+>>         }
+At line:2 char:21
++             "Symbol": ["AAPL", "TSLA", "NVDA"],
++                     ~
+Unexpected token ':' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : UnexpectedToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         st.dataframe(pd.DataFrame(positions))
+positions : The term 'positions' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:35
++         st.dataframe(pd.DataFrame(positions))
++                                   ~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (positions:Stri
+   ng) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> # === SETTINGS PAGE ===
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> elif current_page == "settings":
+elif : The term 'elif' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ elif current_page == "settings":
++ ~~~~
+    + CategoryInfo          : ObjectNotFound: (elif:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     st.markdown('<h1 class="main-header">⚙️ Settings & Configuration</h1>', unsafe_allow_html=True)
+At line:1 char:76
++ ... n('<h1 class="main-header">⚙️ Settings &
+Configuration</h1>', unsafe_ ...
++
+     ~
+Missing expression after ','.
+At line:1 char:77
++ ... in-header">⚙️ Settings & Configuration</h1>',
+unsafe_allow_html=True)
++
+~~~~~~~~~~~~~~~~~~~~~~
+Unexpected token 'unsafe_allow_html=True' in expression or
+statement.
+At line:1 char:76
++ ... n('<h1 class="main-header">⚙️ Settings &
+Configuration</h1>', unsafe_ ...
++
+     ~
+Missing closing ')' in expression.
+At line:1 char:99
++ ... in-header">⚙️ Settings & Configuration</h1>',
+unsafe_allow_html=True)
++
+            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     col1, col2 = st.columns(2)
+At line:1 char:9
++     col1, col2 = st.columns(2)
++         ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     with col1:
+with : The term 'with' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:5
++     with col1:
++     ~~~~
+    + CategoryInfo          : ObjectNotFound: (with:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         st.markdown("### 🎨 Display Settings")
+st.markdown : The term 'st.markdown' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:9
++         st.markdown("### 🎨 Display Settings")
++         ~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (st.markdown:St
+   ring) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         theme = st.selectbox("Theme", ["Dark", "Light", "Auto"])
+At line:1 char:40
++         theme = st.selectbox("Theme", ["Dark", "Light",
+"Auto"])
++                                        ~
+Missing type name after '['.
+At line:1 char:38
++         theme = st.selectbox("Theme", ["Dark", "Light",
+"Auto"])
++                                      ~
+Missing expression after ','.
+At line:1 char:39
++         theme = st.selectbox("Theme", ["Dark", "Light",
+"Auto"])
++                                       ~~~~~~~
+Unexpected token '["Dark"' in expression or statement.
+At line:1 char:38
++         theme = st.selectbox("Theme", ["Dark", "Light",
+"Auto"])
++                                      ~
+Missing closing ')' in expression.
+At line:1 char:64
++         theme = st.selectbox("Theme", ["Dark", "Light",
+"Auto"])
++
+   ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingTypename
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         refresh_rate = st.slider("Refresh Rate (seconds)", 1, 60, 5)
+refresh_rate : The term 'refresh_rate' is not recognized as
+the name of a cmdlet, function, script file, or operable
+program. Check the spelling of the name, or if a path was
+included, verify that the path is correct and try again.
+At line:1 char:9
++         refresh_rate = st.slider("Refresh Rate (seconds)",
+1, 60, 5)
++         ~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (refresh_rate:S
+   tring) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     with col2:
+with : The term 'with' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:5
++     with col2:
++     ~~~~
+    + CategoryInfo          : ObjectNotFound: (with:String) [
+   ], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         st.markdown("### 🎯 Trading Settings")
+st.markdown : The term 'st.markdown' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:9
++         st.markdown("### 🎯 Trading Settings")
++         ~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (st.markdown:St
+   ring) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         risk_limit = st.slider("Risk Limit (%)", 1, 10, 2)
+risk_limit : The term 'risk_limit' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:9
++         risk_limit = st.slider("Risk Limit (%)", 1, 10, 2)
++         ~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (risk_limit:Str
+   ing) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         auto_stop_loss = st.checkbox("Auto Stop Loss", value=True)
+At line:1 char:55
++         auto_stop_loss = st.checkbox("Auto Stop Loss",
+value=True)
++                                                       ~
+Missing expression after ','.
+At line:1 char:56
++         auto_stop_loss = st.checkbox("Auto Stop Loss",
+value=True)
++
+~~~~~~~~~~
+Unexpected token 'value=True' in expression or statement.
+At line:1 char:55
++         auto_stop_loss = st.checkbox("Auto Stop Loss",
+value=True)
++                                                       ~
+Missing closing ')' in expression.
+At line:1 char:66
++         auto_stop_loss = st.checkbox("Auto Stop Loss",
+value=True)
++
+     ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>     if st.button("💾 Save Settings"):
+At line:1 char:7
++     if st.button("💾 Save Settings"):
++       ~
+Missing '(' after 'if' in if statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingOpenParenthesisInIfState
+   ment
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>         st.success("✅ Settings saved!")
+st.success : The term 'st.success' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:9
++         st.success("✅ Settings saved!")
++         ~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (st.success:Str
+   ing) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision>
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> # === Footer ===
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> st.markdown("---")
+st.markdown : The term 'st.markdown' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:1
++ st.markdown("---")
++ ~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (st.markdown:St
+   ring) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(base) PS C:\Users\johnl\GitHub\CamboStationVision> st.markdown("""
+>> <div style='text-align: center; color: #666; padding: 1rem;'>
+>>     🚀 CamboStationVision™ | Advanced Trading Platform | Version 2.0
+>> </div>
+>> """, unsafe_allow_html=True)
+At line:5 char:5
++ """, unsafe_allow_html=True)
++     ~
+Missing expression after ','.
+At line:5 char:6
++ """, unsafe_allow_html=True)
++      ~~~~~~~~~~~~~~~~~~~~~~
+Unexpected token 'unsafe_allow_html=True' in expression or
+statement.
+At line:5 char:5
++ """, unsafe_allow_html=True)
++     ~
+Missing closing ')' in expression.
+At line:5 char:28
++ """, unsafe_allow_html=True)
++                            ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentCont
+   ainsErrorRecordException
+    + FullyQualifiedErrorId : MissingExpressionAfterToken

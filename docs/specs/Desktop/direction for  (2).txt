@@ -1,0 +1,109 @@
+defined “my instruction”:
+
+Step by step
+
+Direction by direction
+
+One step at a time
+
+Full script included
+
+PowerShell executes unless told otherwise
+
+Get it right the first time
+
+Don’t move on until you say so
+
+Errors trigger repeat + new PowerShell script
+
+I’ve locked this in permanently. Anytime you say “my instruction,” I respond accordingly.
+
+✅ Folder Location Registered
+Root project path confirmed:
+
+C:\Users\johnl\GitHub\CamboStationVision
+
+All scripts will target this folder from now on — no risk of misplacement
+
+✅ File/Folder Scan Summary
+You sent screenshots and uploads showing:
+
+📂 Confirmed Directories
+strategies/, execution/, persona/, glyphs/, narrative/, rituals/, dashboards/, overlays/, macros/, modules/, assets/, .git, .devcontainer, venv/, logs/, docs
+
+🐍 Key Python Files
+strategy_lab.py, belief_codex.py, execution_playlist.py, identity_myth_engine.py, ritual_composer.py, mission_dashboard.py
+
+Plus: Candles.py, ChartPatterns.py, education_tab.py, john_ai_dashboard.py, etc.
+
+📜 Launch + Bootstrap Scripts
+main.py, bootloader.ps1, starter.bat, start.bat, launch_cambo.bat
+
+🧭 Blueprint Uploaded
+glyph_blueprint.txt shows full symbolic flow of belief → glyph → persona → ritual → execution → dashboard
+
+I parsed the diagram and confirmed match with your directory
+
+✅ Sync Instructions Registered
+You told me:
+
+Do not overwrite existing scripts without permission
+
+You will upload scripts to be adjusted if already created
+
+If file is new, I will generate full PowerShell script for it
+
+All actions move forward only when you say “next”
+You defined “my instruction” as:
+
+✅ Step by step — No skipping, no leaping forward
+
+✅ Direction by direction — Exact action, precisely followed
+
+✅ One step at a time — Execute, wait, then proceed
+
+✅ Full script included — Every time
+
+✅ PowerShell executes — Unless you say otherwise
+
+✅ Get it right the first time — No assumptions
+
+✅ Errors trigger repeat — With new PowerShell fix script
+
+❌ Do not move on — Until you say “next”
+
+📂 Folder Lock Confirmation
+Your project path is locked to:
+
+C:\Users\johnl\GitHub\CamboStationVision
+All generated scripts, modules, and deployments will target this location. No exceptions, no drift. The cockpit knows this path as its core.
+
+📜 Files + Folders Confirmed via Scan
+You uploaded or screenshotted these:
+
+📁 Directories Registered
+strategies/, execution/, persona/, glyphs/, narrative/, rituals/,
+dashboards/, overlays/, macros/, modules/, assets/, .git,
+.devcontainer/, venv/, logs/, docs/
+🐍 Python Modules Confirmed
+strategy_lab.py, belief_codex.py, execution_playlist.py,
+identity_myth_engine.py, ritual_composer.py, mission_dashboard.py,
+Candles.py, ChartPatterns.py, education_tab.py, john_ai_dashboard.py
+🧭 Launch + Bootstrap Scripts
+main.py, bootloader.ps1, starter.bat, start.bat, launch_cambo.bat
+🔮 Blueprint Diagram Uploaded
+glyph_blueprint.txt
+Parsed and stored. It defines the full symbolic lifecycle: belief → glyph → persona → ritual → execution → dashboard
+
+🔗 Sync Instructions Registered
+❗ Scripts will not be overwritten without permission
+
+📨 Uploaded files = adjust or fuse, not rebuild
+
+✨ New script = full PowerShell deployment included
+
+📡 Movement only triggered by one phrase: “next”✅ Add-on only: All PowerShell patches will append new tabs, modules, and functions
+
+❌ Never overwrite your layout or modules without your explicit approval
+
+🎙️ Every enhancement gets wired modularly and safely

@@ -1,0 +1,9 @@
+﻿Migration Summary 
+2025-08-13T22:51:08.2989891-07:00
+Root: d:\CamboAI\docs\specs
+
+Folder	Files
+Desktop	19
+D_project	5
+D_TraderStation	12
+User_TraderStation	12

@@ -1,0 +1,17 @@
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222 47% 11%;
+}
+
+.dark {
+  --background: 222 66% 9%;
+  --foreground: 210 40% 98%;
+}
+
+html, body, :root { height: 100%; }
+body { background-color: hsl(var(--background)); color: hsl(var(--foreground)); }
+

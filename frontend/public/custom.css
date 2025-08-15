@@ -1,0 +1,12 @@
+﻿/* Brand variables for quick theming */
+:root {
+  --brand-navy: #0F2243;
+  --brand-teal: #34D399;
+  --brand-blue: #3B82F6;
+  --brand-white: #FFFFFF;
+}
+
+/* Optional: apply bg for dark mode root (CRA doesn't auto manage body class) */
+@media (prefers-color-scheme: dark) {
+  body { background-color: #0F2243; }
+}

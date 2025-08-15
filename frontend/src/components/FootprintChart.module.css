@@ -1,0 +1,29 @@
+.container {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  font-family: monospace;
+  overflow-x: auto;
+}
+.barColumn {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #222;
+  background: #111;
+}
+.level {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 0 4px;
+  border-bottom: 1px solid #1c1c1c;
+  box-sizing: border-box;
+  color: #d0d0d0;
+}
+.price { color: #aaa; }
+.bid { color: #ff5a5a; }
+.ask { color: #5aff5a; }
+.deltaPos { color: #4dd; }
+.deltaNeg { color: #f77; }
+.imbalanceUp { box-shadow: 0 0 0 1px #4dff4d inset; }
+.imbalanceDown { box-shadow: 0 0 0 1px #ff4d4d inset; }

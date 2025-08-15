@@ -1,0 +1,209 @@
+Option A — Fastest Managed Launch (Recommended)
+Frontend on Vercel, Backend on Render, Postgres on Neon, DNS with Cloudflare
+
+1) Create the required accounts
+GitHub (repo hosting)
+Vercel (frontend hosting)
+Render (backend hosting, supports WebSockets)
+Neon (managed Postgres) or Supabase (also fine)
+Cloudflare (DNS + TLS)
+2) Prepare production URLs
+Frontend: https://app.yourdomain.com
+Backend/API: https://api.yourdomain.com
+If you don’t have a domain yet:
+
+Buy a domain (e.g., Namecheap/Google Domains)
+Move DNS to Cloudflare (change nameservers)
+3) Database (Neon)
+Create a Neon Postgres project
+Create a database and user
+Copy the connection string (psql format) Example: postgresql://USER:PASS@HOST/dbname
+Keep this handy as DATABASE_URL
+4) Backend deploy (Render)
+In Render, create a “Web Service”
+Connect your GitHub repo, set “Root directory” to backend
+Build Command: pip install -r requirements.txt
+Start Command: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+Environment variables:
+DATABASE_URL = postgresql://USER:PASS@HOST/dbname
+ENV = production
+LOG_LEVEL = INFO
+OPTIONAL: any secrets your auth system needs later (JWT_SECRET, etc.)
+Important: CORS configuration
+
+In backend/app/main.py, the CORS allow_origins list is static. Add your production URLs there BEFORE deploying:
+https://app.yourdomain.com
+https://api.yourdomain.com (if needed)
+Commit and push so Render picks up the change.
+Test the backend after deployment:
+
+Open https://your-render-service.onrender.com/health
+If OK, set up a custom domain for Render (api.yourdomain.com) in Render’s dashboard and point Cloudflare DNS (CNAME) to the Render domain. Wait for SSL to provision.
+Seed demo content (once): POST https://api.yourdomain.com/api/learning/seed
+5) Frontend deploy (Vercel)
+Import the GitHub repo, set “Root directory” to frontend
+Set Environment Variables:
+REACT_APP_API_URL = https://api.yourdomain.com
+Build: Vercel will detect npm and build using your scripts (craco build)
+After deploy, attach your custom domain:
+app.yourdomain.com → Vercel project
+In Cloudflare: create CNAME for app.yourdomain.com → the Vercel domain Vercel shows
+If Cloudflare orange-proxy causes issues, temporarily set to “DNS only” while you verify
+6) DNS on Cloudflare
+Create CNAMEs:
+app.yourdomain.com → cname from Vercel
+api.yourdomain.com → cname from Render
+SSL/TLS mode: Full (strict) is ideal once both providers have valid certs
+Wait for DNS + TLS to propagate
+7) Verify end-to-end
+Backend health:
+GET https://api.yourdomain.com/health
+Seed data (one time):
+POST https://api.yourdomain.com/api/learning/seed
+Frontend:
+Visit https://app.yourdomain.com
+Go to Education → pick a lesson → Open
+Test Quiz/Assignment tabs
+WebSockets:
+Ensure charts/WS widget shows “connected” in the header
+8) Production hygiene
+Enable Neon backup/snapshots
+Protect Prometheus /metrics (currently exposed). Options:
+Cloudflare firewall rule to restrict /metrics
+Remove Instrumentator().expose(app) in production or gate it behind an env flag
+Add your production domains to CORS in backend/app/main.py and redeploy whenever you add new subdomains
+If you plan to accept file uploads for assignments:
+Use object storage (S3 or Backblaze B2)
+Configure signed upload URLs (next iteration)
+9) CI/CD
+Vercel auto-deploys on push to main
+Render can auto-deploy on push to main
+Add GitHub branch protection for main
+Optional: add a GitHub Actions workflow for backend tests on PR
+10) Admin and security
+Create an admin user flow (if needed) for forum moderation and course authoring
+Add rate limits (already present) and tune further if needed
+Ensure any auth-related secrets are set in backend service envs (JWT secret, etc.)
+Option B — Docker on a VM (Single host)
+If you prefer a single server (DigitalOcean/AWS Lightsail):
+
+Provision Ubuntu VM + domain on Cloudflare
+Install Docker + Compose
+Use Docker Compose to run:
+Backend container (uvicorn)
+Frontend Nginx container serving built static files
+Postgres container (or Neon external)
+Reverse proxy (Caddy or Nginx) with automatic TLS (e.g., Caddy makes this simpler)
+Set env:
+DATABASE_URL, REACT_APP_API_URL, etc.
+Bring up stack:
+docker compose up -d
+Seed:
+POST https://api.yourdomain.com/api/learning/seed
+This is more work to maintain (TLS renewals, metrics, logs), so only choose this if you need full control.
+
+Minimal launch-day checklist
+[ ] Backend deployed on https://api.yourdomain.com, health OK
+[ ] Frontend deployed on https://app.yourdomain.com, hitting the backend
+[ ] CORS list updated in backend for production URLs and redeployed
+[ ] DB backups enabled on Neon
+[ ] /metrics restricted or disabled
+[ ] Education data seeded; Education pages load
+[ ] WebSockets connected (status widget shows connected)
+[ ] Basic auth flow verified if you plan to require login on production
+Useful URLs to hit after launch
+Backend docs: https://api.yourdomain.com/api/docs
+Health: https://api.yourdomain.com/health
+Seed (one time): POST https://api.yourdomain.com/api/learning/seed
+Education page: https://app.yourdomain.com/education
+If you want, I can:
+
+Add an env-driven CORS setting (so you don’t need code changes for new domains)
+Add basic auth on /metrics
+Add a simple “admin” flag/role scaffold
+Add a Render/Neon/Vercel step-by-step with screenshots (text-only here, but I’ll provide exact forms/values)
+Tell me your domain, and I’ll prepare exact DNS records and the exact env values to paste into Render and Vercel.The best setup for fast, low-risk updates/upgrades/bug fixes is the Managed stack:
+
+Frontend: Vercel
+Backend: Render (supports WebSockets well)
+Database: Neon (or Supabase)
+DNS/TLS: Cloudflare
+Why this is best for maintenance
+
+Zero-downtime deploys by default
+Automatic preview deployments on each PR (isolated URLs)
+One‑click rollbacks if something breaks
+Built‑in CDN (Vercel) and TLS provisioning (Vercel/Render)
+Less ops to babysit vs a self-managed VM
+Recommended workflow for updates and bug fixes
+
+Branching and previews
+Protect main; work in feature branches
+Open a PR → you’ll get:
+Vercel preview URL for frontend
+Render PR Preview (enable in Render) for backend
+QA against preview URLs before merging
+Tests and CI
+GitHub Actions:
+Backend: run pytest (and mypy if you want)
+Frontend: typecheck and build (optionally jest)
+Block merge if CI fails
+Database migrations (safe pattern)
+Use Alembic for SQLAlchemy
+alembic revision --autogenerate -m "add X"
+alembic upgrade head
+Deploy flow:
+Staging: deploy → run alembic upgrade → smoke test
+Production: same order
+For risky changes, use expand/contract:
+Expand: add new columns nullable/backward-compatible
+Deploy app that reads both schemas
+Backfill data if needed
+Contract: drop old columns in a later release
+Deploy to production
+Merge PR → Vercel/Render auto-deploy
+Smoke test health and critical paths
+If issues: one-click rollback on Vercel/Render, then revert the PR
+Hotfix playbook
+Branch from main: hotfix/…
+Fix + add regression test
+PR → preview → merge → auto-deploy
+If DB change is involved, prefer a quick toggle or config-based fix and schedule migrations for later unless trivial and safe
+Dependency upgrades
+Enable Renovate or Dependabot (weekly batches)
+Test in preview/staging; roll out small increments (easier to roll back)
+Observability and error handling
+Keep Prometheus/Grafana for infra metrics
+Add Sentry (backend + frontend) for error tracking
+Uptime monitor (e.g., UptimeRobot) on /health and critical APIs
+Ensure structured logs (Loguru) and correlation IDs where possible
+Feature flags (for risky changes)
+Wrap new views/features with flags; enable gradually after deploy
+Can be as simple as env vars at first; scale to a flag service later
+Security & ops hygiene
+Cloudflare: WAF and rate limits
+Backend CORS: allow only your app domains (prod + preview)
+Rotate secrets in Render env vars; never commit them
+Gate /metrics behind auth or firewall rule
+Concrete next steps to enable smooth updates
+
+Turn on PR previews:
+Vercel: automatic for PRs
+Render: enable “Preview Environments” for your web service
+Add CI checks:
+Backend: pytest (and alembic check for heads)
+Frontend: tsc and build
+Add Alembic (if not already):
+pip install alembic
+alembic init alembic
+configure sqlalchemy.url to DATABASE_URL
+Add Sentry (optional but recommended)
+Document your hotfix steps in README so it’s repeatable
+If you want, I can:
+
+Add Alembic config + first migration
+Add GitHub Actions workflows for backend/frontend
+Add Render deploy hook to run alembic upgrade on deploy
+Add Sentry stubs and env wiring
+Add flexible CORS via env so preview domains “just work”
+Short answer: choose Vercel + Render + Neon. It gives you previews, auto-deploys, and rollbacks — the fastest path to ship fixes safely and often.

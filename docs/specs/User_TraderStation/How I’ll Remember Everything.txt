@@ -1,0 +1,17 @@
+How I’ll Remember Everything
+I maintain an evolving Project Memory Log in each reply.
+
+Whenever you introduce a new requirement or tweak, I’ll add it to that log and restate it back to you.
+
+I’ll flag “locked-in” items so we know they’re cemented into our design and won’t get accidentally dropped later.
+
+How You Can Help Me Lock In Details
+To make it foolproof, just follow these simple habits:
+
+Preface new ideas with “Remember:” e.g. “Remember: add voice-activated strategy toggles.”
+
+Call out items to “Forget” if you ever change your mind.
+
+Maintain a shared spec document (Google Doc or GitHub README). We both update it—then I can pull from it whenever we chat.
+
+Review the Memory Log at the start of each session to confirm nothing needs tweaking.

@@ -1,0 +1,128 @@
+CORE MODULES
+[ ] CamboStation™ Base Charting Engine (Streamlit + Plotly)
+
+[ ] Candlestick Pattern Recognition Module
+
+[ ] Journal Tab (with AI tagging + feedback engine)
+
+[ ] Modular Strategy Composer (Risk, Entry, Exit logic)
+
+[ ] Execution Console (trade trigger interface)
+
+🧠 AI INTELLIGENCE ENGINES
+[ ] AI SelectorTab (dropdown + auto-adapt toggle for engine choice)
+
+[ ] AI Role-Based Assignment System (e.g., ChatGPT = journal analysis; Grok = structural detection)
+
+[ ] Multi-Agent Voting Engine (collaborative signal generation + weighted confidence)
+
+[ ] Self-Questioning Engine (AI re-evaluates its own signals before release)
+
+[ ] Reverse Trade Synthesizer (user provides target, AI builds full setup backward)
+
+[ ] Trade Emotion Tracker (learns user behavior, adapts signal tuning)
+
+[ ] Strategy Composer Assistant (auto-generates full trade plans)
+
+[ ] Personal Strategy Architect (AI generates new systems from your journal + results)
+
+📊 MARKET STRUCTURE DETECTION
+[ ] Market Profile Detector (tags expansion, compression, chop zones)
+
+[ ] Structural Overlay Mapper (trendlines, zones, flags, squeezes)
+
+[ ] Regime-Aware Logic Adapter (auto-tunes strategy based on market behavior)
+
+🛰️ MICROSTRUCTURE INTELLIGENCE
+[ ] Level 2 / Level 3 Order Book Interpreter
+
+[ ] Time & Sales Analysis Engine
+
+[ ] Spoof Detection Logic
+
+[ ] Bid/Ask Imbalance Scanner
+
+[ ] Liquidity Withdrawal Detection
+
+[ ] Quote Behavior Tagging (quote stuffing, spread collapse tracking)
+
+💼 PARTICIPANT FINGERPRINTING SYSTEM
+[ ] Hedge Fund Behavior Model
+
+[ ] Bank Macro Behavior + Bias Engine
+
+[ ] Market Maker Flow Classifier
+
+[ ] Retail Trader Momentum Signal Tracker
+
+[ ] Insider Trade Tagger (Form 4 parser)
+
+[ ] Wall Street Analyst Sentiment Monitor
+
+🌐 SENTIMENT & MACRO INTELLIGENCE
+[ ] NLP Engine for Tweet/News Parsing
+
+[ ] Government/Fed Bias Tracker
+
+[ ] Institutional Theme Extractor
+
+[ ] Global Intelligence Pulse Dashboard (macro bias overlays)
+
+🎛️ COCKPIT UI FEATURES
+[ ] Multi-Tab Streamlit Interface (Dashboard, SelectorTab, Strategy Planner, etc.)
+
+[ ] Auto-Adaptive Engine Routing Toggle
+
+[ ] Voting Consensus Panel (see what every AI agent thinks)
+
+[ ] Setup Type Bias Selector (e.g. scalping, swing, fade, breakout)
+
+[ ] Asset Class Filter Toggle (options, futures, stocks, crypto, bonds, etc.)
+
+[ ] Strategy Theme Selector (conservative, aggressive, precision)
+
+🧬 ADVANCED BONUS SYSTEMS
+[ ] Self-Tuning AI Logic (learns from outcomes, improves over time)
+
+[ ] Trade Feedback Loop Engine (slippage, timing, fill rate analysis)
+
+[ ] Execution Companion Agent (suggests best order type per setup)
+
+[ ] Sentiment Fusion Engine (NLP + volume + structure merged)
+
+[ ] Context-Aware AI Narrator (“This EMA slope confirms low momentum”)
+
+🔮 FUTURE EXPANSION MODULES
+[ ] Multiverse Trade Simulator (alternate setup paths based on logic branches)
+
+[ ] Reverse Planner (give goal, AI builds entry)
+
+[ ] Market Narrative Theater (turns structure into storyline)
+
+[ ] External AI Portal Sync (compare ideas with other dashboards)
+
+[ ] Quantum Probability Matrix (confidence grid across setups & engines)
+
+[ ] Setup Entanglement Map (cross-timeframe setup detection engine)
+
+[ ] Save/Load Dashboard Profiles (based on mood, goal, or regime)
+
+🧠 ASSET CLASS INTELLIGENCE SYSTEM
+[ ] Dynamic Engine Assignment Per Asset Type (e.g., TradeGPT for options)
+
+[ ] Streamlit Dropdown UI: “Select Asset” (Stocks, Forex, Crypto, Futures, Bonds, etc.)
+
+[ ] Auto-Adapt AI Models Per Asset Class (custom signal logic)
+
+[ ] Asset-Specific Strategy Composer (tailored setups for each instrument)
+
+🧠 OPTIONAL ADD-ON ENHANCEMENTS
+[] Quantum Swarm Voting (AI consensus with role bias + performance weighting)
+
+[ ] Behavior Forecast Grid (estimates next moves by entity type)
+
+[ ] Market Pulse Heatmap (live chart overlays by participant intent)
+
+[ ] Adaptive Skeptic Mode (AI challenges its own assumptions)
+
+[ ] Strategy Personality Filters (scalper, sniper, intuitive, textbook)
