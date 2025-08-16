@@ -1,186 +1,117 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from typing import List, Dict
-import asyncio
+from __future__ import annotations
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
+from typing import Optional
 import json
-import yfinance as yf
-from datetime import datetime
 import logging
+from app.services.websocket_manager import manager, broadcaster
 
-router = APIRouter()
 logger = logging.getLogger(__name__)
+router = APIRouter()
 
-class ConnectionManager:
-    def __init__(self):
-        self.active_connections: List[WebSocket] = []
-        self.subscriptions: Dict[WebSocket, List[str]] = {}
-
-    async def connect(self, websocket: WebSocket):
-        await websocket.accept()
-        self.active_connections.append(websocket)
-        self.subscriptions[websocket] = []
-        logger.info(f"WebSocket connected. Total connections: {len(self.active_connections)}")
-
-    def disconnect(self, websocket: WebSocket):
-        if websocket in self.active_connections:
-            self.active_connections.remove(websocket)
-        if websocket in self.subscriptions:
-            del self.subscriptions[websocket]
-        logger.info(f"WebSocket disconnected. Total connections: {len(self.active_connections)}")
-
-    async def send_personal_message(self, message: str, websocket: WebSocket):
-        try:
-            await websocket.send_text(message)
-        except Exception as e:
-            logger.error(f"Error sending message to websocket: {e}")
-            self.disconnect(websocket)
-
-    async def broadcast(self, message: str):
-        disconnected = []
-        for connection in self.active_connections:
-            try:
-                await connection.send_text(message)
-            except Exception as e:
-                logger.error(f"Error broadcasting to websocket: {e}")
-                disconnected.append(connection)
-        
-        # Clean up disconnected connections
-        for conn in disconnected:
-            self.disconnect(conn)
-
-    async def send_to_subscribers(self, symbol: str, data: dict):
-        message = json.dumps({
-            "type": "price_update",
-            "symbol": symbol,
-            "data": data,
-            "timestamp": datetime.now().isoformat()
-        })
-        
-        disconnected = []
-        for websocket, symbols in self.subscriptions.items():
-            if symbol in symbols:
-                try:
-                    await websocket.send_text(message)
-                except Exception as e:
-                    logger.error(f"Error sending to subscriber: {e}")
-                    disconnected.append(websocket)
-        
-        # Clean up disconnected connections
-        for conn in disconnected:
-            self.disconnect(conn)
-
-    def subscribe(self, websocket: WebSocket, symbols: List[str]):
-        if websocket in self.subscriptions:
-            self.subscriptions[websocket].extend(symbols)
-            # Remove duplicates
-            self.subscriptions[websocket] = list(set(self.subscriptions[websocket]))
-
-    def unsubscribe(self, websocket: WebSocket, symbols: List[str]):
-        if websocket in self.subscriptions:
-            for symbol in symbols:
-                if symbol in self.subscriptions[websocket]:
-                    self.subscriptions[websocket].remove(symbol)
-
-manager = ConnectionManager()
-
-@router.websocket("/prices")
-async def websocket_endpoint(websocket: WebSocket):
-    await manager.connect(websocket)
+@router.websocket("/ws")
+async def websocket_endpoint(
+    websocket: WebSocket,
+    connection_id: Optional[str] = Query(None)
+):
+    """
+    Main WebSocket endpoint for real-time CamboAI updates.
+    
+    Supported message types:
+    - subscribe: {"type": "subscribe", "topic": "prices|alerts|sentiment|prices_AAPL"}
+    - unsubscribe: {"type": "unsubscribe", "topic": "topic_name"}
+    - ping: {"type": "ping"}
+    """
+    
+    connection_id = await manager.connect(websocket, connection_id)
+    
     try:
+        # Start broadcasting if not already running
+        await broadcaster.start_broadcasting()
+        
+        # Send welcome message
+        await manager.send_personal_message({
+            "type": "connection_established",
+            "connection_id": connection_id,
+            "message": "Connected to CamboAI real-time feed"
+        }, connection_id)
+        
         while True:
+            # Receive message from client
             data = await websocket.receive_text()
-            message = json.loads(data)
             
-            if message["type"] == "subscribe":
-                symbols = message.get("symbols", [])
-                manager.subscribe(websocket, symbols)
-                await manager.send_personal_message(
-                    json.dumps({
-                        "type": "subscription_confirmed",
-                        "symbols": symbols,
-                        "message": f"Subscribed to {len(symbols)} symbols"
-                    }),
-                    websocket
-                )
-            
-            elif message["type"] == "unsubscribe":
-                symbols = message.get("symbols", [])
-                manager.unsubscribe(websocket, symbols)
-                await manager.send_personal_message(
-                    json.dumps({
-                        "type": "unsubscription_confirmed",
-                        "symbols": symbols,
-                        "message": f"Unsubscribed from {len(symbols)} symbols"
-                    }),
-                    websocket
-                )
+            try:
+                message = json.loads(data)
+                message_type = message.get("type", "")
+                
+                if message_type == "subscribe":
+                    topic = message.get("topic", "")
+                    if topic:
+                        success = await manager.subscribe(connection_id, topic)
+                        await manager.send_personal_message({
+                            "type": "subscription_response",
+                            "topic": topic,
+                            "subscribed": success
+                        }, connection_id)
+                        
+                elif message_type == "unsubscribe":
+                    topic = message.get("topic", "")
+                    if topic:
+                        await manager.unsubscribe(connection_id, topic)
+                        await manager.send_personal_message({
+                            "type": "unsubscription_response", 
+                            "topic": topic,
+                            "unsubscribed": True
+                        }, connection_id)
+                        
+                elif message_type == "ping":
+                    await manager.send_personal_message({
+                        "type": "pong",
+                        "timestamp": message.get("timestamp", "")
+                    }, connection_id)
+                    
+                elif message_type == "get_stats":
+                    stats = manager.get_stats()
+                    await manager.send_personal_message({
+                        "type": "stats",
+                        "data": stats
+                    }, connection_id)
+                    
+                else:
+                    await manager.send_personal_message({
+                        "type": "error",
+                        "message": f"Unknown message type: {message_type}"
+                    }, connection_id)
+                    
+            except json.JSONDecodeError:
+                await manager.send_personal_message({
+                    "type": "error",
+                    "message": "Invalid JSON message"
+                }, connection_id)
+                
+            except Exception as e:
+                logger.error(f"Error processing message: {e}")
+                await manager.send_personal_message({
+                    "type": "error",
+                    "message": f"Message processing error: {str(e)}"
+                }, connection_id)
                 
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
+        logger.info(f"WebSocket disconnected: {connection_id}")
     except Exception as e:
-        logger.error(f"WebSocket error: {e}")
-        manager.disconnect(websocket)
+        logger.error(f"WebSocket error for {connection_id}: {e}")
+    finally:
+        manager.disconnect(connection_id)
 
-@router.websocket("/portfolio")
-async def portfolio_websocket(websocket: WebSocket):
-    await manager.connect(websocket)
-    try:
-        while True:
-            # Send portfolio updates every 5 seconds
-            await asyncio.sleep(5)
-            
-            # In a real implementation, this would fetch actual portfolio changes
-            portfolio_update = {
-                "type": "portfolio_update",
-                "timestamp": datetime.now().isoformat(),
-                "total_value": 125000.00,  # Mock data
-                "daily_pnl": 2500.00,
-                "positions_updated": ["AAPL", "MSFT", "GOOGL"]
-            }
-            
-            await manager.send_personal_message(
-                json.dumps(portfolio_update),
-                websocket
-            )
-            
-    except WebSocketDisconnect:
-        manager.disconnect(websocket)
-    except Exception as e:
-        logger.error(f"Portfolio WebSocket error: {e}")
-        manager.disconnect(websocket)
+@router.get("/ws/stats")
+async def get_websocket_stats():
+    """Get WebSocket connection statistics."""
+    return manager.get_stats()
 
-# Background task to fetch and broadcast real-time price updates
-async def price_update_task():
-    """Background task to fetch and broadcast price updates"""
-    while True:
-        try:
-            # Get all unique subscribed symbols
-            all_symbols = set()
-            for symbols in manager.subscriptions.values():
-                all_symbols.update(symbols)
-            
-            if all_symbols:
-                for symbol in all_symbols:
-                    try:
-                        ticker = yf.Ticker(symbol)
-                        data = ticker.history(period="1d", interval="1m")
-                        
-                        if not data.empty:
-                            latest = data.iloc[-1]
-                            price_data = {
-                                "price": round(float(latest['Close']), 2),
-                                "volume": int(latest['Volume']),
-                                "high": round(float(latest['High']), 2),
-                                "low": round(float(latest['Low']), 2),
-                                "open": round(float(latest['Open']), 2)
-                            }
-                            
-                            await manager.send_to_subscribers(symbol, price_data)
-                    
-                    except Exception as e:
-                        logger.error(f"Error fetching price for {symbol}: {e}")
-            
-            await asyncio.sleep(10)  # Update every 10 seconds
-            
-        except Exception as e:
-            logger.error(f"Error in price update task: {e}")
-            await asyncio.sleep(30)  # Wait longer on error
+@router.post("/ws/broadcast")
+async def broadcast_message(message: dict, topic: str):
+    """
+    Broadcast custom message to topic subscribers.
+    Admin/testing endpoint.
+    """
+    count = await manager.broadcast_to_topic(message, topic)
+    return {"message": "Broadcast sent", "recipients": count, "topic": topic}

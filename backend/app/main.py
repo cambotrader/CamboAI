@@ -110,7 +110,11 @@ app.include_router(learning.router)
 from app.api import patterns as patterns_router, news as news_router, sentiment as sentiment_router
 from app.api.options import router as options_api_router
 from app.api.options.hedging_router import router as hedging_api_router
+from app.api import news_sentiment as news_sentiment_router
 app.include_router(ws_router.router, prefix="/ws", tags=["WebSocket"])
+# Real-time WebSocket endpoint
+from app.api import websocket as realtime_ws
+app.include_router(realtime_ws.router, prefix="/api", tags=["Real-time"])
 app.include_router(modules_router.router)
 app.include_router(admin_router.router)
 # New API routes
