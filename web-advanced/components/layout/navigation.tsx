@@ -61,10 +61,34 @@ const navigation = [
     description: 'AI-powered market sentiment'
   },
   {
-    name: 'Analytics',
-    href: '/dashboard/analytics',
-    icon: BarChart3,
-    description: 'Performance analytics'
+    name: 'Portfolio',
+    href: '/dashboard/portfolio',
+    icon: PieChart,
+    description: 'Portfolio management & analysis'
+  },
+  {
+    name: 'Risk',
+    href: '/dashboard/risk',
+    icon: Target,
+    description: 'Risk management & VaR'
+  },
+  {
+    name: 'Trading',
+    href: '/dashboard/trading',
+    icon: Activity,
+    description: 'Order execution & management'
+  },
+  {
+    name: 'War Room',
+    href: '/dashboard/warroom',
+    icon: Brain,
+    description: 'AI agent debates & analysis'
+  },
+  {
+    name: 'Learning',
+    href: '/dashboard/learning',
+    icon: Zap,
+    description: 'Trading courses & education'
   }
 ];
 
