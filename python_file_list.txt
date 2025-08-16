@@ -1,0 +1,63 @@
+d:\CamboAI\test_server.py
+- Test script for server functionality
+
+d:\CamboAI\test_imports.py
+- Test script for Python imports
+
+d:\CamboAI\dashboard\utils\api.py
+- Dashboard API utilities
+
+d:\CamboAI\dashboard\app.py
+- Main dashboard application
+
+d:\CamboAI\dashboard\components\indicators.py
+- Financial indicators component
+
+d:\CamboAI\dashboard\components\chart.py
+- Charting component for dashboard
+
+d:\CamboAI\backend\tests\test_modules_api.py
+- Unit test for backend API modules
+
+d:\CamboAI\backend\tests\test_metrics.py
+- Unit test for backend metrics
+
+d:\CamboAI\backend\tests\test_health.py
+- Unit test for backend health checks
+
+d:\CamboAI\backend\simple_server.py
+- Simplified backend server
+
+d:\CamboAI\camboai\test_server.py
+- Test script for server functionality (duplicate in camboai)
+
+d:\CamboAI\camboai\test_imports.py
+- Test script for Python imports (duplicate in camboai)
+
+d:\CamboAI\backend\app\services\spec_ingest.py
+- Service for ingesting specifications
+
+d:\CamboAI\backend\app\services\scheduler.py
+- Task scheduling service
+
+d:\CamboAI\backend\app\services\risk_service.py
+- Risk management service
+
+d:\CamboAI\backend\app\services\redis_service.py
+- Redis database service
+
+d:\CamboAI\backend\app\services\progress_service.py
+- Progress tracking service
+
+d:\CamboAI\backend\app\services\pii_moderator.py
+- PII moderation service
+
+d:\CamboAI\backend\app\services\pattern_catalog.py
+- Pattern catalog service
+
+d:\CamboAI\backend\app\services\patterns.py
+- Pattern matching service
+
+... (and more)
+
+This file lists Python files and their purpose. For the full list, see project documentation or request a specific directory summary.

@@ -1,0 +1,347 @@
+filename,description,benefit_or_use
+d:\CamboAI\test_server.py,Test script for server functionality
+d:\CamboAI\test_server.py,Test script for server functionality,Helps verify that the backend server is running and responding correctly; useful for debugging and testing server endpoints.
+d:\CamboAI\test_imports.py,Test script for checking Python imports
+d:\CamboAI\test_imports.py,Test script for checking Python imports,Ensures all required Python modules are installed and importable; helps catch missing dependencies early.
+d:\CamboAI\backend\tests\test_modules_api.py,Unit test for backend API modules
+d:\CamboAI\backend\tests\test_metrics.py,Unit test for backend metrics
+d:\CamboAI\backend\tests\test_health.py,Unit test for backend health checks
+d:\CamboAI\backend\simple_server.py,Simplified backend server implementation
+d:\CamboAI\backend\app\core\metrics.py,Core metrics logic
+d:\CamboAI\backend\app\core\logging.py,Logging utilities
+d:\CamboAI\backend\app\main_simple.py,Main entry for simple backend
+d:\CamboAI\backend\app\main.py,Main entry for backend
+d:\CamboAI\backend\app\database_simple.py,Simple database logic
+d:\CamboAI\backend\app\database.py,Database logic
+d:\CamboAI\backend\app\models\memory.py,Memory model definitions
+d:\CamboAI\backend\app\models\learning.py,Learning model definitions
+d:\CamboAI\backend\app\models\social.py,Social model definitions
+d:\CamboAI\camboai\backend\app\core\metrics.py,Core metrics logic (camboai)
+d:\CamboAI\camboai\backend\app\core\logging.py,Logging utilities (camboai)
+d:\CamboAI\camboai\backend\app\main_simple.py,Main entry for simple backend (camboai)
+d:\CamboAI\camboai\backend\app\main.py,Main entry for backend (camboai)
+d:\CamboAI\camboai\backend\app\database_simple.py,Simple database logic (camboai)
+d:\CamboAI\camboai\backend\app\database.py,Database logic (camboai)
+d:\CamboAI\camboai\backend\app\models\memory.py,Memory model definitions (camboai)
+d:\CamboAI\camboai\backend\app\models\learning.py,Learning model definitions (camboai)
+d:\CamboAI\camboai\backend\app\models\social.py,Social model definitions (camboai)
+d:\CamboAI\backend\app\services\spec_ingest.py,Service for ingesting specifications
+d:\CamboAI\backend\app\services\scheduler.py,Task scheduling service
+d:\CamboAI\backend\app\services\risk_service.py,Risk management service
+d:\CamboAI\backend\app\services\redis_service.py,Redis database service
+d:\CamboAI\backend\app\services\progress_service.py,Progress tracking service
+d:\CamboAI\backend\app\services\pii_moderator.py,PII moderation service
+d:\CamboAI\backend\app\services\pattern_catalog.py,Pattern catalog service
+d:\CamboAI\backend\app\services\patterns.py,Pattern matching service
+d:\CamboAI\backend\app\services\news_sentiment.py,News sentiment analysis service
+d:\CamboAI\backend\app\services\memory_service.py,Memory/state management service
+d:\CamboAI\backend\app\services\llm_provider.py,Large language model provider service
+d:\CamboAI\backend\app\services\keys.py,API keys/credentials management service
+d:\CamboAI\backend\app\services\feeds.py,Data feeds service
+d:\CamboAI\backend\app\services\database_service.py,Database service
+d:\CamboAI\backend\app\services\chart_patterns.py,Chart patterns service
+d:\CamboAI\backend\app\services\cache_service.py,Cache management service
+d:\CamboAI\backend\app\services\broker_service.py,Broker service for trading
+d:\CamboAI\backend\app\security\security_service.py,Security service logic
+d:\CamboAI\backend\app\security\middleware.py,Security middleware
+d:\CamboAI\backend\app\models\social.py,Social model definitions
+d:\CamboAI\backend\app\models\memory.py,Memory model definitions
+d:\CamboAI\backend\app\models\learning.py,Learning model definitions
+d:\CamboAI\backend\app\main_simple.py,Main entry for simple backend
+d:\CamboAI\backend\app\main.py,Main entry for backend
+d:\CamboAI\backend\app\database_simple.py,Simple database logic
+d:\CamboAI\backend\app\database.py,Database logic
+d:\CamboAI\backend\app\core\metrics.py,Core metrics logic
+d:\CamboAI\backend\app\core\logging.py,Logging utilities
+d:\CamboAI\backend\app\api\websocket.py,WebSocket API handler
+d:\CamboAI\backend\app\api\war_room.py,War room API handler
+d:\CamboAI\backend\app\api\transactions.py,Transactions API handler
+d:\CamboAI\backend\app\api\trading.py,Trading API handler
+d:\CamboAI\backend\app\api\sentiment.py,Sentiment API handler
+d:\CamboAI\backend\app\api\risk.py,Risk API handler
+d:\CamboAI\backend\app\api\portfolio.py,Portfolio API handler
+d:\CamboAI\backend\app\api\patterns.py,Patterns API handler
+d:\CamboAI\backend\app\api\news.py,News API handler
+d:\CamboAI\backend\app\api\modules.py,Modules API handler
+d:\CamboAI\backend\app\api\market_data.py,Market data API handler
+d:\CamboAI\camboai\test_server.py,Test script for server functionality (camboai)
+d:\CamboAI\camboai\test_imports.py,Test script for checking Python imports (camboai)
+d:\CamboAI\camboai\dashboard\utils\api.py,Utility functions for dashboard API (camboai)
+d:\CamboAI\camboai\dashboard\components\indicators.py,Financial indicators component for dashboard (camboai)
+d:\CamboAI\camboai\dashboard\components\chart.py,Charting component for dashboard (camboai)
+d:\CamboAI\camboai\dashboard\app.py,Main dashboard application entry point (camboai)
+d:\CamboAI\camboai\camboai\test_server.py,Test script for server functionality (camboai/camboai)
+d:\CamboAI\camboai\camboai\test_imports.py,Test script for checking Python imports (camboai/camboai)
+d:\CamboAI\camboai\camboai\dashboard\utils\api.py,Utility functions for dashboard API (camboai/camboai)
+d:\CamboAI\camboai\camboai\dashboard\components\indicators.py,Financial indicators component for dashboard (camboai/camboai)
+d:\CamboAI\camboai\camboai\dashboard\components\chart.py,Charting component for dashboard (camboai/camboai)
+d:\CamboAI\camboai\camboai\dashboard\app.py,Main dashboard application entry point (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\tests\test_modules_api.py,Unit test for backend API modules (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\tests\test_metrics.py,Unit test for backend metrics (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\tests\test_health.py,Unit test for backend health checks (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\keys.py,API keys/credentials management service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\models\memory.py,Memory model definitions (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\feeds.py,Data feeds service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\models\learning.py,Learning model definitions (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\database_service.py,Database service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\security\security_service.py,Security service logic (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\chart_patterns.py,Chart patterns service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\security\middleware.py,Security middleware (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\llm_provider.py,Large language model provider service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\models\social.py,Social model definitions (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\cache_service.py,Cache management service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\broker_service.py,Broker service for trading (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\main_simple.py,Main entry for simple backend (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\main.py,Main entry for backend (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\database_simple.py,Simple database logic (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\database.py,Database logic (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\memory_service.py,Memory/state management service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\news_sentiment.py,News sentiment analysis service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\spec_ingest.py,Service for ingesting specifications (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\scheduler.py,Task scheduling service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\risk_service.py,Risk management service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\redis_service.py,Redis database service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\progress_service.py,Progress tracking service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\pii_moderator.py,PII moderation service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\pattern_catalog.py,Pattern catalog service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\patterns.py,Pattern matching service (camboai/camboai)
+d:\CamboAI\backend\tests\test_metrics.py,Unit test for backend metrics
+d:\CamboAI\backend\tests\test_health.py,Unit test for backend health checks
+d:\CamboAI\backend\app\api\community_chat.py,Community chat API handler
+d:\CamboAI\backend\app\api\coach.py,Coach API handler
+d:\CamboAI\backend\app\api\auth.py,Authentication API handler
+d:\CamboAI\backend\app\api\analysis.py,Analysis API handler
+d:\CamboAI\backend\app\api\admin.py,Admin API handler
+d:\CamboAI\test_imports.py,Test script for checking Python imports
+d:\CamboAI\test_server.py,Test script for server functionality
+d:\CamboAI\backend\alembic\env.py,Alembic migration environment
+d:\CamboAI\camboai\camboai\backend\app\api\modules.py,Modules API handler (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\api\market_data.py,Market data API handler (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\api\learning.py,Learning API handler (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\api\community_chat.py,Community chat API handler (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\alembic\env.py,Alembic migration environment (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\api\coach.py,Coach API handler (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\api\auth.py,Authentication API handler (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\api\analysis.py,Analysis API handler (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\api\admin.py,Admin API handler (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\api\news.py,News API handler (camboai/camboai)
+d:\CamboAI\camboai\backend\tests\test_modules_api.py,Unit test for backend API modules (camboai)
+d:\CamboAI\camboai\backend\tests\test_metrics.py,Unit test for backend metrics (camboai)
+d:\CamboAI\camboai\backend\tests\test_health.py,Unit test for backend health checks (camboai)
+d:\CamboAI\camboai\backend\simple_server.py,Simplified backend server implementation (camboai)
+d:\CamboAI\camboai\backend\app\services\spec_ingest.py,Service for ingesting specifications (camboai)
+d:\CamboAI\camboai\backend\app\services\scheduler.py,Task scheduling service (camboai)
+d:\CamboAI\camboai\backend\app\services\risk_service.py,Risk management service (camboai)
+d:\CamboAI\camboai\backend\app\services\redis_service.py,Redis database service (camboai)
+d:\CamboAI\camboai\backend\app\services\progress_service.py,Progress tracking service (camboai)
+d:\CamboAI\camboai\backend\app\services\pii_moderator.py,PII moderation service (camboai)
+d:\CamboAI\camboai\backend\app\services\pattern_catalog.py,Pattern catalog service (camboai)
+d:\CamboAI\camboai\backend\app\services\patterns.py,Pattern matching service (camboai)
+d:\CamboAI\camboai\backend\app\services\news_sentiment.py,News sentiment analysis service (camboai)
+d:\CamboAI\camboai\backend\app\services\memory_service.py,Memory/state management service (camboai)
+d:\CamboAI\camboai\backend\app\services\llm_provider.py,Large language model provider service (camboai)
+d:\CamboAI\camboai\backend\app\services\keys.py,API keys/credentials management service (camboai)
+d:\CamboAI\camboai\backend\app\services\feeds.py,Data feeds service (camboai)
+d:\CamboAI\camboai\backend\app\services\database_service.py,Database service (camboai)
+d:\CamboAI\camboai\backend\app\services\chart_patterns.py,Chart patterns service (camboai)
+d:\CamboAI\camboai\backend\app\services\cache_service.py,Cache management service (camboai)
+d:\CamboAI\camboai\backend\app\services\broker_service.py,Broker service for trading (camboai)
+d:\CamboAI\camboai\backend\app\security\security_service.py,Security service logic (camboai)
+d:\CamboAI\camboai\backend\app\security\middleware.py,Security middleware (camboai)
+d:\CamboAI\camboai\backend\app\models\social.py,Social model definitions (camboai)
+d:\CamboAI\camboai\backend\app\models\memory.py,Memory model definitions (camboai)
+d:\CamboAI\camboai\backend\app\models\learning.py,Learning model definitions (camboai)
+d:\CamboAI\camboai\backend\app\main_simple.py,Main entry for simple backend (camboai)
+d:\CamboAI\camboai\backend\app\main.py,Main entry for backend (camboai)
+d:\CamboAI\camboai\backend\app\database_simple.py,Simple database logic (camboai)
+d:\CamboAI\camboai\backend\app\database.py,Database logic (camboai)
+d:\CamboAI\camboai\backend\app\core\metrics.py,Core metrics logic (camboai)
+d:\CamboAI\camboai\backend\app\core\logging.py,Logging utilities (camboai)
+d:\CamboAI\camboai\backend\app\api\websocket.py,WebSocket API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\war_room.py,War room API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\transactions.py,Transactions API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\trading.py,Trading API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\sentiment.py,Sentiment API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\risk.py,Risk API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\portfolio.py,Portfolio API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\patterns.py,Patterns API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\news.py,News API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\modules.py,Modules API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\market_data.py,Market data API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\learning.py,Learning API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\community_chat.py,Community chat API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\coach.py,Coach API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\auth.py,Authentication API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\analysis.py,Analysis API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\admin.py,Admin API handler (camboai)
+d:\CamboAI\camboai\backend\alembic\env.py,Alembic migration environment (camboai)
+d:\CamboAI\dashboard\utils\api.py,Utility functions for dashboard API
+d:\CamboAI\dashboard\utils\api.py,Utility functions for dashboard API,Provides reusable functions for API calls from the dashboard; simplifies communication between frontend and backend.
+d:\CamboAI\dashboard\components\indicators.py,Financial indicators component for dashboard
+d:\CamboAI\dashboard\components\indicators.py,Financial indicators component for dashboard,Displays key financial metrics and indicators to users; enhances the dashboard’s analytical capabilities.
+d:\CamboAI\dashboard\components\chart.py,Charting component for dashboard
+d:\CamboAI\dashboard\components\chart.py,Charting component for dashboard,Enables visualization of trading data and analytics; helps users interpret trends and patterns.
+d:\CamboAI\dashboard\app.py,Main dashboard application entry point
+d:\CamboAI\dashboard\app.py,Main dashboard application entry point,Launches the dashboard web app; central for user interaction with CamboAI.
+d:\CamboAI\backend\tests\test_modules_api.py,Unit test for backend API modules
+d:\CamboAI\backend\tests\test_modules_api.py,Unit test for backend API modules,Validates the functionality of backend API modules; ensures reliability and correctness of API endpoints.
+d:\CamboAI\backend\tests\test_metrics.py,Unit test for backend metrics
+d:\CamboAI\backend\tests\test_metrics.py,Unit test for backend metrics,Tests the metrics logic in the backend; helps maintain accurate performance and analytics reporting.
+d:\CamboAI\backend\tests\test_health.py,Unit test for backend health checks
+d:\CamboAI\backend\tests\test_health.py,Unit test for backend health checks,Checks the health endpoints and system status; useful for monitoring and maintenance.
+d:\CamboAI\backend\simple_server.py,Simplified backend server implementation
+d:\CamboAI\backend\simple_server.py,Simplified backend server implementation,Provides a lightweight version of the backend server; useful for quick testing and development.
+d:\CamboAI\backend\app\services\spec_ingest.py,Service for ingesting specifications
+d:\CamboAI\backend\app\services\scheduler.py,Task scheduling service
+d:\CamboAI\backend\app\services\risk_service.py,Risk management service
+d:\CamboAI\backend\app\services\redis_service.py,Redis database service
+d:\CamboAI\backend\app\services\progress_service.py,Progress tracking service
+d:\CamboAI\backend\app\services\pii_moderator.py,PII moderation service
+d:\CamboAI\backend\app\services\pattern_catalog.py,Pattern catalog service
+d:\CamboAI\backend\app\services\patterns.py,Pattern matching service
+d:\CamboAI\backend\app\services\news_sentiment.py,News sentiment analysis service
+d:\CamboAI\backend\app\services\memory_service.py,Memory/state management service
+d:\CamboAI\backend\app\services\llm_provider.py,Large language model provider service
+d:\CamboAI\backend\app\services\keys.py,API keys/credentials management service
+d:\CamboAI\backend\app\services\feeds.py,Data feeds service
+d:\CamboAI\backend\app\services\database_service.py,Database service
+d:\CamboAI\backend\app\services\chart_patterns.py,Chart patterns service
+d:\CamboAI\backend\app\services\cache_service.py,Cache management service
+d:\CamboAI\backend\app\services\broker_service.py,Broker service for trading
+d:\CamboAI\backend\app\security\security_service.py,Security service logic
+d:\CamboAI\backend\app\security\middleware.py,Security middleware
+d:\CamboAI\backend\app\models\social.py,Social model definitions
+d:\CamboAI\backend\app\models\memory.py,Memory model definitions
+d:\CamboAI\backend\app\models\learning.py,Learning model definitions
+d:\CamboAI\backend\app\main_simple.py,Main entry for simple backend
+d:\CamboAI\backend\app\main.py,Main entry for backend
+d:\CamboAI\backend\app\database_simple.py,Simple database logic
+d:\CamboAI\backend\app\database.py,Database logic
+d:\CamboAI\backend\app\core\metrics.py,Core metrics logic
+d:\CamboAI\backend\app\core\logging.py,Logging utilities
+d:\CamboAI\backend\app\api\websocket.py,WebSocket API handler
+d:\CamboAI\backend\app\api\war_room.py,War room API handler
+d:\CamboAI\backend\app\api\transactions.py,Transactions API handler
+d:\CamboAI\backend\app\api\trading.py,Trading API handler
+d:\CamboAI\backend\app\api\sentiment.py,Sentiment API handler
+d:\CamboAI\backend\app\api\risk.py,Risk API handler
+d:\CamboAI\backend\app\api\portfolio.py,Portfolio API handler
+d:\CamboAI\backend\app\api\patterns.py,Patterns API handler
+d:\CamboAI\backend\app\api\news.py,News API handler
+d:\CamboAI\backend\app\api\modules.py,Modules API handler
+d:\CamboAI\backend\app\api\market_data.py,Market data API handler
+d:\CamboAI\camboai\test_server.py,Test script for server functionality (camboai)
+d:\CamboAI\camboai\test_imports.py,Test script for checking Python imports (camboai)
+d:\CamboAI\camboai\dashboard\utils\api.py,Utility functions for dashboard API (camboai)
+d:\CamboAI\camboai\dashboard\components\indicators.py,Financial indicators component for dashboard (camboai)
+d:\CamboAI\camboai\dashboard\components\chart.py,Charting component for dashboard (camboai)
+d:\CamboAI\camboai\dashboard\app.py,Main dashboard application entry point (camboai)
+d:\CamboAI\camboai\camboai\test_server.py,Test script for server functionality (camboai/camboai)
+d:\CamboAI\camboai\camboai\test_imports.py,Test script for checking Python imports (camboai/camboai)
+d:\CamboAI\camboai\camboai\dashboard\utils\api.py,Utility functions for dashboard API (camboai/camboai)
+d:\CamboAI\camboai\camboai\dashboard\components\indicators.py,Financial indicators component for dashboard (camboai/camboai)
+d:\CamboAI\camboai\camboai\dashboard\components\chart.py,Charting component for dashboard (camboai/camboai)
+d:\CamboAI\camboai\camboai\dashboard\app.py,Main dashboard application entry point (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\tests\test_modules_api.py,Unit test for backend API modules (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\tests\test_metrics.py,Unit test for backend metrics (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\tests\test_health.py,Unit test for backend health checks (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\keys.py,API keys/credentials management service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\models\memory.py,Memory model definitions (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\feeds.py,Data feeds service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\models\learning.py,Learning model definitions (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\database_service.py,Database service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\security\security_service.py,Security service logic (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\chart_patterns.py,Chart patterns service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\security\middleware.py,Security middleware (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\llm_provider.py,Large language model provider service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\models\social.py,Social model definitions (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\cache_service.py,Cache management service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\broker_service.py,Broker service for trading (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\main_simple.py,Main entry for simple backend (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\main.py,Main entry for backend (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\database_simple.py,Simple database logic (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\database.py,Database logic (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\memory_service.py,Memory/state management service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\news_sentiment.py,News sentiment analysis service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\spec_ingest.py,Service for ingesting specifications (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\scheduler.py,Task scheduling service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\risk_service.py,Risk management service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\redis_service.py,Redis database service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\progress_service.py,Progress tracking service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\pii_moderator.py,PII moderation service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\pattern_catalog.py,Pattern catalog service (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\services\patterns.py,Pattern matching service (camboai/camboai)
+d:\CamboAI\backend\tests\test_metrics.py,Unit test for backend metrics
+d:\CamboAI\backend\tests\test_health.py,Unit test for backend health checks
+d:\CamboAI\backend\app\api\community_chat.py,Community chat API handler
+d:\CamboAI\backend\app\api\coach.py,Coach API handler
+d:\CamboAI\backend\app\api\auth.py,Authentication API handler
+d:\CamboAI\backend\app\api\analysis.py,Analysis API handler
+d:\CamboAI\backend\app\api\admin.py,Admin API handler
+d:\CamboAI\backend\alembic\env.py,Alembic migration environment
+d:\CamboAI\camboai\camboai\backend\app\api\modules.py,Modules API handler (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\api\market_data.py,Market data API handler (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\api\learning.py,Learning API handler (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\api\community_chat.py,Community chat API handler (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\alembic\env.py,Alembic migration environment (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\api\coach.py,Coach API handler (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\api\auth.py,Authentication API handler (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\api\analysis.py,Analysis API handler (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\api\admin.py,Admin API handler (camboai/camboai)
+d:\CamboAI\camboai\camboai\backend\app\api\news.py,News API handler (camboai/camboai)
+d:\CamboAI\camboai\backend\tests\test_modules_api.py,Unit test for backend API modules (camboai)
+d:\CamboAI\camboai\backend\tests\test_metrics.py,Unit test for backend metrics (camboai)
+d:\CamboAI\camboai\backend\tests\test_health.py,Unit test for backend health checks (camboai)
+d:\CamboAI\camboai\backend\simple_server.py,Simplified backend server implementation (camboai)
+d:\CamboAI\camboai\backend\app\services\spec_ingest.py,Service for ingesting specifications (camboai)
+d:\CamboAI\camboai\backend\app\services\scheduler.py,Task scheduling service (camboai)
+d:\CamboAI\camboai\backend\app\services\risk_service.py,Risk management service (camboai)
+d:\CamboAI\camboai\backend\app\services\redis_service.py,Redis database service (camboai)
+d:\CamboAI\camboai\backend\app\services\progress_service.py,Progress tracking service (camboai)
+d:\CamboAI\camboai\backend\app\services\pii_moderator.py,PII moderation service (camboai)
+d:\CamboAI\camboai\backend\app\services\pattern_catalog.py,Pattern catalog service (camboai)
+d:\CamboAI\camboai\backend\app\services\patterns.py,Pattern matching service (camboai)
+d:\CamboAI\camboai\backend\app\services\news_sentiment.py,News sentiment analysis service (camboai)
+d:\CamboAI\camboai\backend\app\services\memory_service.py,Memory/state management service (camboai)
+d:\CamboAI\camboai\backend\app\services\llm_provider.py,Large language model provider service (camboai)
+d:\CamboAI\camboai\backend\app\services\keys.py,API keys/credentials management service (camboai)
+d:\CamboAI\camboai\backend\app\services\feeds.py,Data feeds service (camboai)
+d:\CamboAI\camboai\backend\app\services\database_service.py,Database service (camboai)
+d:\CamboAI\camboai\backend\app\services\chart_patterns.py,Chart patterns service (camboai)
+d:\CamboAI\camboai\backend\app\services\cache_service.py,Cache management service (camboai)
+d:\CamboAI\camboai\backend\app\services\broker_service.py,Broker service for trading (camboai)
+d:\CamboAI\camboai\backend\app\security\security_service.py,Security service logic (camboai)
+d:\CamboAI\camboai\backend\app\security\middleware.py,Security middleware (camboai)
+d:\CamboAI\camboai\backend\app\models\social.py,Social model definitions (camboai)
+d:\CamboAI\camboai\backend\app\models\memory.py,Memory model definitions (camboai)
+d:\CamboAI\camboai\backend\app\models\learning.py,Learning model definitions (camboai)
+d:\CamboAI\camboai\backend\app\main_simple.py,Main entry for simple backend (camboai)
+d:\CamboAI\camboai\backend\app\main.py,Main entry for backend (camboai)
+d:\CamboAI\camboai\backend\app\database_simple.py,Simple database logic (camboai)
+d:\CamboAI\camboai\backend\app\database.py,Database logic (camboai)
+d:\CamboAI\camboai\backend\app\core\metrics.py,Core metrics logic (camboai)
+d:\CamboAI\camboai\backend\app\core\logging.py,Logging utilities (camboai)
+d:\CamboAI\camboai\backend\app\api\websocket.py,WebSocket API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\war_room.py,War room API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\transactions.py,Transactions API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\trading.py,Trading API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\sentiment.py,Sentiment API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\risk.py,Risk API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\portfolio.py,Portfolio API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\patterns.py,Patterns API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\news.py,News API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\modules.py,Modules API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\market_data.py,Market data API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\learning.py,Learning API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\community_chat.py,Community chat API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\coach.py,Coach API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\auth.py,Authentication API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\analysis.py,Analysis API handler (camboai)
+d:\CamboAI\camboai\backend\app\api\admin.py,Admin API handler (camboai)
+d:\CamboAI\camboai\backend\alembic\env.py,Alembic migration environment (camboai)
+d:\CamboAI\dashboard\utils\api.py,Utility functions for dashboard API
+d:\CamboAI\dashboard\components\indicators.py,Financial indicators component for dashboard
+d:\CamboAI\dashboard\components\chart.py,Charting component for dashboard
+d:\CamboAI\dashboard\app.py,Main dashboard application entry point
+d:\CamboAI\test_server.py,Test script for server functionality
+d:\CamboAI\test_imports.py,Test script for checking Python imports
