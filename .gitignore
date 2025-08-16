@@ -10,3 +10,25 @@ __pycache__/
 *.log
 .DS_Store
 Thumbs.db
+
+# Python & backend artifacts
+backend/venv/
+backend/__pycache__/
+backend/logs/
+backend/uploads/
+backend/app/__pycache__/
+backend/cambo_ai_trader.db
+backend/alembic/versions/__pycache__/
+
+# Secrets
+backend/secrets/
+deploy/.env
+
+# Dashboard venv
+dashboard/venv/
+
+# Frontend build output (CRA)
+frontend/build/
+
+# IDE
+.vscode/
