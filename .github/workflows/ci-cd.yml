@@ -43,16 +43,28 @@ jobs:
         pytest --cov=app --cov-report=xml
 
     - name: Set up Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
-        node-version: '16'
+        node-version: '20'
 
-    - name: Install frontend dependencies
+    - name: Install web-advanced dependencies
+      run: |
+        cd web-advanced
+        npm ci || npm install
+
+    - name: Build web-advanced
+      run: |
+        cd web-advanced
+        npm run build
+
+    - name: Install legacy frontend deps (if present)
+      if: ${{ hashFiles('frontend/package.json') != '' }}
       run: |
         cd frontend
-        npm ci
+        npm ci || npm install
 
-    - name: Run frontend tests
+    - name: Run legacy frontend tests (if present)
+      if: ${{ hashFiles('frontend/package.json') != '' }}
       run: |
         cd frontend
         npm test -- --coverage
