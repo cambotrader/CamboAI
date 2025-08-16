@@ -105,6 +105,7 @@ app.include_router(community_chat.router)
 app.include_router(voice.router)
 app.include_router(voice_tts.router)
 app.include_router(learning.router)
+from app.api import patterns as patterns_router, news as news_router, sentiment as sentiment_router
 app.include_router(ws_router.router, prefix="/ws", tags=["WebSocket"])
 app.include_router(modules_router.router)
 app.include_router(admin_router.router)
