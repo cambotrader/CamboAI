@@ -97,6 +97,8 @@ app.include_router(portfolio.router, tags=["Portfolio"])  # Already has prefix
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(risk.router, tags=["Risk Management"])  # Already has prefix
 app.include_router(transactions.router, tags=["Transactions"])  # Already has prefix
+from app.api import alerts as alerts_router
+app.include_router(alerts_router.router)
 # New: Coach/Therapy, War Room, Community Chat, Voice (STT/TTS)
 from app.api import coach, war_room, community_chat, voice, voice_tts, learning
 app.include_router(coach.router)
@@ -106,6 +108,8 @@ app.include_router(voice.router)
 app.include_router(voice_tts.router)
 app.include_router(learning.router)
 from app.api import patterns as patterns_router, news as news_router, sentiment as sentiment_router
+from app.api.options import router as options_api_router
+from app.api.options.hedging_router import router as hedging_api_router
 app.include_router(ws_router.router, prefix="/ws", tags=["WebSocket"])
 app.include_router(modules_router.router)
 app.include_router(admin_router.router)
@@ -113,6 +117,8 @@ app.include_router(admin_router.router)
 app.include_router(patterns_router.router)
 app.include_router(news_router.router)
 app.include_router(sentiment_router.router)
+app.include_router(options_api_router)
+app.include_router(hedging_api_router)
 
 # Start background task for real-time updates
 from app.database import create_tables
