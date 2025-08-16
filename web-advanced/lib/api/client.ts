@@ -62,3 +62,78 @@ export async function deltaHedgeBacktest(payload: any) {
   if (!res.ok) throw new Error(await res.text())
   return res.json()
 }
+
+// Portfolio API
+export async function getPortfolioPositions() {
+  const res = await fetch(`${base()}/api/portfolio/positions`, { cache: 'no-store' })
+  if (!res.ok) throw new Error(await res.text())
+  return res.json()
+}
+
+export async function getPortfolioSummary() {
+  const res = await fetch(`${base()}/api/portfolio/summary`, { cache: 'no-store' })
+  if (!res.ok) throw new Error(await res.text())
+  return res.json()
+}
+
+export async function getPortfolioPerformance(days: number = 90) {
+  const res = await fetch(`${base()}/api/portfolio/performance?days=${days}`, { cache: 'no-store' })
+  if (!res.ok) throw new Error(await res.text())
+  return res.json()
+}
+
+// Risk API
+export async function getPortfolioRisk(portfolioId: string, days: number = 90) {
+  const res = await fetch(`${base()}/api/risk/portfolio/${portfolioId}/analysis?days=${days}`, { cache: 'no-store' })
+  if (!res.ok) throw new Error(await res.text())
+  return res.json()
+}
+
+// Trading API
+export async function placeOrder(order: any) {
+  const res = await fetch(`${base()}/api/trading/order`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(order),
+    cache: 'no-store',
+  })
+  if (!res.ok) throw new Error(await res.text())
+  return res.json()
+}
+
+export async function getTradingPositions() {
+  const res = await fetch(`${base()}/api/trading/positions`, { cache: 'no-store' })
+  if (!res.ok) throw new Error(await res.text())
+  return res.json()
+}
+
+export async function getOrders() {
+  const res = await fetch(`${base()}/api/trading/orders`, { cache: 'no-store' })
+  if (!res.ok) throw new Error(await res.text())
+  return res.json()
+}
+
+// War Room API
+export async function runDebate(payload: any) {
+  const res = await fetch(`${base()}/api/war-room/debate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    cache: 'no-store',
+  })
+  if (!res.ok) throw new Error(await res.text())
+  return res.json()
+}
+
+// Learning API
+export async function getCourses() {
+  const res = await fetch(`${base()}/api/learning/courses`, { cache: 'no-store' })
+  if (!res.ok) throw new Error(await res.text())
+  return res.json()
+}
+
+export async function getCourseDetails(courseId: string) {
+  const res = await fetch(`${base()}/api/learning/courses/${courseId}`, { cache: 'no-store' })
+  if (!res.ok) throw new Error(await res.text())
+  return res.json()
+}
