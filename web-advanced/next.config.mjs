@@ -3,31 +3,28 @@ const nextConfig = {
   experimental: {
     appDir: true,
   },
-  images: {
-    domains: ['localhost', 'your-backend-domain.com', 'camboai.com', 'www.camboai.com', 'api.camboai.com'],
-  },
   env: {
-    CUSTOM_KEY: 'my-value',
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
+    NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000',
   },
   async rewrites() {
-    // In development only, if NEXT_PUBLIC_API_BASE isn't set, proxy to local backend
-    if (!process.env.NEXT_PUBLIC_API_BASE && process.env.NODE_ENV !== 'production') {
-      return [
-        {
-          source: '/api/:path*',
-          destination: 'http://localhost:8000/api/:path*',
-        },
-      ];
-    }
-    return [];
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/api/:path*`,
+      },
+    ]
   },
-  webpack: (config) => {
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      fs: false,
-    };
-    return config;
+  images: {
+    domains: ['camboai.com', 'render.com'],
   },
-};
+  output: 'standalone',
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+  eslint: {
+    ignoreDuringBuilds: false,
+  },
+}
 
-export default nextConfig;
+export default nextConfig
