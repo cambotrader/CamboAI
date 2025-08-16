@@ -106,6 +106,10 @@ app.include_router(learning.router)
 app.include_router(ws_router.router, prefix="/ws", tags=["WebSocket"])
 app.include_router(modules_router.router)
 app.include_router(admin_router.router)
+# New API routes
+app.include_router(patterns_router.router)
+app.include_router(news_router.router)
+app.include_router(sentiment_router.router)
 
 # Start background task for real-time updates
 from app.database import create_tables
