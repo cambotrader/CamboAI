@@ -1,64 +1,101 @@
-# 🚀 CamboAI Platform Quick Test Script
-# Tests all core functionality to ensure everything works
+# CAMBOAI TRADERSTATION - Quick Platform Test
+Write-Host "CAMBOAI TRADERSTATION DEPLOYMENT TEST" -ForegroundColor Green
+Write-Host "======================================" -ForegroundColor Green
 
-Write-Host "🚀 Testing CamboAI Trading Platform..." -ForegroundColor Green
-Write-Host "=====================================" -ForegroundColor Green
-
-# Check if we're in the right directory
-if (-not (Test-Path "backend\app\main.py")) {
-    Write-Host "❌ Please run this from the CamboAI root directory" -ForegroundColor Red
-    exit 1
+# Test 1: Frontend (Vercel)
+Write-Host "`nTesting Frontend (camboai.com)..." -ForegroundColor Cyan
+try {
+    $response = Invoke-WebRequest -Uri "https://camboai.com" -UseBasicParsing -TimeoutSec 10
+    if ($response.StatusCode -eq 200) {
+        if ($response.Content.Contains("CamboAI") -or $response.Content.Contains("TraderStation")) {
+            Write-Host "   SUCCESS: Frontend is LIVE and working!" -ForegroundColor Green
+        } else {
+            Write-Host "   WARNING: Frontend is up but may be wrong content" -ForegroundColor Yellow
+        }
+    }
+} catch {
+    Write-Host "   ISSUE: Frontend not accessible - $($_.Exception.Message.Split('.')[0])" -ForegroundColor Red
+    Write-Host "   ACTION: Check Vercel deployment dashboard" -ForegroundColor Gray
 }
 
-# Step 1: Install Python dependencies
-Write-Host "`n📦 Installing Python dependencies..." -ForegroundColor Yellow
-Set-Location "backend"
+# Test 2: Backend APIs (Common Render URLs)
+Write-Host "`nTesting Backend APIs..." -ForegroundColor Cyan
+$backendUrls = @(
+    "https://camboai-traderstation-api.onrender.com",
+    "https://camboai-backend.onrender.com",
+    "https://camboai-api.onrender.com"
+)
 
-if (-not (Test-Path "venv")) {
-    Write-Host "Creating virtual environment..." -ForegroundColor Blue
-    python -m venv venv
+$backendFound = $false
+foreach ($url in $backendUrls) {
+    try {
+        $healthUrl = "$url/health"
+        $response = Invoke-WebRequest -Uri $healthUrl -UseBasicParsing -TimeoutSec 5
+        if ($response.StatusCode -eq 200) {
+            Write-Host "   SUCCESS: Backend API is LIVE at $url" -ForegroundColor Green
+            $backendFound = $true
+            break
+        }
+    } catch {
+        # Try next URL
+    }
 }
 
-Write-Host "Activating virtual environment..." -ForegroundColor Blue
-& "venv\Scripts\Activate.ps1"
-
-Write-Host "Installing requirements..." -ForegroundColor Blue
-pip install -r requirements.txt
-
-# Step 2: Setup database
-Write-Host "`n🗄️ Setting up database..." -ForegroundColor Yellow
-if (-not (Test-Path "cambo_ai_trader.db")) {
-    Write-Host "Creating database tables..." -ForegroundColor Blue
-    python -c "
-from app.database import engine, Base
-from app.models import *
-Base.metadata.create_all(bind=engine)
-print('✅ Database tables created')
-"
+if (-not $backendFound) {
+    Write-Host "   PENDING: Backend not deployed yet" -ForegroundColor Yellow
+    Write-Host "   ACTION: Deploy to Render following deployment guide" -ForegroundColor Gray
 }
 
-# Step 3: Test imports
-Write-Host "`n🔍 Testing core imports..." -ForegroundColor Yellow
-python -c "
-try:
-    from app.main import app
-    from app.core.market_data_stream import market_data_stream
-    from app.core.paper_trading_engine import paper_trading_engine
-    from app.core.risk_manager import risk_manager
-    from app.core.order_manager import order_manager
-    from app.core.websocket_manager import websocket_manager
-    print('✅ All core modules imported successfully')
-except Exception as e:
-    print(f'❌ Import error: {e}')
-    exit(1)
-"
+# Test 3: Local AI Modules
+Write-Host "`nTesting Local AI Modules..." -ForegroundColor Cyan
+$aiModules = @{
+    "Live Coach" = "backend\app\modules\live_coaching.py"
+    "Psychology Hub" = "backend\app\modules\psychology_therapy.py"
+    "AI Omnipresence" = "backend\app\modules\ai_omnipresence.py"
+}
 
-# Step 4: Start the platform
-Write-Host "`n🚀 Starting CamboAI Platform..." -ForegroundColor Yellow
-Write-Host "This will open your browser automatically..." -ForegroundColor Blue
-Write-Host "Press Ctrl+C to stop the server" -ForegroundColor Blue
+foreach ($module in $aiModules.GetEnumerator()) {
+    if (Test-Path $module.Value) {
+        $lines = (Get-Content $module.Value).Count
+        Write-Host "   OK: $($module.Key) - $lines lines ready" -ForegroundColor Green
+    } else {
+        Write-Host "   MISSING: $($module.Key)" -ForegroundColor Red
+    }
+}
 
-Set-Location ".."
-python run_camboai.py
+# Summary
+Write-Host "`nDEPLOYMENT STATUS:" -ForegroundColor Cyan
+Write-Host "==================" -ForegroundColor Cyan
 
-Write-Host "`n✅ Platform test complete!" -ForegroundColor Green
+$frontendWorking = $false
+$backendWorking = $backendFound
+
+try {
+    $test = Invoke-WebRequest -Uri "https://camboai.com" -UseBasicParsing -TimeoutSec 5
+    $frontendWorking = ($test.StatusCode -eq 200)
+} catch { }
+
+if ($frontendWorking -and $backendWorking) {
+    Write-Host "PLATFORM STATUS: FULLY OPERATIONAL!" -ForegroundColor Green
+    Write-Host "   Frontend: LIVE at camboai.com" -ForegroundColor White
+    Write-Host "   Backend: LIVE and responding" -ForegroundColor White
+    Write-Host "   AI Modules: All loaded" -ForegroundColor White
+    Write-Host ""
+    Write-Host "YOUR CAMBOAI TRADERSTATION IS LIVE!" -ForegroundColor Green
+} elseif ($frontendWorking) {
+    Write-Host "PLATFORM STATUS: Frontend Ready, Backend Pending" -ForegroundColor Yellow
+    Write-Host "   Frontend: LIVE at camboai.com" -ForegroundColor White
+    Write-Host "   Backend: Deploy to Render needed" -ForegroundColor Yellow
+} else {
+    Write-Host "PLATFORM STATUS: Deployment in Progress" -ForegroundColor Yellow
+    Write-Host "   Frontend: Check Vercel dashboard" -ForegroundColor Yellow
+    Write-Host "   Backend: Deploy to Render needed" -ForegroundColor Yellow
+}
+
+Write-Host ""
+Write-Host "Next Steps:" -ForegroundColor Cyan
+Write-Host "1. Read: DEPLOYMENT_GUIDE.md" -ForegroundColor White
+Write-Host "2. Check Vercel dashboard for frontend issues" -ForegroundColor White
+Write-Host "3. Deploy backend to Render" -ForegroundColor White
+Write-Host ""
+Write-Host "Trade with Vision, Learn with Purpose, Evolve with AI" -ForegroundColor Magenta

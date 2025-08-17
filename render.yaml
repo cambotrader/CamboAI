@@ -1,22 +1,17 @@
 ﻿services:
   - type: web
-    name: camboai-traderstation-api
+    name: camboai-backend
     env: python
-    plan: starter
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    region: oregon
+    buildCommand: pip install --no-cache-dir -r requirements.simple.txt
+    startCommand: uvicorn simple_server:app --host 0.0.0.0 --port $PORT --workers 1
     envVars:
       - key: PYTHON_VERSION
         value: 3.9.16
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        generateValue: true
       - key: OPENAI_API_KEY
         sync: false
-      - key: ANTHROPIC_API_KEY
-        sync: false
-      - key: GOOGLE_AI_API_KEY
-        sync: false
-        
-  - type: postgresql
-    name: camboai-traderstation-db
-    databaseName: camboai_db
-    user: camboai_user
-    plan: starter

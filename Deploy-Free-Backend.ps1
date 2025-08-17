@@ -1,74 +1,129 @@
-# CamboStation Vision - Free Backend Deployment
-# Deploy your FastAPI backend completely free
+# CAMBOAI TRADERSTATION - Free Backend Deployment (Render-Optimized)
+Write-Host "DEPLOYING SIMPLIFIED BACKEND TO RENDER..." -ForegroundColor Green
 
-Write-Host "🖥️ Deploying CamboStation Vision Backend (100% Free)" -ForegroundColor Green
-Write-Host "=====================================================" -ForegroundColor Green
+# Create optimized render.yaml
+$renderConfig = @'
+services:
+  - type: web
+    name: camboai-backend
+    env: python
+    plan: free
+    region: oregon
+    buildCommand: pip install --no-cache-dir -r requirements.simple.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.16
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        generateValue: true
+      - key: OPENAI_API_KEY
+        sync: false
+'@
 
-# Check if we're in the right directory
-if (-not (Test-Path "d:\CamboAI\backend")) {
-    Write-Host "❌ Backend directory not found. Make sure you're in the CamboAI project root." -ForegroundColor Red
-    exit 1
+Write-Host "Creating optimized render.yaml..." -ForegroundColor Yellow
+$renderConfig | Out-File -FilePath "render.yaml" -Encoding UTF8
+
+# Create optimized Dockerfile
+$dockerfile = @'
+FROM python:3.9-slim
+
+WORKDIR /app
+
+# Copy simplified requirements first for better caching
+COPY backend/requirements.simple.txt requirements.txt
+
+# Install dependencies with optimizations
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY backend/ .
+
+# Create non-root user for security
+RUN adduser --disabled-password --gecos '' appuser
+RUN chown -R appuser:appuser /app
+USER appuser
+
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8000/health || exit 1
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+'@
+
+Write-Host "Creating optimized Dockerfile..." -ForegroundColor Yellow
+$dockerfile | Out-File -FilePath "Dockerfile" -Encoding UTF8
+
+# Create a simple main.py if it doesn't exist
+if (-not (Test-Path "backend\app\main.py")) {
+    Write-Host "Creating basic main.py..." -ForegroundColor Yellow
+    $mainPy = @'
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+import os
+
+app = FastAPI(
+    title="CamboAI TraderStation API",
+    description="AI-Powered Trading Intelligence Platform",
+    version="1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/")
+def root():
+    return {"message": "CamboAI TraderStation API", "status": "operational"}
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy", "service": "camboai-traderstation"}
+
+@app.get("/api/status")
+def api_status():
+    return {
+        "api": "online",
+        "version": "1.0.0",
+        "features": [
+            "AI Trading Coach",
+            "Psychology & Therapy Hub", 
+            "Market Analytics",
+            "Real-time Data"
+        ]
+    }
+'@
+    
+    # Ensure directory exists
+    if (-not (Test-Path "backend\app")) {
+        New-Item -ItemType Directory -Path "backend\app" -Force
+    }
+    
+    $mainPy | Out-File -FilePath "backend\app\main.py" -Encoding UTF8
 }
 
-# Navigate to backend directory
-Set-Location "d:\CamboAI\backend"
-
-# Check if Python is installed
-Write-Host "🐍 Checking Python installation..." -ForegroundColor Yellow
-try {
-    $pythonVersion = python --version
-    Write-Host "✅ Python found: $pythonVersion" -ForegroundColor Green
-} catch {
-    Write-Host "❌ Python not found. Please install from https://python.org" -ForegroundColor Red
-    exit 1
-}
-
-# Create requirements.txt for deployment if it doesn't exist
-if (-not (Test-Path "requirements.txt")) {
-    Write-Host "📝 Creating requirements.txt..." -ForegroundColor Yellow
-    @"
-fastapi==0.68.0
-uvicorn==0.15.0
-sqlalchemy==1.4.23
-pandas==1.3.3
-numpy==1.21.2
-python-multipart==0.0.5
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-python-dotenv==0.19.0
-"@ | Out-File -FilePath "requirements.txt" -Encoding UTF8
-}
-
+Write-Host "RENDER DEPLOYMENT FILES READY!" -ForegroundColor Green
 Write-Host ""
-Write-Host "🎉 Ready to deploy! Choose your free option:" -ForegroundColor Green
-Write-Host "===========================================" -ForegroundColor Green
+Write-Host "MANUAL RENDER SETUP:" -ForegroundColor Cyan
+Write-Host "1. Go to: https://render.com/dashboard" -ForegroundColor White
+Write-Host "2. Click: New + -> Web Service" -ForegroundColor White
+Write-Host "3. Connect repository: cambotrader/CamboAI" -ForegroundColor White
+Write-Host "4. Configure service:" -ForegroundColor White
+Write-Host "   Name: camboai-backend" -ForegroundColor Gray
+Write-Host "   Root Directory: backend" -ForegroundColor Gray
+Write-Host "   Build Command: pip install --no-cache-dir -r requirements.simple.txt" -ForegroundColor Gray
+Write-Host "   Start Command: uvicorn app.main:app --host 0.0.0.0 --port `$PORT" -ForegroundColor Gray
 Write-Host ""
-Write-Host "Option 1: Railway (Recommended)" -ForegroundColor Cyan
-Write-Host "1. Install: npm install -g @railway/cli" -ForegroundColor White
-Write-Host "2. Login: railway login" -ForegroundColor White
-Write-Host "3. Deploy: railway up" -ForegroundColor White
-Write-Host "4. Free tier: 512MB RAM, $5 credit/month" -ForegroundColor White
+Write-Host "ENVIRONMENT VARIABLES (optional for now):" -ForegroundColor Yellow
+Write-Host "   OPENAI_API_KEY=sk-your-key-here" -ForegroundColor Gray
 Write-Host ""
-Write-Host "Option 2: Render" -ForegroundColor Cyan
-Write-Host "1. Go to: https://render.com" -ForegroundColor White
-Write-Host "2. Connect your GitHub repo" -ForegroundColor White
-Write-Host "3. Auto-deploy on push" -ForegroundColor White
-Write-Host "4. Free tier: 512MB RAM" -ForegroundColor White
-Write-Host ""
-Write-Host "Option 3: Fly.io" -ForegroundColor Cyan
-Write-Host "1. Install: https://fly.io/docs/getting-started/installing-flyctl/" -ForegroundColor White
-Write-Host "2. Run: flyctl launch" -ForegroundColor White
-Write-Host "3. Deploy: flyctl deploy" -ForegroundColor White
-Write-Host ""
-Write-Host "Option 4: PythonAnywhere (Python-specific)" -ForegroundColor Cyan
-Write-Host "1. Sign up: https://pythonanywhere.com" -ForegroundColor White
-Write-Host "2. Upload your code" -ForegroundColor White
-Write-Host "3. Configure web app" -ForegroundColor White
-Write-Host ""
-Write-Host "💡 All options are 100% FREE with generous limits!" -ForegroundColor Green
-Write-Host ""
-Write-Host "🚀 Quick setup for Railway:" -ForegroundColor Yellow
-Write-Host "npm install -g @railway/cli" -ForegroundColor Cyan
-Write-Host "railway login" -ForegroundColor Cyan
-Write-Host "railway init" -ForegroundColor Cyan
-Write-Host "railway up" -ForegroundColor Cyan
+Write-Host "This simplified version will deploy successfully!" -ForegroundColor Green
+Write-Host "You can add more features later once basic API is working." -ForegroundColor Cyan

@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException, Header
+from fastapi import FastAPI, HTTPException, Header, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 import os
 import importlib.util
 
@@ -12,34 +13,65 @@ else:
 
 app = FastAPI()
 
-# CORS for local + optional production origin via FRONTEND_ORIGIN env var
+# CORS for local development + production origins
 frontend_origin = os.environ.get("FRONTEND_ORIGIN")
-allowlist = [
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "http://localhost:3002",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:3001",
-    "http://127.0.0.1:3002",
-]
-if frontend_origin:
-    allowlist.append(frontend_origin)
-    # Add www variant if domain provided without scheme
-    try:
-        if frontend_origin.startswith("https://") and "." in frontend_origin:
-            host = frontend_origin.split("//", 1)[1]
-            if not host.startswith("www."):
-                allowlist.append(frontend_origin.replace("//", "//www.", 1))
-    except Exception:
-        pass
+environment = os.environ.get("ENVIRONMENT", "development")
+
+# Strict CORS for production
+if environment == "production":
+    allowlist = []
+    if frontend_origin:
+        allowlist.append(frontend_origin)
+        # Add www variant if domain provided
+        try:
+            if frontend_origin.startswith("https://") and "." in frontend_origin:
+                host = frontend_origin.split("//", 1)[1]
+                if not host.startswith("www."):
+                    allowlist.append(frontend_origin.replace("//", "//www.", 1))
+        except Exception:
+            pass
+    # Add Render default domains if not specified
+    if not allowlist:
+        allowlist = ["https://*.onrender.com"]
+else:
+    # Development CORS
+    allowlist = [
+        "http://localhost:3000",
+        "http://localhost:3001", 
+        "http://localhost:3002",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+        "http://127.0.0.1:3002",
+    ]
+    if frontend_origin:
+        allowlist.append(frontend_origin)
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowlist,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"]
 )
+
+# Add security middleware for production
+if environment == "production":
+    app.add_middleware(
+        TrustedHostMiddleware, 
+        allowed_hosts=["*.onrender.com", "localhost", "127.0.0.1"]
+    )
+
+# Security headers middleware
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    if environment == "production":
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
 
 # Mount lightweight auth endpoints if available
 if AUTH_ROUTER_AVAILABLE:
@@ -269,7 +301,12 @@ def read_root():
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    return {
+        "status": "ok",
+        "environment": environment,
+        "timestamp": datetime.now().isoformat(),
+        "version": "1.0.0"
+    }
 
 # ----- Optional: Journal CRUD (in-memory) -----
 class JournalNote(BaseModel):
