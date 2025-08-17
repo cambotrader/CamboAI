@@ -123,7 +123,8 @@ foreach ($item in $keyFiles.GetEnumerator()) {
 }
 
 $percentage = [math]::Round(($completeness / $keyFiles.Count) * 100)
-Write-Host "`n📈 PROJECT COMPLETENESS: $completeness/$($keyFiles.Count) ($percentage%)" -ForegroundColor $(if($percentage -ge 90){"Green"}elseif($percentage -ge 70){"Yellow"}else{"Red"})
+$percentageText = "$percentage" + "%"
+Write-Host "`n📈 PROJECT COMPLETENESS: $completeness/$($keyFiles.Count) ($percentageText)" -ForegroundColor $(if($percentage -ge 90){"Green"}elseif($percentage -ge 70){"Yellow"}else{"Red"})
 
 # Deployment readiness
 Write-Host "`n🚀 DEPLOYMENT READINESS:" -ForegroundColor Cyan
