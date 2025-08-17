@@ -35,8 +35,33 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-TileColor" content="#1976d2" />
         <meta name="theme-color" content="#1976d2" />
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            /* Prevent browser extension interference */
+            .translate-tooltip-mtz,
+            .translate-tooltip,
+            [class*="translate"],
+            [class*="extension"],
+            [hidden="null"] {
+              display: none !important;
+              visibility: hidden !important;
+              opacity: 0 !important;
+            }
+            
+            /* Prevent hydration flash */
+            body { 
+              visibility: hidden; 
+              opacity: 0;
+              transition: opacity 0.3s ease;
+            }
+            body.hydrated { 
+              visibility: visible; 
+              opacity: 1;
+            }
+          `
+        }} />
       </head>
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -50,6 +75,13 @@ export default function RootLayout({
             <Toaster />
           </QueryProvider>
         </ThemeProvider>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            setTimeout(() => {
+              document.body.classList.add('hydrated');
+            }, 100);
+          `
+        }} />
       </body>
     </html>
   )

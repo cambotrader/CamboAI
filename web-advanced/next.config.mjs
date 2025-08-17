@@ -25,6 +25,35 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
+  // Fix hydration issues
+  reactStrictMode: true,
+  swcMinify: true,
+  compiler: {
+    // Remove console logs in production
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  // Headers to prevent extension interference
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin',
+          },
+        ],
+      },
+    ]
+  },
 }
 
 export default nextConfig

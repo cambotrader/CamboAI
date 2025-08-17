@@ -1,7 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import dynamic from 'next/dynamic'
+
+// Dynamically import motion to prevent SSR issues
+const motion = dynamic(() => import('framer-motion').then(mod => ({
+  default: mod.motion
+})), { ssr: false })
 import { 
   TrendingUp, 
   BarChart3, 
@@ -20,6 +25,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
+import NoSSR from '@/components/no-ssr'
 
 const features = [
   {
@@ -108,12 +114,13 @@ export default function HomePage() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-cambo-gradient opacity-10" />
         <div className="relative container mx-auto px-4 py-20">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center max-w-4xl mx-auto"
-          >
+          <NoSSR fallback={<div className="text-center max-w-4xl mx-auto opacity-0">Loading...</div>}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center max-w-4xl mx-auto"
+            >
             <Badge variant="secondary" className="mb-4">
               <Rocket className="h-4 w-4 mr-2" />
               Version 2.0 - Now Live
@@ -148,6 +155,7 @@ export default function HomePage() {
               </Button>
             </div>
           </motion.div>
+          </NoSSR>
         </div>
       </section>
 
