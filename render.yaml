@@ -4,27 +4,19 @@
     env: python
     plan: starter
     buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port 
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: 3.9.16
-      - key: DATABASE_URL
-        generateValue: true
       - key: OPENAI_API_KEY
         sync: false
-      - key: ANTHROPIC_API_KEY  
+      - key: ANTHROPIC_API_KEY
         sync: false
       - key: GOOGLE_AI_API_KEY
         sync: false
-      - key: JWT_SECRET_KEY
-        generateValue: true
         
   - type: postgresql
     name: camboai-traderstation-db
     databaseName: camboai_db
     user: camboai_user
-    plan: starter
-
-  - type: redis
-    name: camboai-traderstation-cache
     plan: starter
