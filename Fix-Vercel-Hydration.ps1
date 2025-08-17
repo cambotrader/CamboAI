@@ -7,6 +7,9 @@ Write-Host "=========================================" -ForegroundColor Green
 # Navigate to web-advanced directory
 Set-Location "d:\CamboAI\web-advanced"
 
+Write-Host "📍 Current working directory: $PWD" -ForegroundColor Gray
+Write-Host "📁 Verifying D: drive paths..." -ForegroundColor Gray
+
 Write-Host "📦 Installing dependencies..." -ForegroundColor Yellow
 npm install
 

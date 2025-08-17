@@ -1,27 +1,30 @@
-services:
+﻿services:
   - type: web
-    name: camboai
-    runtime: docker
-    plan: free
-    autoDeploy: true
-    dockerfilePath: ./Dockerfile.allinone
-    healthCheckPath: /health
+    name: camboai-traderstation-api
+    env: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port 
     envVars:
-      - key: PYTHONUNBUFFERED
-        value: "1"
-      - key: ENVIRONMENT
-        value: production
-      - key: FRONTEND_ORIGIN
-        value: https://camboai.com
-      - key: SECRET_KEY
-        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.9.16
       - key: DATABASE_URL
+        generateValue: true
+      - key: OPENAI_API_KEY
         sync: false
-      - key: REDIS_URL
+      - key: ANTHROPIC_API_KEY  
         sync: false
-      - key: ALPACA_API_KEY
+      - key: GOOGLE_AI_API_KEY
         sync: false
-      - key: ALPACA_SECRET_KEY
-        sync: false
-      - key: ALPACA_BASE_URL
-        value: https://paper-api.alpaca.markets
+      - key: JWT_SECRET_KEY
+        generateValue: true
+        
+  - type: postgresql
+    name: camboai-traderstation-db
+    databaseName: camboai_db
+    user: camboai_user
+    plan: starter
+
+  - type: redis
+    name: camboai-traderstation-cache
+    plan: starter

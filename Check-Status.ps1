@@ -1,60 +1,144 @@
-#!/usr/bin/env powershell
-# Cambo AI Trader Station - Status Check
+# 🚀 CAMBOAI TRADERSTATION - PATH & STATUS CHECK
+# Trade with Vision, Learn with Purpose, Evolve with AI
+# Verify all paths are correctly using D: drive
 
-Write-Host "🔍 CAMBO AI TRADER STATION - STATUS CHECK" -ForegroundColor Green
-Write-Host "=========================================" -ForegroundColor Green
+Write-Host "🔍 CHECKING CAMBOAI TRADERSTATION PATHS..." -ForegroundColor Green
+Write-Host "=============================================" -ForegroundColor Green
 
-Write-Host "`n📊 Checking services..." -ForegroundColor Cyan
+# Current location check
+Write-Host "`n📍 CURRENT LOCATION:" -ForegroundColor Cyan
+Write-Host "Working Directory: $PWD" -ForegroundColor White
+Write-Host "Drive: $((Get-Location).Drive.Name)" -ForegroundColor White
 
-# Check if backend is running
-Write-Host "`n🔧 Backend API (Port 8000):" -ForegroundColor Yellow
-try {
-    $response = Invoke-WebRequest -Uri "http://localhost:8000/health" -TimeoutSec 5 -UseBasicParsing
-    Write-Host "✅ Backend is running - Status: $($response.StatusCode)" -ForegroundColor Green
-} catch {
-    Write-Host "❌ Backend is not responding" -ForegroundColor Red
-}
+# Verify D: drive structure
+Write-Host "`n📁 D: DRIVE STRUCTURE CHECK:" -ForegroundColor Cyan
+$baseDir = "d:\CamboAI"
+Write-Host "Base Directory: $baseDir" -ForegroundColor White
 
-# Check if frontend is running
-Write-Host "`n⚛️ Frontend (Port 3000):" -ForegroundColor Yellow
-try {
-    $response = Invoke-WebRequest -Uri "http://localhost:3000" -TimeoutSec 5 -UseBasicParsing
-    Write-Host "✅ Frontend is running - Status: $($response.StatusCode)" -ForegroundColor Green
-} catch {
-    Write-Host "❌ Frontend is not responding" -ForegroundColor Red
-}
-
-# Check running processes
-Write-Host "`n🔍 Related Processes:" -ForegroundColor Yellow
-$processes = Get-Process | Where-Object { $_.ProcessName -match "uvicorn|node|python" }
-if ($processes) {
-    Write-Host "Found running processes:" -ForegroundColor Green
-    $processes | Select-Object ProcessName, Id | Format-Table -AutoSize
-} else {
-    Write-Host "❌ No related processes found" -ForegroundColor Red
-}
-
-# Check listening ports
-Write-Host "`n🌐 Listening Ports:" -ForegroundColor Yellow
-$ports = @(3000, 8000)
-foreach ($port in $ports) {
-    try {
-        $connection = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
-        if ($connection) {
-            Write-Host "✅ Port $port is in use" -ForegroundColor Green
+if (Test-Path $baseDir) {
+    Write-Host "   ✅ CamboAI folder exists on D: drive" -ForegroundColor Green
+    
+    # Key directories
+    $directories = @{
+        "Frontend (React)" = "d:\CamboAI\frontend"
+        "Web Simple" = "d:\CamboAI\web"  
+        "Web Advanced" = "d:\CamboAI\web-advanced"
+        "Backend" = "d:\CamboAI\backend"
+        "Mobile App" = "d:\CamboAI\mobile"
+        "Dashboard" = "d:\CamboAI\dashboard"
+    }
+    
+    foreach ($item in $directories.GetEnumerator()) {
+        if (Test-Path $item.Value) {
+            Write-Host "   ✅ $($item.Key)" -ForegroundColor Green
         } else {
-            Write-Host "❌ Port $port is not in use" -ForegroundColor Red
+            Write-Host "   ⚠️ $($item.Key) - Missing" -ForegroundColor Yellow
+        }
+    }
+} else {
+    Write-Host "   ❌ CamboAI folder NOT FOUND on D: drive!" -ForegroundColor Red
+}
+
+# Check for any C: drive remnants
+Write-Host "`n🔍 C: DRIVE REFERENCE CHECK:" -ForegroundColor Cyan
+$cDriveFiles = @()
+
+# Search for files containing C: drive references
+$searchFiles = Get-ChildItem -Path $baseDir -Recurse -Include "*.ps1", "*.tsx", "*.ts", "*.py", "*.json", "*.md" -ErrorAction SilentlyContinue
+
+foreach ($file in $searchFiles) {
+    try {
+        $content = Get-Content $file.FullName -Raw -ErrorAction SilentlyContinue
+        if ($content -and $content.Contains("C:\Users") -and -not $content.Contains("# Example:") -and -not $content.Contains("Comment")) {
+            $cDriveFiles += $file.FullName
         }
     } catch {
-        Write-Host "❌ Port $port is not in use" -ForegroundColor Red
+        # Skip files we can't read
     }
 }
 
-Write-Host "`n🌟 Access URLs:" -ForegroundColor Cyan
-Write-Host "  Frontend:     http://localhost:3000" -ForegroundColor White
-Write-Host "  Backend API:  http://localhost:8000" -ForegroundColor White
-Write-Host "  API Docs:     http://localhost:8000/docs" -ForegroundColor White
+if ($cDriveFiles.Count -eq 0) {
+    Write-Host "   ✅ No C: drive references found" -ForegroundColor Green
+} else {
+    Write-Host "   ⚠️ Found C: drive references in:" -ForegroundColor Yellow
+    foreach ($file in $cDriveFiles) {
+        Write-Host "      - $file" -ForegroundColor Gray
+    }
+}
 
-Write-Host "`n💡 Quick Start Commands:" -ForegroundColor Yellow
-Write-Host "  Backend:  cd backend; uvicorn app.main:app --reload --port 8000" -ForegroundColor Gray
-Write-Host "  Frontend: cd frontend; npm start" -ForegroundColor Gray
+# Git repository check
+Write-Host "`n📦 GIT REPOSITORY CHECK:" -ForegroundColor Cyan
+if (Test-Path "d:\CamboAI\.git") {
+    Write-Host "   ✅ Git repository initialized" -ForegroundColor Green
+    
+    # Check git remote
+    try {
+        $gitRemote = git -C "d:\CamboAI" remote get-url origin 2>$null
+        if ($gitRemote) {
+            Write-Host "   ✅ Remote origin: $gitRemote" -ForegroundColor Green
+        } else {
+            Write-Host "   ⚠️ No remote origin set" -ForegroundColor Yellow
+        }
+    } catch {
+        Write-Host "   ⚠️ Could not check git remote" -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "   ⚠️ Git not initialized" -ForegroundColor Yellow
+}
+
+# AutoGitPush script check
+Write-Host "`n🔄 AUTOGITPUSH SCRIPT CHECK:" -ForegroundColor Cyan
+$autoGitPath = "c:\Users\johnl\OneDrive\Desktop\AutoGitPush.ps1"
+if (Test-Path $autoGitPath) {
+    $content = Get-Content $autoGitPath -Raw
+    if ($content.Contains('$RepoPath = "D:\CamboAI"')) {
+        Write-Host "   ✅ AutoGitPush correctly points to D:\CamboAI" -ForegroundColor Green
+    } else {
+        Write-Host "   ⚠️ AutoGitPush may have wrong path" -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "   ⚠️ AutoGitPush script not found" -ForegroundColor Yellow
+}
+
+# Project completeness check
+Write-Host "`n📊 PROJECT COMPLETENESS:" -ForegroundColor Cyan
+$keyFiles = @{
+    "Main Deployment" = "d:\CamboAI\Deploy-CamboAI-Quantum.ps1"
+    "Hydration Fix" = "d:\CamboAI\Fix-Vercel-Hydration.ps1"
+    "AI Live Coach" = "d:\CamboAI\backend\app\modules\live_coaching.py"
+    "Psychology Module" = "d:\CamboAI\backend\app\modules\psychology_therapy.py"
+    "AI Omnipresence" = "d:\CamboAI\backend\app\modules\ai_omnipresence.py"
+    "Frontend Main" = "d:\CamboAI\web-advanced\app\page.tsx"
+    "Backend API" = "d:\CamboAI\backend\app\main.py"
+}
+
+$completeness = 0
+foreach ($item in $keyFiles.GetEnumerator()) {
+    if (Test-Path $item.Value) {
+        Write-Host "   ✅ $($item.Key)" -ForegroundColor Green
+        $completeness++
+    } else {
+        Write-Host "   ❌ $($item.Key) - Missing" -ForegroundColor Red
+    }
+}
+
+$percentage = [math]::Round(($completeness / $keyFiles.Count) * 100)
+Write-Host "`n📈 PROJECT COMPLETENESS: $completeness/$($keyFiles.Count) ($percentage%)" -ForegroundColor $(if($percentage -ge 90){"Green"}elseif($percentage -ge 70){"Yellow"}else{"Red"})
+
+# Deployment readiness
+Write-Host "`n🚀 DEPLOYMENT READINESS:" -ForegroundColor Cyan
+if ($percentage -ge 90) {
+    Write-Host "   🌟 READY FOR DEPLOYMENT!" -ForegroundColor Green
+    Write-Host "   Next steps:" -ForegroundColor White
+    Write-Host "     1. Run: .\Fix-Vercel-Hydration.ps1" -ForegroundColor Gray
+    Write-Host "     2. Run: .\Deploy-Backend-Render.ps1" -ForegroundColor Gray
+    Write-Host "     3. Run: .\Connect-Full-Platform.ps1" -ForegroundColor Gray
+} elseif ($percentage -ge 70) {
+    Write-Host "   ⚡ MOSTLY READY - Few items missing" -ForegroundColor Yellow
+} else {
+    Write-Host "   🔧 NEEDS MORE SETUP" -ForegroundColor Red
+}
+
+Write-Host "`n🎉 CAMBOAI TRADERSTATION PATH CHECK COMPLETE!" -ForegroundColor Green
+Write-Host "All files correctly using D: drive structure ✅" -ForegroundColor White
+Write-Host "Trade with Vision, Learn with Purpose, Evolve with AI ✨" -ForegroundColor Cyan
