@@ -1,0 +1,20 @@
+{
+  "name": "cambo-ai-traderstation-frontend",
+  "version": 2,
+  "builds": [
+    {
+      "src": "build/**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/build/$1"
+    }
+  ],
+  "functions": {},
+  "env": {
+    "REACT_APP_API_URL": "https://cambo-ai-backend.onrender.com"
+  }
+}

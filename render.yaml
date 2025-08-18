@@ -4,6 +4,8 @@
     env: python
     plan: free
     region: oregon
+    repo: https://github.com/cambotrader/CamboAI
+    branch: main
     buildCommand: cd backend && pip install --no-cache-dir -r requirements.simple.txt
     startCommand: cd backend && uvicorn simple_server:app --host 0.0.0.0 --port $PORT --workers 1
     envVars:
