@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Paper, Typography, Box, Alert, Slider, TextField, Stack } from '@mui/material';
+import { Grid, Paper, Typography, Box, Alert, Slider, TextField, Stack, Tabs, Tab } from '@mui/material';
 import ChartContainer from '../components/ChartContainer';
 import ChartSelector, { ChartType } from '../components/ChartSelector';
 import PerformanceChart from '../components/dashboard/PerformanceChart';
 import PositionsTable from '../components/dashboard/PositionsTable';
+import MarketOverview from '../components/dashboard/MarketOverview';
+import OptionsChain from '../components/dashboard/OptionsChain';
+import AdvancedPortfolio from '../components/dashboard/AdvancedPortfolio';
+import OrderManagement from '../components/dashboard/OrderManagement';
+import MarketDataFeed from '../components/dashboard/MarketDataFeed';
+import RiskDashboard from '../components/dashboard/RiskDashboard';
+import TradingTerminal from '../components/dashboard/TradingTerminal';
 import { apiService, wsService, PortfolioPosition, PerformanceData, PortfolioSummary } from '../services/api';
 
 const Dashboard: React.FC = () => {
+  const [activeTab, setActiveTab] = useState(0);
   const [chartType, setChartType] = useState<ChartType>('tradingview');
   const [symbol, setSymbol] = useState('AAPL');
   const [performanceData, setPerformanceData] = useState<any[]>([]);
@@ -129,20 +137,43 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <Grid container spacing={2} sx={{ p: 2 }}>
+    <Box sx={{ width: '100%' }}>
       {error && (
-        <Grid item xs={12}>
-          <Alert severity="warning" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        </Grid>
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
       )}
       
-      {portfolioSummary && (
-        <Grid item xs={12}>
-          <Paper elevation={3} sx={{ p: 2, mb: 2 }}>
-            <Typography variant="h6" gutterBottom>Portfolio Summary</Typography>
-            <Box display="flex" gap={4}>
+      {/* Professional Tab Navigation */}
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+        <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)}>
+          <Tab label="Market Overview" />
+          <Tab label="Live Data Feed" />
+          <Tab label="Trading Terminal" />
+          <Tab label="Portfolio" />
+          <Tab label="Options Chain" />
+          <Tab label="Risk Management" />
+          <Tab label="Order Management" />
+          <Tab label="Charts & Analysis" />
+        </Tabs>
+      </Box>
+
+      {/* Tab Content */}
+      {activeTab === 0 && <MarketOverview />}
+      {activeTab === 1 && <MarketDataFeed />}
+      {activeTab === 2 && <TradingTerminal />}
+      {activeTab === 3 && <AdvancedPortfolio />}
+      {activeTab === 4 && <OptionsChain />}
+      {activeTab === 5 && <RiskDashboard />}
+      {activeTab === 6 && <OrderManagement />}
+      
+      {activeTab === 7 && (
+        <Grid container spacing={2} sx={{ p: 2 }}>
+          {portfolioSummary && (
+            <Grid item xs={12}>
+              <Paper elevation={3} sx={{ p: 2, mb: 2 }}>
+                <Typography variant="h6" gutterBottom>Portfolio Summary</Typography>
+                <Box display="flex" gap={4}>
               <Box>
                 <Typography variant="body2" color="textSecondary">Total Value</Typography>
                 <Typography variant="h5" color="primary">
@@ -253,6 +284,8 @@ const Dashboard: React.FC = () => {
         </Paper>
       </Grid>
     </Grid>
+      )}
+    </Box>
   );
 };
 
