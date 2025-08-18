@@ -1,4 +1,4 @@
-# 🚀 CamboAI Trading Platform
+# 🚀 CamboAI TraderStation
 
 **Institutional-Grade AI-Powered Trading Platform**
 

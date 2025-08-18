@@ -1,6 +1,6 @@
 ﻿services:
   - type: web
-    name: camboai-backend
+    name: camboai-traderstation-backend
     env: python
     plan: free
     region: oregon
