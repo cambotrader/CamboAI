@@ -40,7 +40,7 @@ function TabPanel(props: TabPanelProps) {
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [tab, setTab] = useState(0);
   const [email, setEmail] = useState('demo@cambostation.com');
-  const [password, setPassword] = useState('password');
+  const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

@@ -19,6 +19,7 @@ import logging
 import asyncio
 from collections import defaultdict, deque
 import time
+import os
 
 from ..database import get_db
 from ..models.trading_models import User, Account
@@ -26,7 +27,13 @@ from ..models.trading_models import User, Account
 logger = logging.getLogger(__name__)
 
 # Security Configuration
-SECRET_KEY = "your-super-secret-jwt-key-change-in-production"  # Move to environment variables
+_env_secret = os.getenv("JWT_SECRET_KEY")
+if _env_secret and len(_env_secret) >= 32:
+    SECRET_KEY = _env_secret
+else:
+    # Generate an ephemeral development key if not provided; warn loudly
+    SECRET_KEY = secrets.token_hex(32)
+    logger.warning("JWT_SECRET_KEY not set or too short; using ephemeral in-memory key for development. Set JWT_SECRET_KEY in the environment for production.")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 REFRESH_TOKEN_EXPIRE_DAYS = 30

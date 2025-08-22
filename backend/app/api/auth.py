@@ -5,14 +5,11 @@ from typing import Optional
 import jwt
 from datetime import datetime, timedelta
 import hashlib
-import os
+from ..core.auth import SECRET_KEY, ALGORITHM
 
 router = APIRouter()
 security = HTTPBearer()
 
-# In production, use environment variables or a secure key management system
-SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
-ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 # Mock user database - in production use a real database

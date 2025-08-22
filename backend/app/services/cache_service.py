@@ -1,12 +1,14 @@
 import redis
 from typing import Any, Optional, Dict, List
 import json
-import pickle
+import hmac
+import base64
 from datetime import datetime, timedelta
 import logging
 from functools import wraps
 import asyncio
 import hashlib
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +26,8 @@ class CacheService:
             self.redis_client = None
             self.memory_cache = {}
             self.cache_timestamps = {}
+        # Signing key for cache integrity (separate from JWT secret)
+        self.sign_key = (os.getenv("CACHE_SIGN_KEY") or os.getenv("JWT_SECRET_KEY") or "dev-cache-sign-key-change").encode()
     
     def _get_cache_key(self, key: str, prefix: str = "cambo") -> str:
         """Generate cache key with prefix"""
@@ -36,6 +40,18 @@ class CacheService:
         
         timestamp = self.cache_timestamps[key]
         return datetime.now() - timestamp < timedelta(seconds=ttl)
+
+    def _sign(self, payload_bytes: bytes) -> str:
+        mac = hmac.new(self.sign_key, payload_bytes, hashlib.sha256).digest()
+        return base64.b64encode(mac).decode()
+
+    def _verify(self, payload_bytes: bytes, signature_b64: str) -> bool:
+        try:
+            expected = hmac.new(self.sign_key, payload_bytes, hashlib.sha256).digest()
+            provided = base64.b64decode(signature_b64)
+            return hmac.compare_digest(expected, provided)
+        except Exception:
+            return False
     
     async def get(self, key: str, default: Any = None) -> Any:
         """Get value from cache"""
@@ -43,9 +59,22 @@ class CacheService:
         
         try:
             if self.redis_client:
-                value = self.redis_client.get(cache_key)
-                if value:
-                    return pickle.loads(value)
+                raw = self.redis_client.get(cache_key)
+                if raw:
+                    try:
+                        wrapper = json.loads(raw.decode())
+                        payload_b64 = wrapper.get("p")
+                        sig = wrapper.get("s")
+                        if not payload_b64 or not sig:
+                            return default
+                        payload_bytes = base64.b64decode(payload_b64)
+                        if not self._verify(payload_bytes, sig):
+                            logger.warning(f"Cache signature verification failed for key {cache_key}")
+                            return default
+                        return json.loads(payload_bytes.decode())
+                    except Exception as e:
+                        logger.error(f"Cache parse error for key {key}: {e}\nRaw: {raw[:100] if isinstance(raw, (bytes, bytearray)) else str(raw)[:100]}")
+                        return default
             else:
                 # Use memory cache
                 if key in self.memory_cache and self._is_memory_cache_valid(key, 300):  # 5 min default
@@ -62,8 +91,16 @@ class CacheService:
         
         try:
             if self.redis_client:
-                serialized_value = pickle.dumps(value)
-                return self.redis_client.setex(cache_key, ttl, serialized_value)
+                try:
+                    payload_bytes = json.dumps(value, separators=(",", ":")).encode()
+                except (TypeError, ValueError):
+                    # Fallback: attempt to JSON-serialize via repr for non-JSON types
+                    payload_bytes = json.dumps({"repr": repr(value)}).encode()
+                wrapper = json.dumps({
+                    "p": base64.b64encode(payload_bytes).decode(),
+                    "s": self._sign(payload_bytes),
+                }).encode()
+                return self.redis_client.setex(cache_key, ttl, wrapper)
             else:
                 # Use memory cache
                 self.memory_cache[key] = value
@@ -348,3 +385,13 @@ class QueryOptimizer:
             order = "asc"
         
         return f"ORDER BY {sort_by} {order.upper()}"
+
+class DataValidator:
+    """Utilities for validating and cleaning data"""
+    
+    @staticmethod
+    def validate_numeric(value: Any, default: float = 0.0) -> float:
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return default
