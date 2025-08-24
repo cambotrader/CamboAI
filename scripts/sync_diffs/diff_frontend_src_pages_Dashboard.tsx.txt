@@ -1,0 +1,530 @@
+﻿SOURCE: D:\CamboAI\frontend\src\pages\Dashboard.tsx
+TARGET: D:\CamboAI\camboai\frontend\src\pages\Dashboard.tsx
+==== DIFF (lines prefixed with - are only in SOURCE; + are only in TARGET) ====
++ import { Grid, Paper, Typography, Box, Alert, Slider, TextField, Stack } from '@mui/material';
+- import { Grid, Paper, Typography, Box, Alert, Slider, TextField, Stack, Tabs, Tab } from '@mui/material';
++ import { apiService, wsService, PortfolioPosition, PerformanceData, PortfolioSummary } from '../services/api';
+- import MarketOverview from '../components/dashboard/MarketOverview';
++ 
+- import OptionsChain from '../components/dashboard/OptionsChain';
++ const Dashboard: React.FC = () => {
+- import AdvancedPortfolio from '../components/dashboard/AdvancedPortfolio';
++   const [chartType, setChartType] = useState<ChartType>('tradingview');
+- import OrderManagement from '../components/dashboard/OrderManagement';
++   const [symbol, setSymbol] = useState('AAPL');
+- import MarketDataFeed from '../components/dashboard/MarketDataFeed';
++   const [performanceData, setPerformanceData] = useState<any[]>([]);
+- import RiskDashboard from '../components/dashboard/RiskDashboard';
++   const [positions, setPositions] = useState<PortfolioPosition[]>([]);
+- import TradingTerminal from '../components/dashboard/TradingTerminal';
++   const [portfolioSummary, setPortfolioSummary] = useState<PortfolioSummary | null>(null);
+- import { apiService, wsService, PortfolioPosition, PerformanceData, PortfolioSummary } from '../services/api';
++   const [loading, setLoading] = useState(true);
+- 
++   const [error, setError] = useState<string | null>(null);
+- const Dashboard: React.FC = () => {
++   const [chartHeight, setChartHeight] = useState<number>(() => {
+-   const [activeTab, setActiveTab] = useState(0);
++     const saved = localStorage.getItem('dashboard.chartHeight');
+-   const [chartType, setChartType] = useState<ChartType>('tradingview');
++     return saved ? Math.max(300, Math.min(1200, Number(saved))) : 520;
+-   const [symbol, setSymbol] = useState('AAPL');
++   });
+-   const [performanceData, setPerformanceData] = useState<any[]>([]);
++ 
+-   const [positions, setPositions] = useState<PortfolioPosition[]>([]);
++   useEffect(() => {
+-   const [portfolioSummary, setPortfolioSummary] = useState<PortfolioSummary | null>(null);
++     // Initial load
+-   const [loading, setLoading] = useState(true);
++     loadDashboardData();
+-   const [error, setError] = useState<string | null>(null);
++ 
+-   const [chartHeight, setChartHeight] = useState<number>(() => {
++     // Setup WebSocket once
+-     const saved = localStorage.getItem('dashboard.chartHeight');
++     wsService.connect(
+-     return saved ? Math.max(300, Math.min(1200, Number(saved))) : 520;
++       (data) => {
+-   });
++         console.log('WebSocket data received:', data);
+- 
++         if (data.type === 'price_update') {
+-   useEffect(() => {
++           setPositions(prevPositions => 
+-     // Initial load
++             prevPositions.map(pos => 
+-     loadDashboardData();
++               pos.symbol === data.symbol 
+- 
++                 ? { 
+-     // Setup WebSocket once
++                     ...pos, 
+-     wsService.connect(
++                     current_price: data.data.price,
+-       (data) => {
++                     pnl: (data.data.price - pos.entry_price) * pos.quantity,
+-         console.log('WebSocket data received:', data);
++                     pnl_percentage: ((data.data.price - pos.entry_price) / pos.entry_price) * 100,
+-         if (data.type === 'price_update') {
++                     market_value: data.data.price * pos.quantity
+-           setPositions(prevPositions => 
++                   }
+-             prevPositions.map(pos => 
++                 : pos
+-               pos.symbol === data.symbol 
++             )
+-                 ? { 
++           );
+-                     ...pos, 
++         }
+-                     current_price: data.data.price,
++       },
+-                     pnl: (data.data.price - pos.entry_price) * pos.quantity,
++       () => {
+-                     pnl_percentage: ((data.data.price - pos.entry_price) / pos.entry_price) * 100,
++         console.warn('WebSocket connection failed, continuing with polling data');
+-                     market_value: data.data.price * pos.quantity
++       }
+-                   }
++     );
+-                 : pos
++ 
+-             )
++     return () => {
+-           );
++       wsService.disconnect();
+-         }
++     };
+-       },
++   }, []);
+-       () => {
++ 
+-         console.warn('WebSocket connection failed, continuing with polling data');
++   const loadDashboardData = async () => {
+-       }
++     try {
+-     );
++       setLoading(true);
+-     return () => {
++       setError(null);
+-       wsService.disconnect();
++       // Load portfolio data
+-     };
++       const [positionsData, performanceData, summaryData] = await Promise.all([
+-   }, []);
++         apiService.getPortfolioPositions(),
+- 
++         apiService.getPortfolioPerformance(30),
+-   const loadDashboardData = async () => {
++         apiService.getPortfolioSummary()
+-     try {
++       ]);
+-       setLoading(true);
++       setPositions(positionsData);
+-       setError(null);
++       setPortfolioSummary(summaryData);
+-       // Load portfolio data
++       
+-       const [positionsData, performanceData, summaryData] = await Promise.all([
++       // Transform performance data for Nivo charts
+-         apiService.getPortfolioPositions(),
++       const chartData = [{
+-         apiService.getPortfolioPerformance(30),
++         id: 'portfolio',
+-         apiService.getPortfolioSummary()
++         data: performanceData.map((item: PerformanceData) => ({
+-       ]);
++           x: new Date(item.date),
+- 
++           y: item.value
+-       setPositions(positionsData);
++         }))
+-       setPortfolioSummary(summaryData);
++       }];
+-       
++       setPerformanceData(chartData);
+-       // Transform performance data for Nivo charts
++ 
+-       const chartData = [{
++     } catch (err) {
+-         id: 'portfolio',
++       console.error('Error loading dashboard data:', err);
+-         data: performanceData.map((item: PerformanceData) => ({
++       setError('Failed to load dashboard data. Please check if the backend is running.');
+-           x: new Date(item.date),
++       
+-           y: item.value
++       // Fallback to mock data if API fails
+-         }))
++       setPerformanceData([
+-       }];
++         {
+-       setPerformanceData(chartData);
++           id: 'portfolio',
+- 
++           data: [
+-     } catch (err) {
++             { x: new Date('2025-08-01'), y: 100000 },
+-       console.error('Error loading dashboard data:', err);
++             { x: new Date('2025-08-02'), y: 102500 },
+-       setError('Failed to load dashboard data. Please check if the backend is running.');
++             { x: new Date('2025-08-03'), y: 101300 },
+-       
++             { x: new Date('2025-08-04'), y: 105800 },
+-       // Fallback to mock data if API fails
++             { x: new Date('2025-08-05'), y: 108000 }
+-       setPerformanceData([
++           ]
+-         {
++         }
+-           id: 'portfolio',
++       ]);
+-           data: [
++       
+-             { x: new Date('2025-08-01'), y: 100000 },
++       setPositions([
+-             { x: new Date('2025-08-02'), y: 102500 },
++         { 
+-             { x: new Date('2025-08-03'), y: 101300 },
++           id: 1, 
+-             { x: new Date('2025-08-04'), y: 105800 },
++           symbol: 'AAPL', 
+-             { x: new Date('2025-08-05'), y: 108000 }
++           quantity: 100, 
+-           ]
++           entry_price: 150.00, 
+-         }
++           current_price: 155.00, 
+-       ]);
++           pnl: 500.00, 
+-       
++           pnl_percentage: 3.33,
+-       setPositions([
++           market_value: 15500.00,
+-         { 
++           entry_date: '2025-07-01T00:00:00Z'
+-           id: 1, 
++         }
+-           symbol: 'AAPL', 
++       ]);
+-           quantity: 100, 
++     } finally {
+-           entry_price: 150.00, 
++       setLoading(false);
+-           current_price: 155.00, 
++     }
+-           pnl: 500.00, 
++   };
+-           pnl_percentage: 3.33,
++ 
+-           market_value: 15500.00,
++   // Subscribe whenever positions change
+-           entry_date: '2025-07-01T00:00:00Z'
++   useEffect(() => {
+-         }
++     if (positions.length > 0) {
+-       ]);
++       const symbols = positions.map(pos => pos.symbol);
+-     } finally {
++       wsService.subscribe(symbols);
+-       setLoading(false);
++   }, [positions]);
+-   };
++   const handleHeightChange = (_: Event, value: number | number[]) => {
+-   // Subscribe whenever positions change
++     const v = Array.isArray(value) ? value[0] : value;
+-   useEffect(() => {
++     setChartHeight(v);
+-     if (positions.length > 0) {
++     localStorage.setItem('dashboard.chartHeight', String(v));
+-       const symbols = positions.map(pos => pos.symbol);
++   };
+-       wsService.subscribe(symbols);
++   return (
+-     }
++     <Grid container spacing={2} sx={{ p: 2 }}>
+-   }, [positions]);
++       {error && (
+-   const handleHeightChange = (_: Event, value: number | number[]) => {
++         <Grid item xs={12}>
+-     const v = Array.isArray(value) ? value[0] : value;
++           <Alert severity="warning" sx={{ mb: 2 }}>
+-     setChartHeight(v);
++             {error}
+-     localStorage.setItem('dashboard.chartHeight', String(v));
++           </Alert>
+-   };
++         </Grid>
+- 
++       )}
+-   return (
++       
+-     <Box sx={{ width: '100%' }}>
++       {portfolioSummary && (
+-       {error && (
++         <Grid item xs={12}>
+-         <Alert severity="warning" sx={{ mb: 2 }}>
++           <Paper elevation={3} sx={{ p: 2, mb: 2 }}>
+-           {error}
++             <Typography variant="h6" gutterBottom>Portfolio Summary</Typography>
+-         </Alert>
++             <Box display="flex" gap={4}>
+-       )}
++               <Box>
+-       
++                 <Typography variant="body2" color="textSecondary">Total Value</Typography>
+-       {/* Professional Tab Navigation */}
++                 <Typography variant="h5" color="primary">
+-       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
++                   ${portfolioSummary.total_value.toLocaleString()}
+-         <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)}>
++                 </Typography>
+-           <Tab label="Market Overview" />
++               </Box>
+-           <Tab label="Live Data Feed" />
++               <Box>
+-           <Tab label="Trading Terminal" />
++                 <Typography variant="body2" color="textSecondary">Total P&L</Typography>
+-           <Tab label="Portfolio" />
++                 <Typography 
+-           <Tab label="Options Chain" />
++                   variant="h5" 
+-           <Tab label="Risk Management" />
++                   color={portfolioSummary.total_pnl >= 0 ? 'success.main' : 'error.main'}
+-           <Tab label="Order Management" />
++                 >
+-           <Tab label="Charts & Analysis" />
++                   ${portfolioSummary.total_pnl.toLocaleString()}
+-         </Tabs>
++                 </Typography>
+-       </Box>
++               </Box>
+- 
++               <Box>
+-       {/* Tab Content */}
++                 <Typography variant="body2" color="textSecondary">Return %</Typography>
+-       {activeTab === 0 && <MarketOverview />}
++                 <Typography 
+-       {activeTab === 1 && <MarketDataFeed />}
++                   variant="h5" 
+-       {activeTab === 2 && <TradingTerminal />}
++                   color={portfolioSummary.total_return_percentage >= 0 ? 'success.main' : 'error.main'}
+-       {activeTab === 3 && <AdvancedPortfolio />}
++                 >
+-       {activeTab === 4 && <OptionsChain />}
++                   {portfolioSummary.total_return_percentage.toFixed(2)}%
+-       {activeTab === 5 && <RiskDashboard />}
++                 </Typography>
+-       {activeTab === 6 && <OrderManagement />}
++               </Box>
+-       
++             </Box>
+-       {activeTab === 7 && (
++           </Paper>
+-         <Grid container spacing={2} sx={{ p: 2 }}>
++         </Grid>
+-           {portfolioSummary && (
++       )}
+-             <Grid item xs={12}>
++ 
+-               <Paper elevation={3} sx={{ p: 2, mb: 2 }}>
++       <Grid item xs={12}>
+-                 <Typography variant="h6" gutterBottom>Portfolio Summary</Typography>
++         <Paper elevation={3} sx={{ p: 2, mb: 2 }}>
+-                 <Box display="flex" gap={4}>
++           <Stack spacing={2} direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'stretch', md: 'center' }} justifyContent="space-between">
+-               <Box>
++             <Stack spacing={1} direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'stretch', md: 'center' }}>
+-                 <Typography variant="body2" color="textSecondary">Total Value</Typography>
++               <ChartSelector value={chartType} onChange={setChartType} />
+-                 <Typography variant="h5" color="primary">
++               <TextField
+-                   ${portfolioSummary.total_value.toLocaleString()}
++                 size="small"
+-                 </Typography>
++                 label="Symbol"
+-               </Box>
++                 value={symbol}
+-               <Box>
++                 onChange={(e) => setSymbol(e.target.value.toUpperCase())}
+-                 <Typography variant="body2" color="textSecondary">Total P&L</Typography>
++                 sx={{ width: 140 }}
+-                 <Typography 
++               />
+-                   variant="h5" 
++             </Stack>
+-                   color={portfolioSummary.total_pnl >= 0 ? 'success.main' : 'error.main'}
++             <Box sx={{ minWidth: 240 }}>
+-                 >
++               <Typography variant="body2" color="text.secondary">Chart Height: {chartHeight}px</Typography>
+-                   ${portfolioSummary.total_pnl.toLocaleString()}
++               <Slider
+-                 </Typography>
++                 size="small"
+-               </Box>
++                 value={chartHeight}
+-               <Box>
++                 onChange={handleHeightChange}
+-                 <Typography variant="body2" color="textSecondary">Return %</Typography>
++                 min={300}
+-                 <Typography 
++                 max={1200}
+-                   variant="h5" 
++                 step={20}
+-                   color={portfolioSummary.total_return_percentage >= 0 ? 'success.main' : 'error.main'}
++                 aria-label="Chart Height"
+-                 >
++               />
+-                   {portfolioSummary.total_return_percentage.toFixed(2)}%
++               <TextField
+-                 </Typography>
++                 size="small"
+-               </Box>
++                 type="number"
+-             </Box>
++                 label="Height (px)"
+-           </Paper>
++                 value={chartHeight}
+-         </Grid>
++                 onChange={(e) => {
+-       )}
++                   const v = Math.max(300, Math.min(1200, Number(e.target.value) || 0));
+- 
++                   setChartHeight(v);
+-       <Grid item xs={12}>
++                   localStorage.setItem('dashboard.chartHeight', String(v));
+-         <Paper elevation={3} sx={{ p: 2, mb: 2 }}>
++                 }}
+-           <Stack spacing={2} direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'stretch', md: 'center' }} justifyContent="space-between">
++                 sx={{ width: 140, mt: 1 }}
+-             <Stack spacing={1} direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'stretch', md: 'center' }}>
++                 inputProps={{ min: 300, max: 1200, step: 20 }}
+-               <ChartSelector value={chartType} onChange={setChartType} />
++               />
+-               <TextField
++             </Box>
+-                 size="small"
++           </Stack>
+-                 label="Symbol"
++         </Paper>
+-                 value={symbol}
++       </Grid>
+-                 onChange={(e) => setSymbol(e.target.value.toUpperCase())}
++       
+-                 sx={{ width: 140 }}
++       <Grid item xs={12} lg={8}>
+-               />
++         <Paper elevation={3} sx={{ p: 2 }}>
+-             </Stack>
++           {loading && (
+-             <Box sx={{ minWidth: 240 }}>
++             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+-               <Typography variant="body2" color="text.secondary">Chart Height: {chartHeight}px</Typography>
++               Loading chart and portfolio data...
+-               <Slider
++             </Typography>
+-                 size="small"
++           )}
+-                 value={chartHeight}
++           <ChartContainer 
+-                 onChange={handleHeightChange}
++             chartType={chartType}
+-                 min={300}
++             symbol={symbol}
+-                 max={1200}
++             theme="dark"
+-                 step={20}
++             interval="D"
+-                 aria-label="Chart Height"
++             indicators={{
+-               />
++               sma: true,
+-               <TextField
++               ema: true,
+-                 size="small"
++               rsi: true,
+-                 type="number"
++               macd: true
+-                 label="Height (px)"
++             }}
+-                 value={chartHeight}
++             height={chartHeight}
+-                 onChange={(e) => {
++           />
+-                   const v = Math.max(300, Math.min(1200, Number(e.target.value) || 0));
++         </Paper>
+-                   setChartHeight(v);
++       </Grid>
+-                   localStorage.setItem('dashboard.chartHeight', String(v));
++       
+-                 }}
++       <Grid item xs={12} lg={4}>
+-                 sx={{ width: 140, mt: 1 }}
++         <Paper elevation={3} sx={{ p: 2, mb: 2 }}>
+-                 inputProps={{ min: 300, max: 1200, step: 20 }}
++           <PerformanceChart data={performanceData} />
+-               />
++         <Paper elevation={3} sx={{ p: 2 }}>
+-             </Box>
++           <PositionsTable positions={positions.map(pos => ({
+-           </Stack>
++             id: pos.id || Math.random(),
+-       </Grid>
++             symbol: pos.symbol,
+-       
++             quantity: pos.quantity,
+-       <Grid item xs={12} lg={8}>
++             entryPrice: pos.entry_price || 0,
+-         <Paper elevation={3} sx={{ p: 2 }}>
++             currentPrice: pos.current_price || 0,
+-           {loading && (
++             pnl: pos.pnl || 0
+-             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
++           }))} />
+-               Loading chart and portfolio data...
++         </Paper>
+-             </Typography>
++       </Grid>
+-           )}
++     </Grid>
+-           <ChartContainer 
++   );
+-             chartType={chartType}
++ };
+-             symbol={symbol}
++ 
+-             theme="dark"
+-             interval="D"
+-             indicators={{
+-               sma: true,
+-               ema: true,
+-               rsi: true,
+-               macd: true
+-             }}
+-             height={chartHeight}
+-           />
+-         </Paper>
+-       </Grid>
+-       
+-       <Grid item xs={12} lg={4}>
+-         <Paper elevation={3} sx={{ p: 2, mb: 2 }}>
+-           <PerformanceChart data={performanceData} />
+-         </Paper>
+-         <Paper elevation={3} sx={{ p: 2 }}>
+-           <PositionsTable positions={positions.map(pos => ({
+-             id: pos.id || Math.random(),
+-             symbol: pos.symbol,
+-             quantity: pos.quantity,
+-             entryPrice: pos.entry_price || 0,
+-             currentPrice: pos.current_price || 0,
+-             pnl: pos.pnl || 0
+-           }))} />
+-         </Paper>
+-       </Grid>
+-     </Grid>
+-       )}
+-     </Box>
+-   );
+- };
+- 

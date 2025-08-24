@@ -96,13 +96,30 @@ else:
         email: str
         password: str
 
-    DEMO_EMAIL = "demo@camboai.com"
+    DEMO_EMAIL = "demo@cambostation.com"
     DEMO_PASSWORD = "password"
 
     @app.post("/api/auth/login", response_model=Token)
     async def dev_login(user_credentials: UserLogin):
-        if user_credentials.email != DEMO_EMAIL or user_credentials.password != DEMO_PASSWORD:
-            raise HTTPException(status_code=401, detail="Incorrect email or password")
+        # For development - accept demo credentials or any email/password combo
+        if (user_credentials.email == DEMO_EMAIL and user_credentials.password == DEMO_PASSWORD) or \
+           (user_credentials.email and user_credentials.password):
+            return Token(access_token="demo-token", token_type="bearer", expires_in=30*60)
+        raise HTTPException(status_code=401, detail="Email and password required")
+
+    class UserRegister(BaseModel):
+        email: str
+        password: str
+        confirm_password: str
+
+    @app.post("/api/auth/register", response_model=Token)
+    async def dev_register(user_credentials: UserRegister):
+        # For development - accept any registration
+        if not user_credentials.email or not user_credentials.password:
+            raise HTTPException(status_code=400, detail="Email and password required")
+        if user_credentials.password != user_credentials.confirm_password:
+            raise HTTPException(status_code=400, detail="Passwords do not match")
+        # Auto-login after registration
         return Token(access_token="demo-token", token_type="bearer", expires_in=30*60)
 
     @app.get("/api/auth/me", response_model=User)

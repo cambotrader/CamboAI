@@ -4,7 +4,7 @@ Complete database schema for professional trading platform
 """
 
 from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, Text, ForeignKey, JSON, Enum, Index, UniqueConstraint
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from datetime import datetime
@@ -188,7 +188,7 @@ class Asset(Base):
     # Metadata
     description = Column(Text)
     website = Column(String(255))
-    metadata = Column(JSONB)
+    extra_metadata = Column(JSONB)
     
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -310,7 +310,7 @@ class Order(Base):
     
     # Additional Data
     notes = Column(Text)
-    metadata = Column(JSONB)
+    extra_metadata = Column(JSONB)
     
     # Relationships
     account = relationship("Account", back_populates="orders")

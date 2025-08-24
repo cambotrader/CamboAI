@@ -1,0 +1,54 @@
+﻿SOURCE: D:\CamboAI\dashboard\app.py
+TARGET: D:\CamboAI\camboai\dashboard\app.py
+==== DIFF (lines prefixed with - are only in SOURCE; + are only in TARGET) ====
++ st.set_page_config(page_title="Cambo AI Trader Dashboard", layout="wide")
+- # Rebranded temporary cockpit name
++ st.title("Cambo AI Trader Dashboard")
+- st.set_page_config(page_title="CamboAI TraderStation â€” Backend Monitor", layout="wide")
++ 	st.subheader("Backend Health")
+- st.title("CamboAI TraderStation â€” Backend Monitor")
++ 	try:
+-     st.subheader("Backend Health")
++ 		r = requests.get(f"{API_URL}/health", timeout=3)
+-     try:
++ 		st.success(f"/health -> {r.status_code} {r.json()}")
+-         r = requests.get(f"{API_URL}/health", timeout=3)
++ 	except Exception as e:
+-         st.success(f"/health -> {r.status_code} {r.json()}")
++ 		st.error(f"Failed to reach backend: {e}")
+-     except Exception as e:
++ 	st.subheader("Portfolio Summary (mock)")
+-         st.error(f"Failed to reach backend: {e}")
++ 	try:
+-     st.subheader("Portfolio Summary (mock)")
++ 		r = requests.get(f"{API_URL}/api/portfolio/summary", timeout=3)
+-     try:
++ 		if r.ok:
+-         r = requests.get(f"{API_URL}/api/portfolio/summary", timeout=3)
++ 			data = r.json()
+-         if r.ok:
++ 			st.metric("Total Value", f"${data.get('total_value', 0):,.2f}")
+-             data = r.json()
++ 			st.metric("Total PnL", f"${data.get('total_pnl', 0):,.2f}")
+-             st.metric("Total Value", f"${data.get('total_value', 0):,.2f}")
++ 			st.metric("Positions", data.get('positions_count', 0))
+-             st.metric("Total PnL", f"${data.get('total_pnl', 0):,.2f}")
++ 		else:
+-             st.metric("Positions", data.get('positions_count', 0))
++ 			st.warning(f"No data yet: {r.status_code}")
+-         else:
++ 	except Exception as e:
+-             st.warning(f"No data yet: {r.status_code}")
++ 		st.info("Start backend (simple_server) for demo data.")
+-     except Exception as e:
++ 		st.write(e)
+-         st.info("Start backend (simple_server) for demo data.")
++ 	r = requests.get(f"{API_URL}/api/portfolio/positions", timeout=3)
+-         st.write(e)
++ 	if r.ok:
+-     r = requests.get(f"{API_URL}/api/portfolio/positions", timeout=3)
++ 		st.dataframe(r.json())
+-     if r.ok:
++ 	pass
+-         st.dataframe(r.json())
+-     pass

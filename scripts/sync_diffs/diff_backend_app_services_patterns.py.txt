@@ -1,0 +1,289 @@
+﻿SOURCE: D:\CamboAI\backend\app\services\patterns.py
+TARGET: D:\CamboAI\camboai\backend\app\services\patterns.py
+==== DIFF (lines prefixed with - are only in SOURCE; + are only in TARGET) ====
++ import talib
+- # TA-Lib may be unavailable in some environments (e.g., CI). Fallback gracefully.
++ 
+- try:
++ @dataclass
+-     import talib  # type: ignore
++ class Detection:
+-     HAS_TALIB = True
++     id: str
+- except Exception:
++     name: str
+-     talib = None  # type: ignore
++     confidence: float
+-     HAS_TALIB = False
++     start: str
+- 
++     end: str
+- @dataclass
++     extra: Optional[Dict[str, Any]] = None
+- class Detection:
++ 
+-     id: str
++ def _fetch_ohlc(symbol: str, period: str = "6mo", interval: str = "1d") -> pd.DataFrame:
+-     name: str
++     ticker = yf.Ticker(symbol)
+-     confidence: float
++     df = ticker.history(period=period, interval=interval)
+-     start: str
++     if df is None or df.empty:
+-     end: str
++         raise ValueError("No data returned for symbol")
+-     extra: Optional[Dict[str, Any]] = None
++     df = df.reset_index()  # ensure Datetime column present
+- 
++     # Standardize column names
+- 
++     rename_map = {"Open": "open", "High": "high", "Low": "low", "Close": "close", "Volume": "volume"}
+- def _fetch_ohlc(symbol: str, period: str = "6mo", interval: str = "1d") -> pd.DataFrame:
++     df = df.rename(columns=rename_map)
+-     ticker = yf.Ticker(symbol)
++     return df
+-     df = ticker.history(period=period, interval=interval)
++ 
+-     if df is None or df.empty:
++ 
+-         raise ValueError("No data returned for symbol")
++ def _extract_cdl_signals(df: pd.DataFrame) -> List[Detection]:
+-     df = df.reset_index()  # ensure Datetime column present
++     """Detect a small set of reliable candlestick patterns using TA-Lib.
+-     # Standardize column names
++     We take the last signal occurrence for each pattern.
+-     rename_map = {"Open": "open", "High": "high", "Low": "low", "Close": "close", "Volume": "volume"}
++     """
+-     df = df.rename(columns=rename_map)
++     open_ = df["open"].values.astype(float)
+-     return df
++     high_ = df["high"].values.astype(float)
+- 
++     low_ = df["low"].values.astype(float)
+- def _extract_cdl_signals(df: pd.DataFrame) -> List[Detection]:
++     close_ = df["close"].values.astype(float)
+-     """Detect a small set of reliable candlestick patterns.
++     patterns = [
+-     Uses TA-Lib if available, otherwise a lightweight fallback.
++         ("Bullish Engulfing", talib.CDLENGULFING(open_, high_, low_, close_)),
+-     """
++         ("Bearish Engulfing", talib.CDLENGULFING(open_, high_, low_, close_)),
+-     open_ = df["open"].values.astype(float)
++         ("Hammer", talib.CDLHAMMER(open_, high_, low_, close_)),
+-     high_ = df["high"].values.astype(float)
++         ("Shooting Star", talib.CDLSHOOTINGSTAR(open_, high_, low_, close_)),
+-     low_ = df["low"].values.astype(float)
++         ("Morning Star", talib.CDLMORNINGSTAR(open_, high_, low_, close_, penetration=0.3)),
+-     close_ = df["close"].values.astype(float)
++         ("Evening Star", talib.CDLEVENINGSTAR(open_, high_, low_, close_, penetration=0.3)),
+-     if HAS_TALIB:
++     ]
+-         patterns = [
++     for name, arr in patterns:
+-             ("Bullish Engulfing", talib.CDLENGULFING(open_, high_, low_, close_)),
++         arr = arr.astype(int)
+-             ("Bearish Engulfing", talib.CDLENGULFING(open_, high_, low_, close_)),
++         # Values are typically 0 (no signal), 100/200 (bullish), -100/-200 (bearish)
+-             ("Hammer", talib.CDLHAMMER(open_, high_, low_, close_)),
++         idxs = np.where(arr != 0)[0]
+-             ("Shooting Star", talib.CDLSHOOTINGSTAR(open_, high_, low_, close_)),
++         if idxs.size == 0:
+-             ("Morning Star", talib.CDLMORNINGSTAR(open_, high_, low_, close_, penetration=0.3)),
++             continue
+-             ("Evening Star", talib.CDLEVENINGSTAR(open_, high_, low_, close_, penetration=0.3)),
++         last_idx = int(idxs[-1])
+-         ]
++         val = int(arr[last_idx])
+- 
++         bull = 1 if val > 0 else -1
+-         for name, arr in patterns:
++         conf = min(1.0, abs(val) / 200.0 + 0.5)  # simple mapping 100->0.99, 200->1.0
+-             arr = arr.astype(int)
++         t = df.iloc[last_idx]["Date"] if "Date" in df.columns else df.iloc[last_idx]["Datetime"] if "Datetime" in df.columns else df.iloc[last_idx]["index"]
+-             idxs = np.where(arr != 0)[0]
++         t_iso = t.isoformat() if isinstance(t, (pd.Timestamp, datetime)) else str(t)
+-             if idxs.size == 0:
++         detections.append(Detection(
+-                 continue
++             id=f"cdl-{name.replace(' ', '-').lower()}-{last_idx}",
+-             last_idx = int(idxs[-1])
++             name=("Bullish " + name) if bull > 0 and "Engulfing" in name else ("Bearish " + name) if bull < 0 and "Engulfing" in name else name,
+-             val = int(arr[last_idx])
++             confidence=float(round(conf, 2)),
+-             bull = 1 if val > 0 else -1
++             start=t_iso,
+-             conf = min(1.0, abs(val) / 200.0 + 0.5)
++             end=t_iso,
+-             t = df.iloc[last_idx]["Date"] if "Date" in df.columns else df.iloc[last_idx]["Datetime"] if "Datetime" in df.columns else df.iloc[last_idx].get("index", df.index[last_idx])
++             extra={"direction": "bullish" if bull > 0 else "bearish", "raw": val},
+-             t_iso = t.isoformat() if isinstance(t, (pd.Timestamp, datetime)) else str(t)
++         ))
+-             detections.append(Detection(
++ 
+-                 id=f"cdl-{name.replace(' ', '-').lower()}-{last_idx}",
++     return detections
+-                 name=("Bullish " + name) if bull > 0 and "Engulfing" in name else ("Bearish " + name) if bull < 0 and "Engulfing" in name else name,
++ 
+-                 confidence=float(round(conf, 2)),
++ 
+-                 start=t_iso,
++ def _trend_context(df: pd.DataFrame) -> Dict[str, Any]:
+-                 end=t_iso,
++     close = df["close"].values.astype(float)
+-                 extra={"direction": "bullish" if bull > 0 else "bearish", "raw": val},
++     sma20 = talib.SMA(close, timeperiod=20)
+-             ))
++     sma50 = talib.SMA(close, timeperiod=50)
+-     else:
++     slope = float((close[-1] - close[max(0, len(close)-21)]) / max(1e-9, close[max(0, len(close)-21)])) if len(close) >= 21 else 0.0
+-         # Fallback: simple momentum-based pseudo-signal so endpoints return meaningful data
++     trend = "up" if slope > 0 else "down" if slope < 0 else "flat"
+-         if len(close_) >= 20:
++     return {
+-             win = 5
++         "sma20": None if np.isnan(sma20[-1]) else float(sma20[-1]),
+-             for i in range(win, len(close_)):
++         "sma50": None if np.isnan(sma50[-1]) else float(sma50[-1]),
+-                 delta = close_[i] - close_[i - win]
++         "trend": trend,
+-                 if abs(delta) / max(1e-9, close_[i - win]) > 0.03:
++         "trend_slope_pct": round(slope*100, 2)
+-                     direction = "bullish" if delta > 0 else "bearish"
++     }
+-                     name = "Momentum Burst"
++ 
+-                     t = df.iloc[i]["Date"] if "Date" in df.columns else df.iloc[i]["Datetime"] if "Datetime" in df.columns else df.iloc[i].get("index", df.index[i])
++ 
+-                     t_iso = t.isoformat() if isinstance(t, (pd.Timestamp, datetime)) else str(t)
++ def scan(symbol: str, timeframe: str = "1D", period: str = "6mo") -> Dict[str, Any]:
+-                     detections.append(Detection(
++     """Perform a simple but real scan using TA-Lib candlestick patterns and basic trend context.
+-                         id=f"fallback-momo-{i}",
++     timeframe: one of {"1D","1h","1wk"} mapped to yfinance intervals.
+-                         name=name,
++     """
+-                         confidence=round(min(1.0, abs(delta) / max(1e-9, close_[i - win])), 2),
++     interval_map = {
+-                         start=t_iso,
++         "1D": (period, "1d"),
+-                         end=t_iso,
++         "1d": (period, "1d"),
+-                         extra={"direction": direction, "window": win},
++         "1h": ("60d", "1h"),
+-                     ))
++         "1H": ("60d", "1h"),
+-             # ensure at least one detection
++         "1wk": ("2y", "1wk"),
+-             if not detections:
++         "1W": ("2y", "1wk"),
+-                 t = df.iloc[-1]["Date"] if "Date" in df.columns else df.iloc[-1]["Datetime"] if "Datetime" in df.columns else df.iloc[-1].get("index", df.index[-1])
++     }
+-                 t_iso = t.isoformat() if isinstance(t, (pd.Timestamp, datetime)) else str(t)
++     p, iv = interval_map.get(timeframe, (period, "1d"))
+-                 detections.append(Detection(
++ 
+-                     id="fallback-momo-last",
++     df = _fetch_ohlc(symbol, period=p, interval=iv)
+-                     name="Momentum Neutral",
++ 
+-                     confidence=0.5,
++     detections = _extract_cdl_signals(df)
+-                     start=t_iso,
++     ctx = _trend_context(df)
+-                     end=t_iso,
++     # add chart patterns
+-                     extra={"direction": "flat", "window": 5},
++     try:
+-                 ))
++         from . import chart_patterns as cp
+-     return detections
++         for d in cp.detect(df):
+- 
++             detections.append(Detection(
+- 
++                 id=d.id,
+- def _trend_context(df: pd.DataFrame) -> Dict[str, Any]:
++                 name=d.name,
+-     close = df["close"].values.astype(float)
++                 confidence=d.confidence,
+-     sma20 = talib.SMA(close, timeperiod=20)
++                 start=d.start,
+-     sma50 = talib.SMA(close, timeperiod=50)
++                 end=d.end,
+-     slope = float((close[-1] - close[max(0, len(close)-21)]) / max(1e-9, close[max(0, len(close)-21)])) if len(close) >= 21 else 0.0
++                 extra=d.extra,
+-     trend = "up" if slope > 0 else "down" if slope < 0 else "flat"
++             ))
+-     return {
++     except Exception:
+-         "sma20": None if np.isnan(sma20[-1]) else float(sma20[-1]),
++         pass
+-         "sma50": None if np.isnan(sma50[-1]) else float(sma50[-1]),
++ 
+-         "trend": trend,
++     # enrich detections with catalog descriptions for UI hover
+-         "trend_slope_pct": round(slope*100, 2)
++     try:
+-     }
++         from . import pattern_catalog as pc
+- 
++         enriched = []
+- 
++         for d in detections:
+- def scan(symbol: str, timeframe: str = "1D", period: str = "6mo") -> Dict[str, Any]:
++             row = d.__dict__.copy()
+-     """Perform a simple but real scan using TA-Lib candlestick patterns and basic trend context.
++             row["info"] = pc.describe(d.name)
+-     timeframe: one of {"1D","1h","1wk"} mapped to yfinance intervals.
++             enriched.append(row)
+-     """
++     except Exception:
+-     interval_map = {
++         enriched = [d.__dict__ for d in detections]
+-         "1D": (period, "1d"),
++ 
+-         "1d": (period, "1d"),
++     return {
+-         "1h": ("60d", "1h"),
++         "symbol": symbol,
+-         "1H": ("60d", "1h"),
++         "timeframe": timeframe,
+-         "1wk": ("2y", "1wk"),
+-         "1W": ("2y", "1wk"),
+-     p, iv = interval_map.get(timeframe, (period, "1d"))
+- 
+-     df = _fetch_ohlc(symbol, period=p, interval=iv)
+- 
+-     detections = _extract_cdl_signals(df)
+-     ctx = _trend_context(df)
+- 
+-     # add chart patterns
+-     try:
+-         from . import chart_patterns as cp
+-         for d in cp.detect(df):
+-             detections.append(Detection(
+-                 id=d.id,
+-                 name=d.name,
+-                 confidence=d.confidence,
+-                 start=d.start,
+-                 end=d.end,
+-                 extra=d.extra,
+-             ))
+-     except Exception:
+-         pass
+- 
+-     # enrich detections with catalog descriptions for UI hover
+-     try:
+-         from . import pattern_catalog as pc
+-         enriched = []
+-         for d in detections:
+-             row = d.__dict__.copy()
+-             row["info"] = pc.describe(d.name)
+-             enriched.append(row)
+-     except Exception:
+-         enriched = [d.__dict__ for d in detections]
+- 
+-     return {
+-         "symbol": symbol,
+-         "timeframe": timeframe,
+-     }

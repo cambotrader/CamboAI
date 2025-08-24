@@ -1,0 +1,132 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "panels": [
+    {
+      "type": "graph",
+      "title": "Signals v2 - Request Rate",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "targets": [{
+        "expr": "sum(rate(analysis_requests_total{type=\"signals_v2\"}[5m]))",
+        "refId": "A"
+      }]
+    },
+    {
+      "type": "graph",
+      "title": "Risk v2 - Request Rate",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "targets": [{
+        "expr": "sum(rate(analysis_requests_total{type=\"risk_v2\"}[5m]))",
+        "refId": "A"
+      }]
+    },
+    {
+      "type": "stat",
+      "title": "HTTP Error Rate (5xx %)",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 8},
+      "targets": [{
+        "expr": "100 * sum(rate(http_request_total{status=~\"5..\"}[5m])) / sum(rate(http_request_total[5m]))",
+        "refId": "A"
+      }]
+    },
+    {
+      "type": "stat",
+      "title": "HTTP p95 Latency (s)",
+      "description": "Overall API p95. See panels below for MD endpoints error rates.",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 8},
+      "targets": [{
+        "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))",
+        "refId": "A"
+      }]
+    },
+    {
+      "type": "graph",
+      "title": "Signals v2 - p95 Latency by Endpoint",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+      "targets": [{
+        "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{endpoint=\"/api/v2/signals\"}[5m])) by (le))",
+        "refId": "A"
+      }]
+    },
+    {
+      "type": "graph",
+      "title": "Risk v2 - p95 Latency by Endpoint",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+      "targets": [{
+        "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{endpoint=\"/api/v2/risk/summary\"}[5m])) by (le))",
+        "refId": "A"
+      }]
+    },
+    {
+      "type": "graph",
+      "title": "Crypto OHLCV - Error Rate",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 24},
+      "targets": [{
+        "expr": "sum(rate(http_request_total{endpoint=\"/api/v1/md/crypto/ohlcv\",status=~\"5..\"}[5m])) / sum(rate(http_request_total{endpoint=\"/api/v1/md/crypto/ohlcv\"}[5m]))",
+        "refId": "A"
+      }]
+    },
+    {
+      "type": "graph",
+      "title": "FX OHLCV - Error Rate",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 24},
+      "targets": [{
+        "expr": "sum(rate(http_request_total{endpoint=\"/api/v1/md/fx/ohlcv\",status=~\"5..\"}[5m])) / sum(rate(http_request_total{endpoint=\"/api/v1/md/fx/ohlcv\"}[5m]))",
+        "refId": "A"
+      }]
+    },
+    {
+      "type": "graph",
+      "title": "Options OHLCV - Error Rate",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 24},
+      "targets": [{
+        "expr": "sum(rate(http_request_total{endpoint=\"/api/v1/md/options/ohlcv\",status=~\"5..\"}[5m])) / sum(rate(http_request_total{endpoint=\"/api/v1/md/options/ohlcv\"}[5m]))",
+        "refId": "A"
+      }]
+    },
+    {
+      "type": "graph",
+      "title": "Crypto OHLCV - p95 Latency",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 32},
+      "targets": [{
+        "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{endpoint=\"/api/v1/md/crypto/ohlcv\"}[5m])) by (le))",
+        "refId": "A"
+      }]
+    },
+    {
+      "type": "graph",
+      "title": "FX OHLCV - p95 Latency",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 32},
+      "targets": [{
+        "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{endpoint=\"/api/v1/md/fx/ohlcv\"}[5m])) by (le))",
+        "refId": "A"
+      }]
+    },
+    {
+      "type": "graph",
+      "title": "Options OHLCV - p95 Latency",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 32},
+      "targets": [{
+        "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{endpoint=\"/api/v1/md/options/ohlcv\"}[5m])) by (le))",
+        "refId": "A"
+      }]
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "title": "API v2 Overview",
+  "time": {"from": "now-1h", "to": "now"}
+}

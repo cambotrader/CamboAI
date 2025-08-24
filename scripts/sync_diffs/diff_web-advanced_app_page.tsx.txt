@@ -1,0 +1,519 @@
+﻿SOURCE: D:\CamboAI\web-advanced\app\page.tsx
+TARGET: D:\CamboAI\camboai\web-advanced\app\page.tsx
+==== DIFF (lines prefixed with - are only in SOURCE; + are only in TARGET) ====
++ import { motion } from 'framer-motion'
+- import dynamic from 'next/dynamic'
++ import { 
+- 
++   TrendingUp, 
+- // Dynamically import motion to prevent SSR issues
++   BarChart3, 
+- const motion = dynamic(() => import('framer-motion').then(mod => ({
++   Brain, 
+-   default: mod.motion
++   Zap, 
+- })), { ssr: false })
++   Target, 
+- import { 
++   Globe,
+-   TrendingUp, 
++   Smartphone,
+-   BarChart3, 
++   Monitor,
+-   Brain, 
++   Database,
+-   Zap, 
++   Cloud,
+-   Target, 
++   Shield,
+-   Globe,
++   Rocket
+-   Smartphone,
++ } from 'lucide-react'
+-   Monitor,
++ import { Button } from '@/components/ui/button'
+-   Database,
++ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+-   Cloud,
++ import { Badge } from '@/components/ui/badge'
+-   Shield,
++ import Link from 'next/link'
+-   Rocket
++ 
+- } from 'lucide-react'
++ const features = [
+- import { Button } from '@/components/ui/button'
++   {
+- import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
++     icon: <Brain className="h-8 w-8" />,
+- import { Badge } from '@/components/ui/badge'
++     title: "AI-Powered Analysis",
+- import Link from 'next/link'
++     description: "Advanced machine learning algorithms analyze market patterns and sentiment",
+- import NoSSR from '@/components/no-ssr'
++     color: "text-purple-500"
+- 
++   },
+- const features = [
++     icon: <TrendingUp className="h-8 w-8" />,
+-     icon: <Brain className="h-8 w-8" />,
++     title: "Real-Time Trading",
+-     title: "AI-Powered Analysis",
++     description: "Execute trades with millisecond precision across multiple markets",
+-     description: "Advanced machine learning algorithms analyze market patterns and sentiment",
++     color: "text-green-500"
+-     color: "text-purple-500"
++     icon: <BarChart3 className="h-8 w-8" />,
+-     icon: <TrendingUp className="h-8 w-8" />,
++     title: "Advanced Charts",
+-     title: "Real-Time Trading",
++     description: "Professional-grade charting with 100+ technical indicators",
+-     description: "Execute trades with millisecond precision across multiple markets",
++     color: "text-blue-500"
+-     color: "text-green-500"
++     icon: <Zap className="h-8 w-8" />,
+-     icon: <BarChart3 className="h-8 w-8" />,
++     title: "Lightning Fast",
+-     title: "Advanced Charts",
++     description: "Sub-millisecond latency for high-frequency trading strategies",
+-     description: "Professional-grade charting with 100+ technical indicators",
++     color: "text-yellow-500"
+-     color: "text-blue-500"
++     icon: <Target className="h-8 w-8" />,
+-     icon: <Zap className="h-8 w-8" />,
++     title: "Risk Management",
+-     title: "Lightning Fast",
++     description: "Sophisticated risk controls and portfolio optimization",
+-     description: "Sub-millisecond latency for high-frequency trading strategies",
++     color: "text-red-500"
+-     color: "text-yellow-500"
++     icon: <Globe className="h-8 w-8" />,
+-     icon: <Target className="h-8 w-8" />,
++     title: "Global Markets",
+-     title: "Risk Management",
++     description: "Access to stocks, forex, crypto, and commodities worldwide",
+-     description: "Sophisticated risk controls and portfolio optimization",
++     color: "text-indigo-500"
+-     color: "text-red-500"
++   }
+-   },
++ ]
+-   {
++ 
+-     icon: <Globe className="h-8 w-8" />,
++ const platforms = [
+-     title: "Global Markets",
++   {
+-     description: "Access to stocks, forex, crypto, and commodities worldwide",
++     icon: <Monitor className="h-6 w-6" />,
+-     color: "text-indigo-500"
++     title: "Web Platform",
+-   }
++     description: "Full-featured web application",
+- ]
++     status: "Live",
+- 
++     link: "/dashboard"
+- const platforms = [
++   },
+-     icon: <Monitor className="h-6 w-6" />,
++     icon: <Smartphone className="h-6 w-6" />,
+-     title: "Web Platform",
++     title: "Mobile App",
+-     description: "Full-featured web application",
++     description: "iOS & Android native apps",
+-     link: "/dashboard"
++     link: "/mobile"
+-     icon: <Smartphone className="h-6 w-6" />,
++     icon: <Database className="h-6 w-6" />,
+-     title: "Mobile App",
++     title: "API Access",
+-     description: "iOS & Android native apps",
++     description: "RESTful API for developers",
+-     link: "/mobile"
++     link: "/api"
+-     icon: <Database className="h-6 w-6" />,
++     icon: <Cloud className="h-6 w-6" />,
+-     title: "API Access",
++     title: "Cloud Sync",
+-     description: "RESTful API for developers",
++     description: "Sync across all devices",
+-     link: "/api"
++     link: "/sync"
+-   },
++   }
+-   {
++ ]
+-     icon: <Cloud className="h-6 w-6" />,
++ 
+-     title: "Cloud Sync",
++ export default function HomePage() {
+-     description: "Sync across all devices",
++   const [mounted, setMounted] = useState(false)
+-     status: "Live",
++ 
+-     link: "/sync"
++   useEffect(() => {
+-   }
++     setMounted(true)
+- ]
++   }, [])
+- export default function HomePage() {
++   if (!mounted) {
+-   const [mounted, setMounted] = useState(false)
++     return null
+-   useEffect(() => {
++   }
+-     setMounted(true)
++   return (
+-   }, [])
++     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
+- 
++       {/* Hero Section */}
+-   if (!mounted) {
++       <section className="relative overflow-hidden">
+-     return null
++         <div className="absolute inset-0 bg-cambo-gradient opacity-10" />
+-   }
++         <div className="relative container mx-auto px-4 py-20">
+- 
++           <motion.div
+-   return (
++             initial={{ opacity: 0, y: 20 }}
+-     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
++             animate={{ opacity: 1, y: 0 }}
+-       {/* Hero Section */}
++             transition={{ duration: 0.8 }}
+-       <section className="relative overflow-hidden">
++             className="text-center max-w-4xl mx-auto"
+-         <div className="absolute inset-0 bg-cambo-gradient opacity-10" />
++           >
+-         <div className="relative container mx-auto px-4 py-20">
++             <Badge variant="secondary" className="mb-4">
+-           <NoSSR fallback={<div className="text-center max-w-4xl mx-auto opacity-0">Loading...</div>}>
++               <Rocket className="h-4 w-4 mr-2" />
+-             <motion.div
++               Version 2.0 - Now Live
+-               initial={{ opacity: 0, y: 20 }}
++             </Badge>
+-               animate={{ opacity: 1, y: 0 }}
++             
+-               transition={{ duration: 0.8 }}
++             <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent mb-6">
+-               className="text-center max-w-4xl mx-auto"
++               CamboAI
+-             >
++             </h1>
+-             <Badge variant="secondary" className="mb-4">
++             
+-               <Rocket className="h-4 w-4 mr-2" />
++             <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed">
+-               Version 2.0 - Now Live
++               The Ultimate Unified Trading Platform
+-             </Badge>
++             </p>
+-             <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent mb-6">
++             <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
+-               CamboAI
++               Combining all your CamboStation projects into one powerful platform. 
+-             </h1>
++               Advanced AI, real-time analytics, and professional trading tools - all in one place.
+-             <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed">
++             <div className="flex flex-col sm:flex-row gap-4 justify-center">
+-               The Ultimate Unified Trading Platform
++               <Button asChild size="lg" className="cambo-button text-lg px-8 py-3">
+-             
++                 <Link href="/dashboard">
+-             <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
++                   Launch Platform
+-               Combining all your CamboStation projects into one powerful platform. 
++                   <TrendingUp className="ml-2 h-5 w-5" />
+-               Advanced AI, real-time analytics, and professional trading tools - all in one place.
++                 </Link>
+-             </p>
++               </Button>
+-             
++               
+-             <div className="flex flex-col sm:flex-row gap-4 justify-center">
++               <Button asChild variant="outline" size="lg" className="text-lg px-8 py-3">
+-               <Button asChild size="lg" className="cambo-button text-lg px-8 py-3">
++                 <Link href="/demo">
+-                 <Link href="/dashboard">
++                   View Demo
+-                   Launch Platform
++                   <BarChart3 className="ml-2 h-5 w-5" />
+-                   <TrendingUp className="ml-2 h-5 w-5" />
++             </div>
+-               
++           </motion.div>
+-               <Button asChild variant="outline" size="lg" className="text-lg px-8 py-3">
++         </div>
+-                 <Link href="/demo">
++       </section>
+-                   View Demo
++ 
+-                   <BarChart3 className="ml-2 h-5 w-5" />
++       {/* Features Section */}
+-                 </Link>
++       <section className="py-20 bg-muted/30">
+-               </Button>
++         <div className="container mx-auto px-4">
+-             </div>
++           <motion.div
+-           </motion.div>
++             initial={{ opacity: 0, y: 20 }}
+-           </NoSSR>
++             whileInView={{ opacity: 1, y: 0 }}
+-         </div>
++             transition={{ duration: 0.8 }}
+-       </section>
++             viewport={{ once: true }}
+- 
++             className="text-center mb-16"
+-       {/* Features Section */}
++           >
+-       <section className="py-20 bg-muted/30">
++             <h2 className="text-4xl font-bold mb-4">Powerful Features</h2>
+-         <div className="container mx-auto px-4">
++             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+-           <motion.div
++               Everything you need for professional trading, powered by cutting-edge AI
+-             initial={{ opacity: 0, y: 20 }}
++             </p>
+-             whileInView={{ opacity: 1, y: 0 }}
++           </motion.div>
+-             transition={{ duration: 0.8 }}
++ 
+-             viewport={{ once: true }}
++           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+-             className="text-center mb-16"
++             {features.map((feature, index) => (
+-           >
++               <motion.div
+-             <h2 className="text-4xl font-bold mb-4">Powerful Features</h2>
++                 key={index}
+-             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
++                 initial={{ opacity: 0, y: 20 }}
+-               Everything you need for professional trading, powered by cutting-edge AI
++                 whileInView={{ opacity: 1, y: 0 }}
+-             </p>
++                 transition={{ duration: 0.5, delay: index * 0.1 }}
+-           </motion.div>
++                 viewport={{ once: true }}
+- 
++               >
+-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
++                 <Card className="cambo-card h-full hover:cambo-glow transition-all duration-300">
+-             {features.map((feature, index) => (
++                   <CardHeader>
+-               <motion.div
++                     <div className={`${feature.color} mb-4`}>
+-                 key={index}
++                       {feature.icon}
+-                 initial={{ opacity: 0, y: 20 }}
++                     </div>
+-                 whileInView={{ opacity: 1, y: 0 }}
++                     <CardTitle className="text-xl">{feature.title}</CardTitle>
+-                 transition={{ duration: 0.5, delay: index * 0.1 }}
++                   </CardHeader>
+-                 viewport={{ once: true }}
++                   <CardContent>
+-               >
++                     <CardDescription className="text-base">
+-                 <Card className="cambo-card h-full hover:cambo-glow transition-all duration-300">
++                       {feature.description}
+-                   <CardHeader>
++                     </CardDescription>
+-                     <div className={`${feature.color} mb-4`}>
++                   </CardContent>
+-                       {feature.icon}
++                 </Card>
+-                     </div>
++               </motion.div>
+-                     <CardTitle className="text-xl">{feature.title}</CardTitle>
++             ))}
+-                   </CardHeader>
++           </div>
+-                   <CardContent>
++         </div>
+-                     <CardDescription className="text-base">
++       </section>
+-                       {feature.description}
++ 
+-                     </CardDescription>
++       {/* Platforms Section */}
+-                   </CardContent>
++       <section className="py-20">
+-                 </Card>
++         <div className="container mx-auto px-4">
+-               </motion.div>
++           <motion.div
+-             ))}
++             initial={{ opacity: 0, y: 20 }}
+-           </div>
++             whileInView={{ opacity: 1, y: 0 }}
+-         </div>
++             transition={{ duration: 0.8 }}
+-       </section>
++             viewport={{ once: true }}
+- 
++             className="text-center mb-16"
+-       {/* Platforms Section */}
++           >
+-       <section className="py-20">
++             <h2 className="text-4xl font-bold mb-4">Multi-Platform Access</h2>
+-         <div className="container mx-auto px-4">
++             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+-           <motion.div
++               Trade anywhere, anytime with our comprehensive platform ecosystem
+-             initial={{ opacity: 0, y: 20 }}
++             </p>
+-             whileInView={{ opacity: 1, y: 0 }}
++           </motion.div>
+-             transition={{ duration: 0.8 }}
++ 
+-             viewport={{ once: true }}
++           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+-             className="text-center mb-16"
++             {platforms.map((platform, index) => (
+-           >
++               <motion.div
+-             <h2 className="text-4xl font-bold mb-4">Multi-Platform Access</h2>
++                 key={index}
+-             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
++                 initial={{ opacity: 0, scale: 0.9 }}
+-               Trade anywhere, anytime with our comprehensive platform ecosystem
++                 whileInView={{ opacity: 1, scale: 1 }}
+-             </p>
++                 transition={{ duration: 0.5, delay: index * 0.1 }}
+-           </motion.div>
++                 viewport={{ once: true }}
+- 
++               >
+-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
++                 <Card className="cambo-card text-center hover:scale-105 transition-transform duration-300">
+-             {platforms.map((platform, index) => (
++                   <CardHeader>
+-               <motion.div
++                     <div className="mx-auto mb-4 p-3 bg-primary/10 rounded-full w-fit">
+-                 key={index}
++                       <div className="text-primary">
+-                 initial={{ opacity: 0, scale: 0.9 }}
++                         {platform.icon}
+-                 whileInView={{ opacity: 1, scale: 1 }}
++                       </div>
+-                 transition={{ duration: 0.5, delay: index * 0.1 }}
++                     </div>
+-                 viewport={{ once: true }}
++                     <CardTitle className="text-lg">{platform.title}</CardTitle>
+-               >
++                     <CardDescription>{platform.description}</CardDescription>
+-                 <Card className="cambo-card text-center hover:scale-105 transition-transform duration-300">
++                   </CardHeader>
+-                   <CardHeader>
++                   <CardContent>
+-                     <div className="mx-auto mb-4 p-3 bg-primary/10 rounded-full w-fit">
++                     <Badge variant="secondary" className="mb-4">
+-                       <div className="text-primary">
++                       <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
+-                         {platform.icon}
++                       {platform.status}
+-                       </div>
++                     </Badge>
+-                     </div>
++                     <Button asChild variant="outline" className="w-full">
+-                     <CardTitle className="text-lg">{platform.title}</CardTitle>
++                       <Link href={platform.link}>Access</Link>
+-                     <CardDescription>{platform.description}</CardDescription>
++                     </Button>
+-                   </CardHeader>
++                   </CardContent>
+-                   <CardContent>
++                 </Card>
+-                     <Badge variant="secondary" className="mb-4">
++               </motion.div>
+-                       <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
++             ))}
+-                       {platform.status}
++           </div>
+-                     </Badge>
++         </div>
+-                     <Button asChild variant="outline" className="w-full">
++       </section>
+-                       <Link href={platform.link}>Access</Link>
++ 
+-                     </Button>
++       {/* CTA Section */}
+-                   </CardContent>
++       <section className="py-20 bg-primary/5">
+-                 </Card>
++         <div className="container mx-auto px-4 text-center">
+-               </motion.div>
++           <motion.div
+-             ))}
++             initial={{ opacity: 0, y: 20 }}
+-           </div>
++             whileInView={{ opacity: 1, y: 0 }}
+-         </div>
++             transition={{ duration: 0.8 }}
+-       </section>
++             viewport={{ once: true }}
+- 
++             className="max-w-3xl mx-auto"
+-       {/* CTA Section */}
++           >
+-       <section className="py-20 bg-primary/5">
++             <Shield className="h-16 w-16 mx-auto mb-6 text-primary" />
+-         <div className="container mx-auto px-4 text-center">
++             <h2 className="text-4xl font-bold mb-6">Ready to Start Trading?</h2>
+-           <motion.div
++             <p className="text-xl text-muted-foreground mb-8">
+-             initial={{ opacity: 0, y: 20 }}
++               Join thousands of traders using CamboAI for professional trading. 
+-             whileInView={{ opacity: 1, y: 0 }}
++               Get started in minutes with our intuitive platform.
+-             transition={{ duration: 0.8 }}
++             </p>
+-             viewport={{ once: true }}
++             <div className="flex flex-col sm:flex-row gap-4 justify-center">
+-             className="max-w-3xl mx-auto"
++               <Button asChild size="lg" className="cambo-button text-lg px-8 py-3">
+-           >
++                 <Link href="/dashboard">
+-             <Shield className="h-16 w-16 mx-auto mb-6 text-primary" />
++                   Start Trading Now
+-             <h2 className="text-4xl font-bold mb-6">Ready to Start Trading?</h2>
++                   <Rocket className="ml-2 h-5 w-5" />
+-             <p className="text-xl text-muted-foreground mb-8">
++                 </Link>
+-               Join thousands of traders using CamboAI for professional trading. 
++               </Button>
+-               Get started in minutes with our intuitive platform.
++               <Button asChild variant="outline" size="lg" className="text-lg px-8 py-3">
+-             </p>
++                 <Link href="/contact">
+-             <div className="flex flex-col sm:flex-row gap-4 justify-center">
++                   Contact Sales
+-               <Button asChild size="lg" className="cambo-button text-lg px-8 py-3">
++                 </Link>
+-                 <Link href="/dashboard">
++               </Button>
+-                   Start Trading Now
++             </div>
+-                   <Rocket className="ml-2 h-5 w-5" />
++           </motion.div>
+-                 </Link>
++         </div>
+-               </Button>
++       </section>
+-               <Button asChild variant="outline" size="lg" className="text-lg px-8 py-3">
++     </div>
+-                 <Link href="/contact">
+-                   Contact Sales
+-                 </Link>
+-               </Button>
+-             </div>
+-           </motion.div>
+-         </div>
+-       </section>
+-     </div>

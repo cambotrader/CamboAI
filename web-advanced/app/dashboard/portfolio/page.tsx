@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import dynamic from 'next/dynamic';
+import { ConnectDataPanel } from '@/components/dashboard/connect-data-panel';
 
 const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
 
@@ -181,6 +182,8 @@ export default function PortfolioPage() {
           {loading ? 'Updating...' : '🔄 Refresh'}
         </Button>
       </div>
+
+      <ConnectDataPanel />
 
       {/* Portfolio Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

@@ -1,0 +1,22 @@
+AI Agents and Their Task Assignments
+Agent	Specialization	Task Assignments
+GitHub Copilot	Inline code suggestion & scaffolding	• Draft functions in Python & React<br>• Refactor logic blocks<br>• Quick syntax help
+Amazon CodeWhisperer	Backend & AWS-native intelligence	• Scaffold secure APIs<br>• Set up IAM & credentials<br>• Build AWS Lambda workflows
+Cursor	GPT-powered IDE assistant	• Prompt engineering inside modules<br>• Refactor multi-file systems<br>• Generate UI logic
+Blackbox AI	Public repo miner & code injection	• Mine code snippets from GitHub<br>• Surface strategy examples<br>• Feed code inspiration
+Continue.dev	IDE-native task router	• Route prompts per file<br>• Trigger agents by filename/context<br>• Automate repetitive edits
+Zencoder	Visual flow orchestrator	• Build drag-and-drop workflows<br>• Coordinate multi-agent flows<br>• Chain AI tasks across modules
+Bolt AI	Low-code rule logic & workflow triggers	• Define trade trigger logic<br>• Configure entry/SL/TP conditions<br>• Prototype automation rules
+LangChain	Reasoning engine & memory management	• Simulate strategy logic<br>• Provide explanations & tutoring<br>• Handle multi-turn decision flows
+FinBERT	Financial sentiment analysis	• Analyze news and tweets<br>• Generate bullish/bearish signals for strategies
+supervisor.py	Master orchestrator	• Trigger and coordinate all AI agents<br>• Bind feature toggles across modules<br>• Route outputs to UI/API or logs Your Cambo AI Agent Roster (So Far)
+AI Agent / Tool	Role / Power	Integration Notes
+GitHub Copilot	🧪 Code whisperer — gives inline suggestions	Use in VS Code for quick logic + syntax scaffolding
+Cursor	🧱 Modular architect — refactors, generates UI, manages GPT prompts	Use separately alongside VS Code; talk to it like a code collaborator
+Amazon CodeWhisperer	🔐 Backend strategist — smart completions + AWS-native tools	Available via AWS Toolkit in VS Code
+Zencoder	🧠 Taskmaster — routes logic between agents, builds visual automation flows	Set up workflows, monitor reasoning, generate prompt chains
+FinBERT	📊 Sentiment analyzer — detects bullish/bearish tone in financial language	Embedded in sentiment_engine.py
+LangChain	🧠 Chain-based logic — handles reasoning, memory, multi-step workflows	Perfect for strategy_agent.py and tutoring logic
+Bolt AI	🛠️ Automation engine — low-code AI scripting agent	Great for rapid prototype flows or rule-based trade logic
+Continue.dev	🤖 Prompt router — coordinates file-level AI tasks in VS Code	Can direct agents based on file paths or content
+Blackbox AI	🗂️ Code miner — fetches public repo snippets fast	Use for inspiration or plug-and-play strategies

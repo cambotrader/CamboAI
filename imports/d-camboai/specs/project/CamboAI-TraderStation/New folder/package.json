@@ -1,0 +1,10 @@
+{
+  "name": "cambostation-root",
+  "private": true,
+  "scripts": {
+    "start": "npm --prefix frontend run start",
+    "start:frontend": "npm --prefix frontend run start",
+    "start:backend": "powershell -ExecutionPolicy Bypass -File Start-Simple.ps1",
+    "install:frontend": "npm --prefix frontend install --legacy-peer-deps"
+  }
+}

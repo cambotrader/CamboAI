@@ -111,7 +111,17 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
-    - name: Deploy to production
+    - uses: actions/checkout@v4
+
+    - name: Deploy web-advanced to Vercel
+      uses: vercel/action@v1
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        working-directory: web-advanced
+        scope: ${{ secrets.VERCEL_ORG_ID }}
+        project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        prod: true
+
+    - name: Note
       run: |
-        echo "Add your deployment steps here"
-        # Add actual deployment steps based on your hosting platform
+        echo "Ensure VERCEL_TOKEN, VERCEL_ORG_ID, and VERCEL_PROJECT_ID are set in repo secrets."

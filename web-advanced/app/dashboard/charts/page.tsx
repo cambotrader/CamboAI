@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import dynamic from 'next/dynamic';
+import { ConnectDataPanel } from '@/components/dashboard/connect-data-panel';
 
 // Dynamically import Plotly to avoid SSR issues
 const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
@@ -49,6 +50,9 @@ export default function ChartsPage() {
   const [showIndicators, setShowIndicators] = useState({ ma50: true, ma200: true, rsi: false });
   const [showPatterns, setShowPatterns] = useState(true);
   const [aiCommentary, setAiCommentary] = useState<string>('');
+  const [marketType, setMarketType] = useState<'stock' | 'crypto'>('stock');
+  const [interval, setInterval] = useState<string>('1d');
+  const [range, setRange] = useState<string>('1mo');
 
   // Calculate moving averages
   const calculateMA = (prices: number[], period: number): number[] => {
@@ -138,21 +142,37 @@ export default function ChartsPage() {
   };
 
   const loadSymbol = async (symbol: string) => {
-    // In real implementation, this would fetch from yfinance API
     setSelectedSymbol(symbol);
-    // Simulate loading new data
-    const newData = {
-      ...SAMPLE_DATA,
-      symbol,
-      prices: SAMPLE_DATA.prices.map(p => ({
-        ...p,
-        open: p.open * (0.8 + Math.random() * 0.4),
-        high: p.high * (0.8 + Math.random() * 0.4),
-        low: p.low * (0.8 + Math.random() * 0.4),
-        close: p.close * (0.8 + Math.random() * 0.4),
-      }))
-    };
-    setChartData(newData);
+    try {
+      const qs = new URLSearchParams({ type: marketType, symbol, interval, range }).toString();
+      const res = await fetch(`/api/market/ohlc?${qs}`);
+      if (!res.ok) throw new Error(`Failed to fetch data (${res.status})`);
+      const data = await res.json();
+      const prices = (data.candles || []).map((c: any) => ({
+        time: new Date(c.t).toISOString(),
+        open: c.o,
+        high: c.h,
+        low: c.l,
+        close: c.c,
+        volume: c.v ?? 0,
+      }));
+      if (prices.length > 0) {
+        setChartData({ symbol, prices });
+      }
+    } catch (e) {
+      const newData = {
+        ...SAMPLE_DATA,
+        symbol,
+        prices: SAMPLE_DATA.prices.map(p => ({
+          ...p,
+          open: p.open * (0.9 + Math.random() * 0.2),
+          high: p.high * (0.9 + Math.random() * 0.2),
+          low: p.low * (0.9 + Math.random() * 0.2),
+          close: p.close * (0.9 + Math.random() * 0.2),
+        }))
+      };
+      setChartData(newData);
+    }
   };
 
   return (
@@ -160,7 +180,11 @@ export default function ChartsPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">📈 Advanced Charts</h1>
         <div className="flex space-x-2">
-          {['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'NVDA'].map(symbol => (
+          {(
+            marketType === 'stock'
+              ? ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'NVDA']
+              : ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT']
+          ).map(symbol => (
             <Button
               key={symbol}
               variant={selectedSymbol === symbol ? 'default' : 'outline'}
@@ -172,6 +196,50 @@ export default function ChartsPage() {
           ))}
         </div>
       </div>
+
+      <div className="flex flex-wrap gap-3 items-center">
+        <select className="p-2 border rounded" value={marketType} onChange={e => setMarketType(e.target.value as any)}>
+          <option value="stock">Stocks (Yahoo)</option>
+          <option value="crypto">Crypto (Binance)</option>
+        </select>
+
+        {marketType === 'stock' ? (
+          <>
+            <select className="p-2 border rounded" value={interval} onChange={e => setInterval(e.target.value)}>
+              <option value="1d">1d</option>
+              <option value="1wk">1wk</option>
+              <option value="1mo">1mo</option>
+            </select>
+            <select className="p-2 border rounded" value={range} onChange={e => setRange(e.target.value)}>
+              <option value="5d">5d</option>
+              <option value="1mo">1mo</option>
+              <option value="3mo">3mo</option>
+              <option value="6mo">6mo</option>
+              <option value="1y">1y</option>
+            </select>
+          </>
+        ) : (
+          <>
+            <select className="p-2 border rounded" value={interval} onChange={e => setInterval(e.target.value)}>
+              <option value="1m">1m</option>
+              <option value="5m">5m</option>
+              <option value="15m">15m</option>
+              <option value="1h">1h</option>
+              <option value="4h">4h</option>
+              <option value="1d">1d</option>
+            </select>
+            {/* Range unused for Binance; keep for API parity */}
+            <select className="p-2 border rounded" value={range} onChange={e => setRange(e.target.value)}>
+              <option value="1w">1w</option>
+              <option value="1mo">1mo</option>
+            </select>
+          </>
+        )}
+
+        <Button size="sm" variant="outline" onClick={() => loadSymbol(selectedSymbol)}>Reload</Button>
+      </div>
+
+      <ConnectDataPanel />
 
       {/* AI Commentary */}
       {aiCommentary && (

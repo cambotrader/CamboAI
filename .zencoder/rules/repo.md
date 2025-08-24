@@ -3,10 +3,12 @@ description: Repository Information Overview
 alwaysApply: true
 ---
 
-# CamboStation Vision Information
+# CamboAI TraderStation Information
 
 ## Summary
-CamboStation Vision is an advanced AI-powered trading intelligence platform that integrates multiple charting solutions, trading platforms, and AI-driven analysis tools. It provides real-time market data, pattern recognition, sentiment analysis, and strategy recommendations.
+CamboAI TraderStation is an advanced AI-powered trading intelligence platform that integrates multiple charting solutions, trading platforms, and AI-driven analysis tools. It provides real-time market data, pattern recognition, sentiment analysis, and strategy recommendations.
+
+Note: The Streamlit dashboard is temporary; the final product will run at https://camboai.com (Vercel/Render behind Cloudflare).
 
 ## Structure
 - **frontend/**: React TypeScript frontend with MUI components and chart libraries

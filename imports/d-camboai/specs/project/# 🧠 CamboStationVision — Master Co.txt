@@ -1,0 +1,750 @@
+# 🧠 CamboStationVision — Master Cockpit (Phase 1–6 Fusion)
+import streamlit as st
+import yfinance as yf
+import pandas as pd
+import plotly.graph_objects as go
+import streamlit.components.v1 as components
+import torch
+from datetime import datetime, timedelta
+from ta.trend import SMAIndicator
+from ta.momentum import RSIIndicator
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+
+# ── Phase 1: UX Amplification ─────────────────────────────────────────────
+st.set_page_config(page_title="🧠 CamboStationVision Cockpit", layout="wide")
+st.title("📊 CamboStationVision Glyph Core Dashboard")
+
+# Sidebar Inputs
+ticker = st.sidebar.text_input("📈 Ticker", "AAPL").upper()
+interval = st.sidebar.selectbox("⏱️ Interval", ["1d", "1h", "15m"], index=0)
+period = st.sidebar.selectbox("🗓️ Period", ["1y", "6mo", "3mo", "1mo"], index=0)
+show_tv = st.sidebar.checkbox("💹 TradingView", value=True)
+show_fbz = st.sidebar.checkbox("🧠 FinBERT Sentiment Zones", value=True)
+show_glyphs = st.sidebar.checkbox("🗿 Show Glyphs", value=True)
+
+# ── FinBERT Setup ─────────────────────────────────────────────────────────
+@st.cache_resource
+def load_finbert():
+    tokenizer = AutoTokenizer.from_pretrained("ProsusAI/finbert")
+    model = AutoModelForSequenceClassification.from_pretrained("ProsusAI/finbert")
+    return tokenizer, model
+
+tokenizer, model = load_finbert()
+labels = ["negative", "neutral", "positive"]
+
+def finbert_sentiment_score(text):
+    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
+    with torch.no_grad():
+        outputs = model(**inputs)
+    scores = torch.nn.functional.softmax(outputs.logits, dim=1)[0]
+    return labels[scores.argmax()]
+
+def get_recent_headlines(ticker):
+    return [
+        {"date": datetime.now() - timedelta(days=3), "headline": f"{ticker} Q2 earnings exceed expectations"},
+        {"date": datetime.now() - timedelta(days=6), "headline": f"{ticker} faces regulatory probe"},
+        {"date": datetime.now() - timedelta(days=10), "headline": f"{ticker} announces AI partnership"}
+    ]
+
+def get_sentiment_zones(headlines):
+    zones = []
+    color_map = {
+        "positive": "rgba(0,200,0,0.2)",
+        "neutral": "rgba(180,180,0,0.2)",
+        "negative": "rgba(200,0,0,0.2)"
+    }
+    for item in headlines:
+        tone = finbert_sentiment_score(item["headline"])
+        zones.append({
+            "start": item["date"] - timedelta(days=1),
+            "end": item["date"] + timedelta(days=1),
+            "color": color_map[tone],
+            "label": tone
+        })
+    return zones
+
+# ── Chart Logic ────────────────────────────────────────────────────────────
+def plot_chart(df, ticker, zones=None):
+    fig = go.Figure(data=[go.Candlestick(
+        x=df.index,
+        open=df['Open'], high=df['High'],
+        low=df['Low'], close=df['Close'],
+        name='Price'
+    )])
+
+    fig.add_trace(go.Scatter(x=df.index, y=df['MA50'], line=dict(color='blue'), name='MA50'))
+    fig.add_trace(go.Scatter(x=df.index, y=df['MA200'], line=dict(color='red'), name='MA200'))
+
+    if zones:
+        for zone in zones:
+            fig.add_vrect(x0=zone['start'], x1=zone['end'], fillcolor=zone['color'], opacity=0.2, line_width=0)
+
+    fig.update_layout(title=f"{ticker} Tactical Chart", xaxis_rangeslider_visible=False)
+    st.plotly_chart(fig, use_container_width=True)
+
+# ── Load Market Data ───────────────────────────────────────────────────────
+df = yf.download(ticker, period=period, interval=interval, auto_adjust=True)
+if df.empty or len(df) < 200:
+    st.error("❌ Not enough data to generate signals.")
+    st.stop()
+
+df['MA50'] = SMAIndicator(close=df['Close'], window=50).sma_indicator()
+df['MA200'] = SMAIndicator(close=df['Close'], window=200).sma_indicator()
+df['RSI'] = RSIIndicator(close=df['Close'], window=14).rsi()
+
+# ── Phase 2: Symbolic Intelligence Fusion ──────────────────────────────────
+try:
+    from identity_myth_engine import get_identity_score
+    identity_score = get_identity_score(df)
+    st.metric("🧬 Identity Score", f"{identity_score:.2f}")
+except:
+    st.info("🧬 Identity Score: placeholder value (module not available)")
+
+try:
+    from persona_volatility_tracker import track_volatility
+    volatility_state = track_volatility(df)
+    st.metric("🎭 Emotional Volatility", volatility_state)
+except:
+    st.info("🎭 Emotional Volatility: placeholder")
+
+try:
+    from belief_codex import get_belief_tags
+    belief_tags = get_belief_tags(ticker)
+    st.write("🧠 Belief Tags:", ", ".join(belief_tags))
+except:
+    st.info("🧠 Belief Tags: module not linked")
+
+# ── Phase 3: Strategy Activation ───────────────────────────────────────────
+try:
+    from strategies.strategy_lab import StrategyLab
+    lab = StrategyLab()
+
+    def sample_logic(data): st.success(f"🔥 Executed SampleStrategy on {data}")
+    lab.register_strategy("SampleStrategy", sample_logic)
+
+    if st.button("🚀 Execute Strategy"):
+        lab.execute_all({'price': df['Close'].iloc[-1], 'volume': df['Volume'].iloc[-1]})
+except:
+    st.warning("🛠 StrategyLab not found")
+
+# ── Phase 4: Signal Confirmation + Ritual ──────────────────────────────────
+try:
+    from signal_overlay import confirm_signal
+    from ritual_composer import ritual_status
+
+    confirmation = confirm_signal(df)
+    ritual = ritual_status(confirmation)
+
+    st.success(f"📡 Signal Confirmed: {confirmation}")
+    st.info(f"🧘 Ritual Status: {ritual}")
+except:
+    st.info("🔁 Ritual and signal modules pending")
+
+# ── Phase 5: Glyph Rendering ───────────────────────────────────────────────
+if show_glyphs:
+    try:
+        from glyphs import render_glyphs
+        glyph_svg = render_glyphs(identity_score, belief_tags)
+        st.image(glyph_svg, use_column_width=True)
+    except:
+        st.info("🗿 Glyph rendering module not available")
+
+# ── Phase 6: Execution Memory ──────────────────────────────────────────────
+try:
+    from execution_playlist import log_execution
+    exec_log = log_execution("SampleStrategy", {'price': df['Close'].iloc[-1]})
+    st.json(exec_log)
+except:
+    st.info("📋 Execution log module not connected")
+
+# ── Sentiment Zones ────────────────────────────────────────────────────────
+if show_fbz:
+    headlines = get_recent_headlines(ticker)
+    zones = get_sentiment_zones(headlines)
+    st.write("🧠 Sentiment Zones:", [z['label'] for z in zones])
+else:
+    zones = None
+
+plot_chart(df, ticker, zones)
+
+# ── TradingView Widget ─────────────────────────────────────────────────────
+if show_tv:
+    embed = f"""
+    <iframe src="https://s.tradingview.com/widgetembed/?symbol={ticker}&interval=D&theme=dark"
+        width="100%" height="520" frameborder="0"></iframe>
+    """
+    components.html(embed, height=540)
+import streamlit as st
+from PIL import Image
+import time
+import streamlit.components.v1 as components
+
+# --- MODULE IMPORTS ---
+from modules.education_tab import show_education_tab
+from modules.scanner_tab import show_scanner_tab
+
+# --- PAGE CONFIG ---
+st.set_page_config(page_title="CamboStation™", layout="wide")
+
+# --- LOAD LOGO ---
+logo = Image.open("assets/logo.png")
+
+# --- HEADER: Centered Logo + Slogan ---
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    st.image(logo, use_column_width=True)
+    st.markdown(
+        """
+        <h1 style='text-align: center; color: #1E90FF;'>Welcome to CamboStation™</h1>
+        <h3 style='text-align: center; color: gray;'>Trade with Vision. Learn with Purpose. Evolve with AI.</h3>
+        """,
+        unsafe_allow_html=True
+    )
+
+# --- LIVE MARKET CHART ---
+st.markdown("---")
+st.subheader("📈 Live Market Chart")
+
+components.html(
+    """ 
+    <!-- TradingView Widget BEGIN -->
+    <div class="tradingview-widget-container">
+      <div id="tradingview_livechart"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+      <script type="text/javascript">
+        new TradingView.widget({
+          "width": "100%",
+          "height": 500,
+          "symbol": "NASDAQ:AAPL",
+          "interval": "D",
+          "timezone": "Etc/UTC",
+          "theme": "dark",
+          "style": "1",
+          "locale": "en",
+          "toolbar_bg": "#f1f3f6",
+          "enable_publishing": false,
+          "allow_symbol_change": true,
+          "container_id": "tradingview_livechart"
+        });
+      </script>
+    </div>
+    <!-- TradingView Widget END -->
+    """,
+    height=520
+)
+
+# --- SIDEBAR NAVIGATION ---
+st.sidebar.image(logo, width=150)
+st.sidebar.title("🧭 Navigation")
+selection = st.sidebar.radio(
+    "Go to",
+    ["📊 Dashboard", "🎓 Education", "🔍 Pattern Scanner"],
+    key="nav_radio"
+)
+st.sidebar.markdown("---")
+st.sidebar.markdown("Made with 💼 by John R. Lim")
+
+# --- MAIN CONTENT TABS ---
+if selection == "📊 Dashboard":
+    st.subheader("📊 Market Dashboard")
+    st.info("Welcome to CamboStation™! Modules under construction.")
+elif selection == "🎓 Education":
+    show_education_tab()
+elif selection == "🔍 Pattern Scanner":
+    show_scanner_tab()
+from modules.banner_module import render_banner
+from modules.strategy_lab import render_strategy_lab
+import streamlit as st
+
+# ─────────────────────────────────────────────
+# Import Modules (adjust based on what you've deployed)
+# ─────────────────────────────────────────────
+from modules.layout_controller import get_enabled_modules
+from modules.tradingview_widget import render_tradingview_widget
+from modules.chart_tab import render_chart_tab  # Only include if chart_tab.py exists
+from modules.pattern_recognizer import render_pattern_tab
+from modules.chart_pattern_detector import render_chart_pattern_tab
+from modules.strategy_linker import link_detected_patterns_to_strategy
+from modules.pattern_logbook import render_logbook_viewer  # Optional: if logbook is deployed
+
+# ─────────────────────────────────────────────
+# App Title + Header
+# ─────────────────────────────────────────────
+st.set_page_config(page_title="CamboStation™", layout="wide")
+render_banner()
+st.title("🎯 CamboStation™ Cockpit Interface")
+
+st.markdown("#### Tactical Trading Dashboard — Modular Pattern & Strategy Intelligence")
+st.markdown("---")
+
+# ─────────────────────────────────────────────
+selected_tab = st.selectbox("🧭 Navigate CamboStation Modules", [
+    "📊 Charts",
+    "📐 Structure Scanner",
+    "📈 Candle Scanner",
+    "🧠 Strategy Lab",
+    "✍️ Pattern Journal",
+    "🌐 Live Widget"
+])
+if selected_tab == "📊 Charts":
+    render_chart_tab()
+
+elif selected_tab == "📐 Structure Scanner":
+    render_chart_pattern_tab()
+
+elif selected_tab == "📈 Candle Scanner":
+    render_pattern_tab()
+
+elif selected_tab == "🧠 Strategy Lab":
+    render_strategy_lab()
+
+elif selected_tab == "✍️ Pattern Journal":
+    render_logbook_viewer()
+
+elif selected_tab == "🌐 Live Widget":
+    render_tradingview_widget()
+
+
+
+
+# 🔮 Future Modules
+# if "🧪 Strategy Lab" in enabled_modules:
+#     render_strategy_lab()  ← You can add this after deploying strategy lab tab
+
+# if "🧠 Sentiment" in enabled_modules:
+#     render_sentiment_tab()
+import streamlit as st
+import yfinance as yf
+import pandas as pd
+import plotly.graph_objects as go
+from ta.trend import SMAIndicator
+from ta.momentum import RSIIndicator
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch
+from datetime import datetime, timedelta
+import streamlit.components.v1 as components
+
+# ─── FinBERT Setup ──────────────────────────────────────────────────────────
+@st.cache_resource
+def load_finbert():
+    tokenizer = AutoTokenizer.from_pretrained("ProsusAI/finbert")
+    model = AutoModelForSequenceClassification.from_pretrained("ProsusAI/finbert")
+    return tokenizer, model
+
+tokenizer, model = load_finbert()
+labels = ["negative", "neutral", "positive"]
+
+def finbert_sentiment_score(text):
+    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
+    with torch.no_grad():
+        outputs = model(**inputs)
+    scores = torch.nn.functional.softmax(outputs.logits, dim=1)[0]
+    return labels[scores.argmax()]
+
+def get_recent_headlines(ticker):
+    return [
+        {"date": datetime.now() - timedelta(days=3), "headline": f"{ticker.upper()} Q2 earnings exceed expectations"},
+        {"date": datetime.now() - timedelta(days=6), "headline": f"{ticker.upper()} faces regulatory probe"},
+        {"date": datetime.now() - timedelta(days=10), "headline": f"{ticker.upper()} announces AI partnership"}
+    ]
+
+def get_sentiment_zones(headlines):
+    zones = []
+    color_map = {
+        "positive": "rgba(0,200,0,0.2)",
+        "neutral": "rgba(180,180,0,0.2)",
+        "negative": "rgba(200,0,0,0.2)"
+    }
+    for item in headlines:
+        tone = finbert_sentiment_score(item["headline"])
+        zones.append({
+            "start": item["date"] - timedelta(days=1),
+            "end": item["date"] + timedelta(days=1),
+            "color": color_map[tone],
+            "label": tone
+        })
+    return zones
+
+# ─── Chart ───────────────────────────────────────────────────────────────────
+def plot_chart(df, ticker, zones=None):
+    fig = go.Figure(data=[go.Candlestick(
+        x=df.index,
+        open=df['Open'], high=df['High'],
+        low=df['Low'], close=df['Close'],
+        name='Price'
+    )])
+
+    fig.add_trace(go.Scatter(x=df.index, y=df['MA50'], line=dict(color='blue'), name='MA50'))
+    fig.add_trace(go.Scatter(x=df.index, y=df['MA200'], line=dict(color='red'), name='MA200'))
+
+    if zones:
+        for zone in zones:
+            fig.add_vrect(
+                x0=zone['start'], x1=zone['end'],
+                fillcolor=zone['color'], opacity=0.2, line_width=0
+            )
+
+    fig.update_layout(title=f"{ticker} Tactical Chart", xaxis_rangeslider_visible=False)
+    st.plotly_chart(fig, use_container_width=True)
+
+# ─── App ─────────────────────────────────────────────────────────────────────
+st.title("📊 CamboStation Tactical Dashboard")
+
+ticker = st.text_input("Enter a stock symbol", "AAPL").upper()
+if not ticker:
+    st.stop()
+
+df = yf.download(ticker, period="1y", auto_adjust=True)
+if df.empty or 'Close' not in df.columns or len(df) < 200:
+    st.error("Not enough data to generate signals.")
+    st.stop()
+
+df['MA50'] = SMAIndicator(close=df['Close'], window=50).sma_indicator()
+df['MA200'] = SMAIndicator(close=df['Close'], window=200).sma_indicator()
+df['RSI'] = RSIIndicator(close=df['Close'], window=14).rsi()
+
+# ─── Sentiment Zones ─────────────────────────────────────────────────────────
+if st.checkbox("🧠 Overlay FinBERT Sentiment Zones"):
+    headlines = get_recent_headlines(ticker)
+    zones = get_sentiment_zones(headlines)
+else:
+    zones = None
+
+plot_chart(df, ticker, zones)
+
+# ─── TradingView Widget ──────────────────────────────────────────────────────
+if st.checkbox("💹 Show TradingView Chart"):
+    embed = f"""
+    <iframe src="https://s.tradingview.com/widgetembed/?symbol={ticker}&interval=D&theme=dark"
+        width="100%" height="520" frameborder="0"></iframe>
+    """
+    components.html(embed, height=540)
+# john_ai_dashboard.py
+import streamlit as st
+import yfinance as yf
+import pandas as pd
+import plotly.graph_objects as go
+from datetime import datetime, timedelta
+
+st.set_page_config(layout="wide")
+st.title("🧠 John AI Trading Cockpit")
+
+# === Sidebar Controls ===
+st.sidebar.header("⚙️ Settings")
+symbol = st.sidebar.text_input("Ticker", "AAPL").upper()
+days_back = st.sidebar.slider("Days Back", 7, 365, 90)
+chart_engine = st.sidebar.selectbox("Chart Engine",
+    ["Plotly", "TradingView", "Coinalyze", "Investing.com", "StockCharts"])
+show_stats = st.sidebar.checkbox("Show Ticker Stats", True)
+show_news = st.sidebar.checkbox("Show News Feed", True)
+show_cnbc = st.sidebar.checkbox("Show CNBC Stream", True)
+show_patterns = st.sidebar.checkbox("Show Pattern Overlays", True)
+show_glossary = st.sidebar.checkbox("Show Pattern Glossary", True)
+
+# === Fetch OHLC Data ===
+df = yf.download(symbol,
+                 period=f"{days_back}d",
+                 interval="1d",
+                 auto_adjust=True)
+if df.empty:
+    st.error("No data found for " + symbol)
+    st.stop()
+
+# === Ticker Stats Panel ===
+if show_stats:
+    st.subheader("📊 Ticker Stats")
+    latest = df.iloc[-1]
+    stats = {
+        "Open": round(latest["Open"],2),
+        "High": round(latest["High"],2),
+        "Low": round(latest["Low"],2),
+        "Close": round(latest["Close"],2),
+        "Volume": int(latest["Volume"]),
+        "52W High": round(df["High"].max(),2),
+        "52W Low": round(df["Low"].min(),2)
+    }
+    st.table(pd.DataFrame(stats.items(), columns=["Metric","Value"]))
+
+# === Pattern Definitions ===
+pattern_dict = {
+    "Hammer": {
+        "emoji":"🔨",
+        "desc":"Small body + long lower wick = bullish reversal signal."
+    },
+    "Doji":{
+        "emoji":"➕",
+        "desc":"Open≈Close = indecision; reversal possible."
+    },
+    "Engulfing Bullish":{
+        "emoji":"🟩⬛",
+        "desc":"Green candle fully engulfs prior red = bullish."
+    },
+    "Engulfing Bearish":{
+        "emoji":"⬛🟥",
+        "desc":"Red candle fully engulfs prior green = bearish."
+    }
+}
+
+# === Simple Pattern Detection ===
+def detect(df):
+    out=[]
+    for i in range(1,len(df)):
+        c, p = df.iloc[i], df.iloc[i-1]
+        # Hammer
+        body = abs(c["Close"]-c["Open"])
+        wick = c["Low"] - min(c["Open"],c["Close"])
+        if show_patterns and body<0.3*(c["High"]-c["Low"]) and wick< -0.5*body:
+            out.append((i,"Hammer"))
+        # Doji
+        if show_patterns and body<0.05*(c["High"]-c["Low"]):
+            out.append((i,"Doji"))
+        # Bullish Engulf
+        if show_patterns and p["Close"]<p["Open"] and c["Close"]>c["Open"]\
+           and c["Close"]>p["Open"] and c["Open"]<p["Close"]:
+            out.append((i,"Engulfing Bullish"))
+        # Bearish Engulf
+        if show_patterns and p["Close"]>p["Open"] and c["Close"]<c["Open"]\
+           and c["Open"]>p["Close"] and c["Close"]<p["Open"]:
+            out.append((i,"Engulfing Bearish"))
+    return out
+
+matches = detect(df)
+
+# === Chart Rendering ===
+st.subheader(f"📈 {symbol} Price Chart")
+if chart_engine=="Plotly":
+    fig = go.Figure(data=[go.Candlestick(
+        x=df.index,
+        open=df["Open"], high=df["High"],
+        low=df["Low"], close=df["Close"]
+    )])
+    for idx, pat in matches:
+        fig.add_annotation(
+            x=df.index[idx],
+            y=df["High"].iloc[idx],
+            text=pattern_dict[pat]["emoji"],
+            showarrow=True, arrowhead=1
+        )
+    fig.update_layout(margin=dict(l=0,r=0,t=30,b=0),height=400)
+    st.plotly_chart(fig,use_container_width=True)
+
+elif chart_engine=="TradingView":
+    url = ("https://s.tradingview.com/embed-widget/mini-symbol-overview/"
+           f"?symbol={symbol}&locale=en")
+    st.components.v1.iframe(url, height=400)
+
+elif chart_engine=="Coinalyze":
+    st.components.v1.iframe(f"https://coinalyze.net/{symbol.lower()}",height=400)
+elif chart_engine=="Investing.com":
+    st.components.v1.iframe(
+        f"https://www.investing.com/equities/{symbol.lower()}",height=400)
+elif chart_engine=="StockCharts":
+    st.image(
+        f"https://stockcharts.com/c-sc/sc?s={symbol}&p=D&b=5&g=0&i=0",
+        use_column_width=True)
+# === Live News via yfinance ===
+if show_news:
+    st.subheader("📰 News Feed")
+    tick = yf.Ticker(symbol)
+    news = tick.news or []
+    for item in news[:5]:
+        st.markdown(f"**[{item['provider']}]** {item['title']}")
+# === CNBC Stream ===
+if show_cnbc:
+    st.subheader("📺 CNBC Live")
+    st.video("https://www.youtube.com/embed/9OnD2FgI4n4")
+# === Pattern Glossary ===
+if show_glossary:
+    st.subheader("📚 Pattern Glossary")
+    for name,data in pattern_dict.items():
+        st.markdown(f"**{data['emoji']} {name}** – {data['desc']}")# CamboStation Genesis Launcher
+Set-Location "C:\Users\johnl\CamboStation-Vision"
+# Activate virtual environment
+& .\venv\Scripts\Activate
+# Upgrade pip (recommended)
+python -m pip install --upgrade pip
+# Install dependencies
+pip install -r requirements.txt
+# Launch Streamlit dashboard
+streamlit run main.py --server.port 8501
+import streamlit as st
+from PIL import Image
+import time
+import streamlit.components.v1 as components
+# --- MODULE IMPORTS ---
+from modules.education_tab import show_education_tab
+from modules.scanner_tab import show_scanner_tab
+# --- PAGE CONFIG ---
+st.set_page_config(page_title="CamboStation™", layout="wide")
+# --- LOAD LOGO ---
+logo = Image.open("assets/logo.png")
+# --- HEADER: Centered Logo + Slogan ---
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    st.image(logo, use_column_width=True)
+    st.markdown(
+        """
+        <h1 style='text-align: center; color: #1E90FF;'>Welcome to CamboStation™</h1>
+        <h3 style='text-align: center; color: gray;'>Trade with Vision. Learn with Purpose. Evolve with AI.</h3>
+        """,
+        unsafe_allow_html=True
+    )# --- LIVE MARKET CHART ---
+st.markdown("---")
+st.subheader("📈 Live Market Chart")
+components.html(
+    """ 
+    <!-- TradingView Widget BEGIN -->
+    <div class="tradingview-widget-container">
+      <div id="tradingview_livechart"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+      <script type="text/javascript">
+        new TradingView.widget({
+          "width": "100%",
+          "height": 500,
+          "symbol": "NASDAQ:AAPL",
+          "interval": "D",
+          "timezone": "Etc/UTC",
+          "theme": "dark",
+          "style": "1",
+          "locale": "en",
+          "toolbar_bg": "#f1f3f6",
+          "enable_publishing": false,
+          "allow_symbol_change": true,
+          "container_id": "tradingview_livechart"
+        });
+      </script>
+    </div>
+    <!-- TradingView Widget END -->
+    """,
+    height=520
+)# --- SIDEBAR NAVIGATION ---
+st.sidebar.image(logo, width=150)
+st.sidebar.title("🧭 Navigation")
+selection = st.sidebar.radio(
+    "Go to",
+    ["📊 Dashboard", "🎓 Education", "🔍 Pattern Scanner"],
+    key="nav_radio"
+)
+st.sidebar.markdown("---")
+st.sidebar.markdown("Made with 💼 by John R. Lim")
+# --- MAIN CONTENT TABS ---
+if selection == "📊 Dashboard":
+    st.subheader("📊 Market Dashboard")
+    st.info("Welcome to CamboStation™! Modules under construction.")
+elif selection == "🎓 Education":
+    show_education_tab()
+elif selection == "🔍 Pattern Scanner":
+    show_scanner_tab()
+from modules.banner_module import render_banner
+from modules.strategy_lab import render_strategy_lab
+import streamlit as st
+# ─────────────────────────────────────────────
+# Import Modules (adjust based on what you've deployed)
+# ─────────────────────────────────────────────
+from modules.layout_controller import get_enabled_modules
+from modules.tradingview_widget import render_tradingview_widget
+from modules.chart_tab import render_chart_tab  # Only include if chart_tab.py exists
+from modules.pattern_recognizer import render_pattern_tab
+from modules.chart_pattern_detector import render_chart_pattern_tab
+from modules.strategy_linker import link_detected_patterns_to_strategy
+from modules.pattern_logbook import render_logbook_viewer  # Optional: if logbook is deployed
+# ─────────────────────────────────────────────
+# App Title + Header
+# ─────────────────────────────────────────────
+st.set_page_config(page_title="CamboStation™", layout="wide")
+render_banner()
+st.title("🎯 CamboStation™ Cockpit Interface")
+st.markdown("#### Tactical Trading Dashboard — Modular Pattern & Strategy Intelligence")
+st.markdown("---")
+# ─────────────────────────────────────────────
+selected_tab = st.selectbox("🧭 Navigate CamboStation Modules", [
+    "📊 Charts",
+    "📐 Structure Scanner",
+    "📈 Candle Scanner",
+    "🧠 Strategy Lab",
+    "✍️ Pattern Journal",
+    "🌐 Live Widget"
+])if selected_tab == "📊 Charts":
+    render_chart_tab()
+elif selected_tab == "📐 Structure Scanner":
+    render_chart_pattern_tab()
+elif selected_tab == "📈 Candle Scanner":
+    render_pattern_tab()
+elif selected_tab == "🧠 Strategy Lab":
+    render_strategy_lab()
+elif selected_tab == "✍️ Pattern Journal":
+    render_logbook_viewer()
+elif selected_tab == "🌐 Live Widget":
+    render_tradingview_widget()
+# 🔮 Future Modules
+# if "🧪 Strategy Lab" in enabled_modules:
+#     render_strategy_lab()  ← You can add this after deploying strategy lab tab
+# if "🧠 Sentiment" in enabled_modules:
+#     render_sentiment_tab()
+import streamlit as st
+from PIL import Image
+import time
+import streamlit.components.v1 as components
+# --- MODULE IMPORTS ---
+from modules.education_tab import show_education_tab
+from modules.scanner_tab import show_scanner_tab
+# --- PAGE CONFIG ---
+st.set_page_config(page_title="CamboStation™", layout="wide")
+# --- LOAD LOGO ---
+logo = Image.open("assets/logo.png")
+# --- HEADER: Centered Logo + Slogan ---
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    st.image(logo, use_column_width=True)
+    st.markdown(
+        """
+        <h1 style='text-align: center; color: #1E90FF;'>Welcome to CamboStation™</h1>
+        <h3 style='text-align: center; color: gray;'>Trade with Vision. Learn with Purpose. Evolve with AI.</h3>
+        """,
+        unsafe_allow_html=True
+    )# --- LIVE MARKET CHART ---
+st.markdown("---")
+st.subheader("📈 Live Market Chart")
+components.html(
+    """ 
+    <!-- TradingView Widget BEGIN -->
+    <div class="tradingview-widget-container">
+      <div id="tradingview_livechart"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+      <script type="text/javascript">
+        new TradingView.widget({
+          "width": "100%",
+          "height": 500,
+          "symbol": "NASDAQ:AAPL",
+          "interval": "D",
+          "timezone": "Etc/UTC",
+          "theme": "dark",
+          "style": "1",
+          "locale": "en",
+          "toolbar_bg": "#f1f3f6",
+          "enable_publishing": false,
+          "allow_symbol_change": true,
+          "container_id": "tradingview_livechart"
+        });
+      </script>
+    </div>
+    <!-- TradingView Widget END -->
+    """,
+   height=520
+)# --- SIDEBAR NAVIGATION ---
+st.sidebar.image(logo, width=150)
+st.sidebar.title("🧭 Navigation")
+selection = st.sidebar.radio(
+    "Go to",
+    ["📊 Dashboard", "🎓 Education", "🔍 Pattern Scanner"],
+    key="nav_radio"
+)st.sidebar.markdown("---")
+st.sidebar.markdown("Made with 💼 by John R. Lim")
+# --- MAIN CONTENT TABS ---
+if selection == "📊 Dashboard":
+    st.subheader("📊 Market Dashboard")
+    st.info("Welcome to CamboStation™! Modules under construction.")
+elif selection == "🎓 Education":
+    show_education_tab()
+elif selection == "🔍 Pattern Scanner":
+    show_scanner_tab()

@@ -31,6 +31,12 @@ const navigation = [
     description: 'Advanced charting with AI patterns'
   },
   {
+    name: 'Strategy',
+    href: '/dashboard/strategy',
+    icon: BarChart3,
+    description: 'Strategy builder & backtesting'
+  },
+  {
     name: 'Options',
     href: '/dashboard/options',
     icon: PieChart,

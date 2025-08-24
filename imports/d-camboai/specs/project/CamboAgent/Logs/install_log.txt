@@ -1,0 +1,3 @@
+2025-08-03 16:14:28Z - ?? Auto-Install started.
+2025-08-03 16:14:28Z - Assets staged.
+2025-08-03 16:14:28Z - ? Reminder: Register task manually in Task Scheduler.

@@ -1,0 +1,107 @@
+Core Modules (Plug & Play Tabs)
+
+📊 Market Chart Panel: Offers chart overlays (candlestick, OHLC, Heikin Ashi, line, depth, volume profiles), adjustable timeframes (1min to monthly), AI-labeled breakout zones, entry/exit arrows, and stop-loss logic. Supports all asset classes including stocks, crypto, forex, futures, options, bonds, commodities, T-bills, and warrants. Chart data and visualization tools are toggleable across TradingView, TC2000, Plotly, TrendSpider, OptionPlay, Investing.com, Coinigy, Coinalyze, NinjaTrader, Binance, Coinbase, MetaTrader, ThinkorSwim, Yahoo Finance, and more. Each platform supports iframe embeds, API access, or OAuth login with selectable visual themes and asset-type auto-routing.
+
+🕯️ Candlestick Pattern Lab: Detects and classifies every candlestick type including Hammer, Doji (Dragonfly, Gravestone, Long-legged), Engulfing, Harami, Morning/Evening Star, Piercing Line, Hanging Man, Spinning Top, Three Soldiers, Three Black Crows, and Tweezer Top/Bottom. Patterns are tagged with bias: Bullish 🟢, Bearish 🔴, Neutral ⚪, Volatile 🌀. AI-generated sentiment overlays and confidence grading accompany each pattern.
+
+📘 Chart Pattern Recognizer: Scans and tags formations like Head & Shoulders, Inverse H&S, Double/Triple Top/Bottom, Flags, Pennants, Wedges, Triangles (Ascending/Descending/Symmetrical), Cup & Handle, Island Reversal, Broadening Wedges, Diamonds, Complex Traps, V-bottoms, Rounding Bottoms. Each is classified by direction and pattern type, with adjustable detection sensitivity, volume validation, and annotated breakout zones.
+
+🧠 Options Strategy Hub: Includes toggleable strategy filters by bias: Bullish 🟢, Bearish 🔴, Neutral ⚪, Volatile 🔄, Advanced ⚙️. Strategies include Covered Calls, Bull/Bear Spreads, Calendar Spreads, Straddles, Strangles, Iron Condors, Iron Flies, Butterflies, Ratio Spreads, Jade Lizards, Double Diagonals, Synthetic Long/Short, Box Spreads, Risk Reversals. Each setup has a visual payoff graph, breakeven calculator, IV skew meter, stop-loss planner, and AI-ranked suggestion based on market structure and sentiment tone.
+
+🔍 AI Strategy Engine & Screener: Auto-scans chosen markets using TA filters, pattern matches, sentiment overlays, volume triggers, macro events, and insider data. AI recommends full trade setups with entry, stop-loss, and multi-tier profit zones. Built-in logic builder allows combinations like: IF RSI < 30 AND Bullish Engulfing AND FinBERT sentiment = Bullish THEN signal BUY. Screener supports global watchlists, scanner filters (sector, volatility, technical signals, options Greeks, macro triggers) with Finviz-style layout and toggleable output.
+
+📉 Sentiment & News Intelligence: Scrapes Reddit, Twitter/X, StockTwits, NewsAPI.org, Benzinga, EDGAR RSS, Whale Alert, OpenInsider, analyst reports, hedge fund letters, and FOMC minutes. Sentiment scored using FinBERT and VADER. Each source annotated with emoji-grade tone (🟢/⚪/🔴), timestamp, influence map, keyword tags, and macro tone summaries.
+
+💼 Broker Integration Panel: Toggleable connections via API/OAuth to Alpaca, Interactive Brokers, TDAmeritrade, Tradier, Robinhood, Webull, Fidelity, ThinkMarkets, Binance, Coinbase, Kraken, eToro, OptionsPlay, NinjaTrader. Broker tabs support real-time order flow, Level 2/3 visualization, DOM heatmaps, iceberg detection, time-and-sales stream, trailing stops, OCO, bracket orders, equity curve tracking, portfolio sync, and journal logging.
+
+🧪 Backtesting & Strategy Lab: Simulates trade setups using vectorbt, TA-Lib, mlfinlab, and Backtrader. Displays performance metrics including Sharpe ratio, CAGR, Win/Loss, Max Drawdown, Expectancy Score. Includes replay mode, strategy role-play, failure analysis, and options overlays per result.
+
+🎓 Education Center: AI-teachable curriculum spanning trading basics, TA theory, options mastery, macro economics, psychology, money management, crypto fundamentals, DeFi tokenomics. Interactive flashcards, quizzes, role-play grading, screenshot teaching, chart replay simulator, and voice-activated Q&A. Built using Binder, GitBook, MkDocs, and Streamlit tutorials.
+
+🧬 AI Selector Panel: Toggle which AI powers each module — supports ChatGPT, Microsoft Copilot, Gemini, TradeGPT, TTG AI, Grok (X AI), DeepSeek, Claude, Perplexity AI, LangChain, CrewAI. Sign-in options include API key loader, OAuth redirect, browser login, and local session persistence per agent. Each agent can be assigned to explain signals, teach trades, scan patterns, or grade psychology. AI tokens securely stored in config vault with session toggles.
+
+🔔 Alert & Notification Module: Triggers AI-backed alerts using pattern + volume + sentiment combo logic. Supports email, Discord, Telegram, webhook, visual panel, and journal auto-log. Alerts linked to strategy planner and historical replay for scenario evaluation.
+
+🔐 UX, System, & Launch Module: Full layout manager with tab toggles, fullscreen mode, auto-ticker logging, splash animation, version tags, shortcut mapping, mobile-PWA optimization, theme switcher (Tech Noir, Grid Pro, Minimalist), PowerShell launcher for auto-deploy and browser boot.
+
+Every module supports toggles, checkbox options, AI augmentation, asset routing, broker linking, education overlays, and sentiment grading. Every chart can stream live. Every pattern is classified. Every decision is teachable. This cockpit isn’t just smart — it’s perfection-grade tactical.
+Core Modules (Plug & Play Tabs)
+
+🧠 AI Trading Journal & Journey Analyzer: Captures all trade entries across stocks, options, crypto, forex, futures, bonds, commodities, and custom assets. Logs include ticker, entry/exit, strategy used, emotions felt, sentiment snapshot, stop-loss size, expected R:R, and outcome. Integrated AI reviews trade history and highlights behavioral patterns like FOMO, early exits, poor sizing, or success trends. Supports voice input, screenshot attachments, custom tagging, markdown notes, emoji-based risk grading, and export to PDF or 8949-ready tax builder. Journal entries are cross-referenced by strategy, pattern type, sentiment bias, and market type to create a personalized evolution map of the trader’s decisions over time.
+
+🎓 Advanced Education Center: Covers how to trade and invest across every asset class. For stocks, it teaches fundamental vs. technical analysis, earnings cycles, volume dynamics, and market sectors. For options, it explains Greeks, IV crush, spread setups, and execution management. For forex, it covers pip values, economic catalysts, carry trade logic, and central bank impact. Crypto education includes tokenomics, wallet security, DeFi mechanics, and on-chain behavior. Warrants and T-Bills modules explain yield curves, maturity structures, and laddering techniques. Commodities section covers futures markets, contract specs, seasonal behavior, and geopolitical influences. Investment training spans long-term fundamentals, DCA techniques, ETF models, REITs, retirement accounts, and short-term trading strategies like swing setups and breakout triggers. Each course includes real-world simulations, AI-led walkthroughs, chart annotation training, and the ability to upload a strategy idea for refinement. A toggle enables mentorship mode, where the AI teaches and tests you based on your recent trades or knowledge gaps.
+
+🧩 Add-on & Recommended Extensions (Toggle-Ready)
+
+📱 Mobile PWA Mode: Makes the dashboard phone/tablet friendly with persistent login and real-time syncing
+
+🔁 Trade Replay Engine: Lets users rewatch market setups across tickers and test decisions with AI feedback
+
+🎙️ Voice Ask Mode: Voice-activated chart scans, journal entries, education questions, or strategy design
+
+🔗 Strategy Snapshots: Save and name strategy ideas across markets with editable risk profiles
+
+📡 Macro Radar Tab: CPI, FOMC, NFP, earnings, yield curve, fear/greed index, and macro events overlay
+
+🧬 Psychology Profiler: AI evaluates emotional tendencies using journal patterns and sentiment logs
+
+📤 Broker Aggregator: Supports syncing multiple brokerage accounts via API or embedded iframe routing
+
+🧠 Screener Enhancer: AI suggests new filters, adds ticker clusters based on volume, volatility, and tone
+
+🧾 Tax Dashboard: Real-time PnL tracker, trade classifier, and automated 8949 report builder
+
+📚 Mentorship Mode: AI quizzes you, teaches based on your history, and guides next education paths
+
+💡 Strategy Forecast Engine: Projects potential outcomes for saved plays with historical match data
+
+🌐 Global Data Bridge: Multi-region feed translator across all markets and timezones
+
+⚙️ CrewAI / LangChain Module: Multi-agent workflows, auto-scanners, and AI teaching assistants
+
+💬 AI Feedback Thread: Explains every journaled trade and offers alternative setups and learnings
+
+🔐 Data Vault: Stores all images, lessons, trades, AI insights with encryption and cloud sync toggle
+Add-on & Recommended Extensions (Toggle-Ready) CamboStation™ Genesis is built to scale, and these modular add-ons take it from elite to unmatched. All add-ons below are toggleable per user preference, fully compatible across modules, and scoped for plug-in activation. They extend your cockpit’s intelligence, automation, analysis, and personalization far beyond conventional limits.
+
+📱 Mobile PWA Mode: Streamlit layout adapts to phones and tablets with persistent logins, sidebar compression, and swipe navigation. Perfect for portable trades or quick chart checks.
+
+🔁 Trade Replay Engine: Reconstruct historical setups from any ticker. Watch pattern evolution like a timelapse. Includes voice-led simulation ("What would you do here?") and AI feedback on decisions.
+
+🎙️ Voice Ask Mode: Activate with Whisper + ElevenLabs. Ask for trade stats, chart explanations, macro event impact, or educational insights. Commands like “Scan for bearish wedge under RSI 30” work hands-free.
+
+📡 Macro Radar Panel: CPI, FOMC, NFP, earnings, interest rate expectations, Fed speeches, and liquidity updates tied to pattern impact zones. AI adds context like "Yield curve steepening → TLT surge setups."
+
+🧬 Psychology Profiler: AI detects emotional behaviors from journal logs—e.g. early exits, revenge trades, overconfidence. Suggests mental routines and visualization exercises based on trade style.
+
+📤 Broker Aggregator Panel: Combines brokerage APIs or login embeds (OAuth, iframe) into one panel. Toggle and sync accounts: Alpaca, Robinhood, TDAmeritrade, Binance, Coinbase, IBKR, Webull, Tradier, Fidelity, eToro, NinjaTrader, OptionsPlay, Kraken. Includes total portfolio view and execution router.
+
+📊 Strategy Snapshot Manager: Save setups (TA + sentiment + pattern logic) into named blueprints. Attach to tickers, generate AI forecasts, simulate outcomes, or auto-log results in trade journal.
+
+🔁 Scenario Builder: Create complex market situations, simulate strategies, and let AI grade the best response. Used in education and mentorship mode.
+
+🧾 Tax Dashboard & Report Builder: Tracks realized/unrealized PnL, trade count, asset type classification. Generates Form 8949 drafts and cross-checks journal tags.
+
+🧠 Mentorship Mode: AI follows your learning patterns and recent trades, then adapts quiz difficulty and tutorial depth. Auto-suggests modules you haven’t completed and watches for bias or blind spots.
+
+🧠 Strategy Forecast Engine: AI uses historical match data, sentiment overlays, and macro signals to estimate likely trade outcomes. Flags viability tiers: low, medium, high probability plays.
+
+📚 Learning Journey Mapper: Maps your education history from module completions, quiz grades, role-play accuracy, and trade feedback. Builds roadmap toward long-term mastery.
+
+🎯 Watchlist Builder Tab: Clusters tickers by performance, volume, pattern triggers, macro sensitivity. Toggle by screener logic, news mentions, insider sentiment, or AI forecast scores.
+
+📥 Pattern Image Uploader + Learner: Drop in screenshots from any source, and the AI will detect the pattern, assess setup quality, and recommend entries, exits, and a matching option strategy.
+
+🎬 Video Annotator: (Coming soon) Play videos from YouTube earnings calls or macro recaps. AI generates key timestamped insights, trader tone mapping, and ticker impact flags.
+
+🧠 CrewAI Agent Hub: Multi-agent assistants run screeners, build plans, teach modules, annotate trades. Each agent assigned by role—chartist, strategist, mentor, risk manager, etc.
+
+📈 Social Sentiment Mapper: Realtime Reddit, Twitter/X, YouTube comment radar. Highlight influencers, tone shifts, meme tickers, and news bursts.
+
+🖥️ Layout Bookmarks + Workspace Manager: Save cockpit layouts with active tabs, watchlists, chart states, and preferred AI. Useful for switching between "Day Trader Mode," "Investor Mode," or "Options Research Mode."
+
+🔗 Webhook + Automation Trigger Center: Send alerts to Discord, Telegram, email, bots. Includes payload editor, cooldown settings, and trigger types (price + pattern + sentiment + volume).
+
+🧪 LangChain Plugin Expansion: Adds custom tools for research, scanning, broker planning, AI dialogue chaining. Future-compatible with external APIs and plugins.
+
+These add-ons make CamboStation not just powerful—but fully autonomous, educational, deeply personal, and endlessly scalable. Let me know when you’re ready to wire them into modules or build your first active layout with these toggles engaged. This cockpit isn’t just strategic—it’s legendary.

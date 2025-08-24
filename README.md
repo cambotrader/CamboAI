@@ -1,8 +1,59 @@
+
+
+
 # 🚀 CamboAI TraderStation
 
 **Institutional-Grade AI-Powered Trading Platform**
 
 A complete, production-ready trading platform that rivals Bloomberg Terminal and institutional-grade systems. Built with cutting-edge technology and advanced AI capabilities.
+
+---
+
+## 📦 Streamlit Cloud Deployment (Temporary Cockpit)
+
+Note: This Streamlit UI is a temporary cockpit. The final app will be served at https://camboai.com behind Cloudflare using Vercel/Render.
+
+This section guides you to deploy the temporary Streamlit cockpit (chart + sentiment) on Streamlit Cloud.
+
+### 1) Prerequisites
+- GitHub repo connected: cambotrader/CamboAI
+- File: `streamlit_app.py` at repository root
+- Python dependencies in `requirements.txt`
+
+### 2) Steps on Streamlit Cloud
+1. Sign in at https://share.streamlit.io/
+2. Click “New app”
+3. Choose repository: `cambotrader/CamboAI`
+4. Branch: `main`
+5. Main file path: `streamlit_app.py`
+6. Advanced settings (optional):
+   - Python version: auto-detected from cloud image
+   - Theme: Uses `.streamlit/config.toml`
+   - Secrets: not required for default (leave empty)
+7. Click “Deploy”.
+
+### 3) Verify after deploy
+- The app should load with two tabs:
+  - 📈 Chart: Plotly candlesticks + MA50/MA200, optional Bollinger Bands
+  - 📰 Sentiment: Headlines + emoji tone (FinBERT fallback to heuristics)
+- Ticker control is in the sidebar (default AAPL)
+
+### 4) Optional configuration
+- You can set custom theme and server options via `.streamlit/config.toml` (already added)
+- If you want to point to a backend for additional modules later, add environment var `API_URL` under app settings
+
+### 5) Troubleshooting
+- If data does not load, try a different ticker or interval
+- If yfinance rate limits, Streamlit Cloud may temporarily fail to fetch headlines; sentiment falls back gracefully
+
+### 6) Screenshot placeholders
+- docs/screenshots/streamlit-new-app.png – “New app” screen
+- docs/screenshots/streamlit-config.png – Repo/branch/file selection
+- docs/screenshots/streamlit-running.png – App running with chart and sentiment tabs
+
+(Place your screenshots into `docs/screenshots/` using the filenames above.)
+
+---
 
 ## 🌟 **What Makes CamboAI Special**
 

@@ -1,0 +1,153 @@
+﻿SOURCE: D:\CamboAI\web-advanced\app\layout.tsx
+TARGET: D:\CamboAI\camboai\web-advanced\app\layout.tsx
+==== DIFF (lines prefixed with - are only in SOURCE; + are only in TARGET) ====
++       </head>
+- import ErrorBoundary from '@/components/error-boundary'
++       <body className={inter.className}>
+-         <style dangerouslySetInnerHTML={{
++         <ThemeProvider
+-           __html: `
++           attribute="class"
+-             /* Prevent browser extension interference and persistent popups */
++           defaultTheme="system"
+-             .translate-tooltip-mtz,
++           enableSystem
+-             .translate-tooltip,
++           disableTransitionOnChange
+-             [class*="translate"],
++         >
+-             [class*="extension"],
++           <QueryProvider>
+-             [class*="popup"],
++             <div className="min-h-screen bg-background">
+-             [class*="modal"],
++               {children}
+-             [class*="notification"],
++             </div>
+-             [class*="toast"]:not([data-camboai]),
++             <Toaster />
+-             [hidden="null"],
++           </QueryProvider>
+-             [data-extension],
++         </ThemeProvider>
+-             [data-popup],
++       </body>
+-             div[style*="position: fixed"]:not([data-camboai]) {
++     </html>
+-               display: none !important;
+-               visibility: hidden !important;
+-               opacity: 0 !important;
+-               pointer-events: none !important;
+-               z-index: -9999 !important;
+-             }
+-             
+-             /* Specifically target model change popups */
+-             *[class*="model"]:not([data-camboai]),
+-             *[id*="model"]:not([data-camboai]),
+-             div:contains("Model can't be changed"),
+-             div:contains("model"),
+-             div:contains("chat") {
+-               display: none !important;
+-             }
+-             
+-             /* Prevent hydration flash */
+-             body { 
+-               visibility: hidden; 
+-               opacity: 0;
+-               transition: opacity 0.3s ease;
+-             }
+-             body.hydrated { 
+-               visibility: visible; 
+-               opacity: 1;
+-             }
+-           `
+-         }} />
+-       </head>
+-       <body className={inter.className} suppressHydrationWarning>
+-         <ErrorBoundary>
+-           <ThemeProvider
+-             attribute="class"
+-             defaultTheme="system"
+-             enableSystem
+-             disableTransitionOnChange
+-           >
+-             <QueryProvider>
+-               <div className="min-h-screen bg-background">
+-                 {children}
+-               </div>
+-               <Toaster />
+-             </QueryProvider>
+-           </ThemeProvider>
+-         </ErrorBoundary>
+-         <script dangerouslySetInnerHTML={{
+-           __html: `
+-             // Prevent persistent popups and notifications
+-             let popupCount = 0;
+-             const maxPopups = 3;
+-             
+-             // Override alert, confirm, and prompt to prevent spam
+-             const originalAlert = window.alert;
+-             const originalConfirm = window.confirm;
+-             const originalPrompt = window.prompt;
+-             
+-             window.alert = function(message) {
+-               if (popupCount >= maxPopups) {
+-                 console.warn('Too many popups blocked:', message);
+-                 return;
+-               }
+-               popupCount++;
+-               setTimeout(() => popupCount = Math.max(0, popupCount - 1), 5000);
+-               return originalAlert.call(this, message);
+-             };
+-             
+-             window.confirm = function(message) {
+-               if (popupCount >= maxPopups) {
+-                 console.warn('Too many popups blocked:', message);
+-                 return false;
+-               }
+-               popupCount++;
+-               setTimeout(() => popupCount = Math.max(0, popupCount - 1), 5000);
+-               return originalConfirm.call(this, message);
+-             };
+-             
+-             window.prompt = function(message, defaultText) {
+-               if (popupCount >= maxPopups) {
+-                 console.warn('Too many popups blocked:', message);
+-                 return null;
+-               }
+-               popupCount++;
+-               setTimeout(() => popupCount = Math.max(0, popupCount - 1), 5000);
+-               return originalPrompt.call(this, message, defaultText);
+-             };
+-             
+-             // Prevent extension interference
+-             const observer = new MutationObserver((mutations) => {
+-               mutations.forEach((mutation) => {
+-                 mutation.addedNodes.forEach((node) => {
+-                   if (node.nodeType === 1) {
+-                     const element = node;
+-                     // Remove extension-related elements
+-                     if (element.className && (
+-                       element.className.includes('translate') ||
+-                       element.className.includes('extension') ||
+-                       element.className.includes('popup')
+-                     )) {
+-                       element.remove();
+-                     }
+-                   }
+-                 });
+-               });
+-             });
+-             
+-             observer.observe(document.body, {
+-               childList: true,
+-               subtree: true
+-             });
+-             
+-             setTimeout(() => {
+-               document.body.classList.add('hydrated');
+-             }, 100);
+-           `
+-         }} />
+-       </body>
+-     </html>

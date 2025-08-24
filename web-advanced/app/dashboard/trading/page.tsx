@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ConnectDataPanel } from '@/components/dashboard/connect-data-panel';
 
 type Order = {
   id: string;
@@ -218,6 +219,8 @@ export default function TradingPage() {
           </Button>
         </div>
       </div>
+
+      <ConnectDataPanel />
 
       {orderAlert && (
         <Alert className={`border-l-4 ${

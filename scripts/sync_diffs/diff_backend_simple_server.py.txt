@@ -1,0 +1,747 @@
+﻿SOURCE: D:\CamboAI\backend\simple_server.py
+TARGET: D:\CamboAI\camboai\backend\simple_server.py
+==== DIFF (lines prefixed with - are only in SOURCE; + are only in TARGET) ====
++ from fastapi import FastAPI, HTTPException, Header
+- from fastapi import FastAPI, HTTPException, Header, Request, Response
++ # CORS for local + optional production origin via FRONTEND_ORIGIN env var
+- from fastapi.middleware.trustedhost import TrustedHostMiddleware
++ allowlist = [
+- # CORS for local development + production origins
++     "http://localhost:3000",
+- environment = os.environ.get("ENVIRONMENT", "development")
++     "http://localhost:3001",
+- 
++     "http://localhost:3002",
+- # Strict CORS for production
++     "http://127.0.0.1:3000",
+- if environment == "production":
++     "http://127.0.0.1:3001",
+-     allowlist = []
++     "http://127.0.0.1:3002",
+-     if frontend_origin:
++ ]
+-         allowlist.append(frontend_origin)
++ if frontend_origin:
+-         # Add www variant if domain provided
++     allowlist.append(frontend_origin)
+-         try:
++     # Add www variant if domain provided without scheme
+-             if frontend_origin.startswith("https://") and "." in frontend_origin:
++     try:
+-                 host = frontend_origin.split("//", 1)[1]
++         if frontend_origin.startswith("https://") and "." in frontend_origin:
+-                 if not host.startswith("www."):
++             host = frontend_origin.split("//", 1)[1]
+-                     allowlist.append(frontend_origin.replace("//", "//www.", 1))
++             if not host.startswith("www."):
+-         except Exception:
++                 allowlist.append(frontend_origin.replace("//", "//www.", 1))
+-             pass
++     except Exception:
+-     # Add Render default domains if not specified
++         pass
+-     if not allowlist:
++ 
+-         allowlist = ["https://*.onrender.com"]
++ app.add_middleware(
+- else:
++     CORSMiddleware,
+-     # Development CORS
++     allow_origins=allowlist,
+-     allowlist = [
++     allow_credentials=True,
+-         "http://localhost:3000",
++     allow_methods=["*"],
+-         "http://localhost:3001", 
++     allow_headers=["*"]
+-         "http://localhost:3002",
++ )
+-         "http://127.0.0.1:3000",
++ 
+-         "http://127.0.0.1:3001",
++ # Mount lightweight auth endpoints if available
+-         "http://127.0.0.1:3002",
++ if AUTH_ROUTER_AVAILABLE:
+-     ]
++     app.include_router(auth_router_module.router, prefix="/api/auth", tags=["Authentication"])  # type: ignore
+-     if frontend_origin:
++ else:
+-         allowlist.append(frontend_origin)
++     # Minimal fallback auth for development
+- 
++     from pydantic import BaseModel
+- app.add_middleware(
++     from datetime import datetime, timedelta
+-     CORSMiddleware,
++     
+-     allow_origins=allowlist,
++     class Token(BaseModel):
+-     allow_credentials=True,
++         access_token: str
+-     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
++         token_type: str
+-     allow_headers=["*"]
++         expires_in: int
+- )
++     class User(BaseModel):
+- # Add security middleware for production
++         id: int
+- if environment == "production":
++         email: str
+-     app.add_middleware(
++         is_active: bool
+-         TrustedHostMiddleware, 
++         created_at: str
+-         allowed_hosts=["*.onrender.com", "localhost", "127.0.0.1"]
++     class UserLogin(BaseModel):
+-     )
++         email: str
+- # Security headers middleware
++         password: str
+- @app.middleware("http")
++ 
+- async def add_security_headers(request: Request, call_next):
++     DEMO_EMAIL = "demo@camboai.com"
+-     response = await call_next(request)
++     DEMO_PASSWORD = "password"
+-     if environment == "production":
++ 
+-         response.headers["X-Content-Type-Options"] = "nosniff"
++     @app.post("/api/auth/login", response_model=Token)
+-         response.headers["X-Frame-Options"] = "DENY"
++     async def dev_login(user_credentials: UserLogin):
+-         response.headers["X-XSS-Protection"] = "1; mode=block"
++         if user_credentials.email != DEMO_EMAIL or user_credentials.password != DEMO_PASSWORD:
+-         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
++             raise HTTPException(status_code=401, detail="Incorrect email or password")
+-         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
++         return Token(access_token="demo-token", token_type="bearer", expires_in=30*60)
+-     return response
++     @app.get("/api/auth/me", response_model=User)
+- # Mount lightweight auth endpoints if available
++     async def dev_me(authorization: str = Header(default="")):
+- if AUTH_ROUTER_AVAILABLE:
++         if not authorization.startswith("Bearer "):
+-     app.include_router(auth_router_module.router, prefix="/api/auth", tags=["Authentication"])  # type: ignore
++             raise HTTPException(status_code=401, detail="Not authenticated")
+- else:
++         # In dev, accept demo-token
+-     # Minimal fallback auth for development
++         token = authorization.split(" ", 1)[1]
+-     from pydantic import BaseModel
++         if token != "demo-token":
+-     from datetime import datetime, timedelta
++             raise HTTPException(status_code=401, detail="Invalid token")
+-     
++         return User(id=1, email=DEMO_EMAIL, is_active=True, created_at=datetime.utcnow().isoformat())
+-     class Token(BaseModel):
++ 
+-         access_token: str
++ # ----- Lightweight portfolio endpoints for dashboard -----
+-         token_type: str
++ from pydantic import BaseModel
+-         expires_in: int
++ from typing import List, Optional, Dict
+- 
++ from datetime import datetime, timedelta
+-     class User(BaseModel):
++ import random
+-         id: int
++ from math import sqrt
+-         email: str
++ 
+-         is_active: bool
++ class Position(BaseModel):
+-         created_at: str
++     id: int
+-     class UserLogin(BaseModel):
++     symbol: str
+-         email: str
++     quantity: int
+-         password: str
++     entry_price: float
+- 
++     current_price: float
+-     DEMO_EMAIL = "demo@cambostation.com"
++     pnl: float
+-     DEMO_PASSWORD = "password"
++     pnl_percentage: float
+- 
++     market_value: float
+-     @app.post("/api/auth/login", response_model=Token)
++     entry_date: str
+-     async def dev_login(user_credentials: UserLogin):
++ 
+-         # For development - accept demo credentials or any email/password combo
++ 
+-         if (user_credentials.email == DEMO_EMAIL and user_credentials.password == DEMO_PASSWORD) or \
++ class PerformancePoint(BaseModel):
+-            (user_credentials.email and user_credentials.password):
++     date: str
+-             return Token(access_token="demo-token", token_type="bearer", expires_in=30*60)
++     value: float
+-         raise HTTPException(status_code=401, detail="Email and password required")
++     daily_return: float
+-     class UserRegister(BaseModel):
++     cumulative_return: float
+-         email: str
++ class PortfolioSummary(BaseModel):
+-         password: str
++     total_value: float
+-         confirm_password: str
++     total_pnl: float
+-     @app.post("/api/auth/register", response_model=Token)
++     total_return_percentage: float
+-     async def dev_register(user_credentials: UserRegister):
++     positions_count: int
+-         # For development - accept any registration
++     current_day_value: float
+-         if not user_credentials.email or not user_credentials.password:
++     current_day_return: float
+-             raise HTTPException(status_code=400, detail="Email and password required")
++ 
+-         if user_credentials.password != user_credentials.confirm_password:
++ 
+-             raise HTTPException(status_code=400, detail="Passwords do not match")
++ @app.get("/api/portfolio/positions", response_model=List[Position])
+-         # Auto-login after registration
++ def get_positions() -> List[Position]:
+-         return Token(access_token="demo-token", token_type="bearer", expires_in=30*60)
++     symbols = ["AAPL", "MSFT", "NVDA", "AMZN", "GOOGL"]
+- 
++     positions: List[Position] = []
+-     @app.get("/api/auth/me", response_model=User)
++     for i, sym in enumerate(symbols, start=1):
+-     async def dev_me(authorization: str = Header(default="")):
++         qty = random.choice([25, 50, 100])
+-         if not authorization.startswith("Bearer "):
++         entry = round(random.uniform(100, 250), 2)
+-             raise HTTPException(status_code=401, detail="Not authenticated")
++         cur = round(entry * random.uniform(0.95, 1.15), 2)
+-         # In dev, accept demo-token
++         pnl = round((cur - entry) * qty, 2)
+-         token = authorization.split(" ", 1)[1]
++         pnl_pct = round(((cur - entry) / entry) * 100, 2)
+-         if token != "demo-token":
++         mv = round(cur * qty, 2)
+-             raise HTTPException(status_code=401, detail="Invalid token")
++         positions.append(
+-         return User(id=1, email=DEMO_EMAIL, is_active=True, created_at=datetime.utcnow().isoformat())
++             Position(
+- 
++                 id=i,
+- # ----- Lightweight portfolio endpoints for dashboard -----
++                 symbol=sym,
+- from pydantic import BaseModel
++                 quantity=qty,
+- from typing import List, Optional, Dict
++                 entry_price=entry,
+- from datetime import datetime, timedelta
++                 current_price=cur,
+- import random
++                 pnl=pnl,
+- from math import sqrt
++                 pnl_percentage=pnl_pct,
+- 
++                 market_value=mv,
+- 
++                 entry_date=(datetime.utcnow() - timedelta(days=random.randint(10, 60))).isoformat(),
+- class Position(BaseModel):
++             )
+-     id: int
++         )
+-     symbol: str
++     return positions
+-     quantity: int
++ 
+-     entry_price: float
++ 
+-     current_price: float
++ @app.get("/api/portfolio/performance", response_model=List[PerformancePoint])
+-     pnl: float
++ def get_performance(days: int = 30) -> List[PerformancePoint]:
+-     pnl_percentage: float
++     base_value = 100000.0
+-     market_value: float
++     points: List[PerformancePoint] = []
+-     entry_date: str
++     cumulative_return = 0.0
+- 
++     current = base_value
+- 
++     start_date = datetime.utcnow() - timedelta(days=days)
+- class PerformancePoint(BaseModel):
++     for d in range(days):
+-     date: str
++         # simulate small daily return between -1% and +1%
+-     value: float
++         daily_ret = random.uniform(-0.01, 0.01)
+-     daily_return: float
++         current = current * (1 + daily_ret)
+-     cumulative_return: float
++         cumulative_return = (current / base_value) - 1
+- 
++         points.append(
+- 
++             PerformancePoint(
+- class PortfolioSummary(BaseModel):
++                 date=(start_date + timedelta(days=d + 1)).date().isoformat(),
+-     total_value: float
++                 value=round(current, 2),
+-     total_pnl: float
++                 daily_return=round(daily_ret * 100, 3),
+-     total_return_percentage: float
++                 cumulative_return=round(cumulative_return * 100, 3),
+-     positions_count: int
++             )
+-     current_day_value: float
++         )
+-     current_day_return: float
++     return points
+- @app.get("/api/portfolio/positions", response_model=List[Position])
++ @app.get("/api/portfolio/summary", response_model=PortfolioSummary)
+- def get_positions() -> List[Position]:
++ def get_summary() -> PortfolioSummary:
+-     symbols = ["AAPL", "MSFT", "NVDA", "AMZN", "GOOGL"]
++     # derive from positions for consistency
+-     positions: List[Position] = []
++     pos = get_positions()
+-     for i, sym in enumerate(symbols, start=1):
++     total_value = round(sum(p.market_value for p in pos), 2)
+-         qty = random.choice([25, 50, 100])
++     total_pnl = round(sum(p.pnl for p in pos), 2)
+-         entry = round(random.uniform(100, 250), 2)
++     total_return_pct = round((total_pnl / (total_value - total_pnl)) * 100, 2) if total_value - total_pnl != 0 else 0.0
+-         cur = round(entry * random.uniform(0.95, 1.15), 2)
++     # current day random move
+-         pnl = round((cur - entry) * qty, 2)
++     day_ret_pct = random.uniform(-0.5, 0.5)  # +/- 0.5%
+-         pnl_pct = round(((cur - entry) / entry) * 100, 2)
++     current_day_value = round(total_value * (1 + day_ret_pct / 100), 2)
+-         mv = round(cur * qty, 2)
++     return PortfolioSummary(
+-         positions.append(
++         total_value=total_value,
+-             Position(
++         total_pnl=total_pnl,
+-                 id=i,
++         total_return_percentage=total_return_pct,
+-                 symbol=sym,
++         positions_count=len(pos),
+-                 quantity=qty,
++         current_day_value=current_day_value,
+-                 entry_price=entry,
++         current_day_return=round(day_ret_pct, 3),
+-                 current_price=cur,
++     )
+-                 pnl=pnl,
++ 
+-                 pnl_percentage=pnl_pct,
++ 
+-                 market_value=mv,
++ # ----- Technical analysis (no external talib) -----
+-                 entry_date=(datetime.utcnow() - timedelta(days=random.randint(10, 60))).isoformat(),
++ class TechnicalInput(BaseModel):
+-             )
++     close: List[float]
+-         )
++ @app.post("/api/analysis/technical")
+-     return positions
++ def technical_analysis(inp: TechnicalInput):
+- @app.get("/api/portfolio/performance", response_model=List[PerformancePoint])
++     closes = inp.close
+- def get_performance(days: int = 30) -> List[PerformancePoint]:
++     n = len(closes)
+-     base_value = 100000.0
++     def sma(period: int):
+-     points: List[PerformancePoint] = []
++         out = [None] * n
+-     cumulative_return = 0.0
++         if period <= 0:
+-     current = base_value
++             return out
+-     start_date = datetime.utcnow() - timedelta(days=days)
++         s = 0.0
+-     for d in range(days):
++         for i, v in enumerate(closes):
+-         # simulate small daily return between -1% and +1%
++             s += v
+-         daily_ret = random.uniform(-0.01, 0.01)
++             if i >= period:
+-         current = current * (1 + daily_ret)
++                 s -= closes[i - period]
+-         cumulative_return = (current / base_value) - 1
++             if i >= period - 1:
+-         points.append(
++                 out[i] = s / period
+-             PerformancePoint(
++         return out
+-                 date=(start_date + timedelta(days=d + 1)).date().isoformat(),
++ 
+-                 value=round(current, 2),
++     def rsi(period: int = 14):
+-                 daily_return=round(daily_ret * 100, 3),
++         out = [None] * n
+-                 cumulative_return=round(cumulative_return * 100, 3),
++         if n == 0 or period <= 0:
+-             )
++             return out
+-         )
++         gains = [0.0] * n
+-     return points
++         losses = [0.0] * n
+- 
++         for i in range(1, n):
+- 
++             change = closes[i] - closes[i - 1]
+- @app.get("/api/portfolio/summary", response_model=PortfolioSummary)
++             gains[i] = max(change, 0.0)
+- def get_summary() -> PortfolioSummary:
++             losses[i] = -min(change, 0.0)
+-     # derive from positions for consistency
++         avg_gain = sum(gains[1:period + 1]) / period if n > period else 0.0
+-     pos = get_positions()
++         avg_loss = sum(losses[1:period + 1]) / period if n > period else 0.0
+-     total_value = round(sum(p.market_value for p in pos), 2)
++         if n > period:
+-     total_pnl = round(sum(p.pnl for p in pos), 2)
++             rs = (avg_gain / avg_loss) if avg_loss != 0 else float('inf')
+-     total_return_pct = round((total_pnl / (total_value - total_pnl)) * 100, 2) if total_value - total_pnl != 0 else 0.0
++             out[period] = 100 - (100 / (1 + rs))
+-     # current day random move
++         for i in range(period + 1, n):
+-     day_ret_pct = random.uniform(-0.5, 0.5)  # +/- 0.5%
++             avg_gain = ((avg_gain * (period - 1)) + gains[i]) / period
+-     current_day_value = round(total_value * (1 + day_ret_pct / 100), 2)
++             avg_loss = ((avg_loss * (period - 1)) + losses[i]) / period
+-     return PortfolioSummary(
++             rs = (avg_gain / avg_loss) if avg_loss != 0 else float('inf')
+-         total_value=total_value,
++             out[i] = 100 - (100 / (1 + rs))
+-         total_pnl=total_pnl,
++         return out
+-         total_return_percentage=total_return_pct,
++ 
+-         positions_count=len(pos),
++     def bbands(period: int = 20, k: float = 2.0):
+-         current_day_value=current_day_value,
++         upper = [None] * n
+-         current_day_return=round(day_ret_pct, 3),
++         middle = [None] * n
+-     )
++         lower = [None] * n
+- 
++         for i in range(n):
+- 
++             if i >= period - 1:
+- # ----- Technical analysis (no external talib) -----
++                 window = closes[i - period + 1:i + 1]
+- class TechnicalInput(BaseModel):
++                 m = sum(window) / period
+-     close: List[float]
++                 var = sum((x - m) ** 2 for x in window) / period
+- 
++                 sd = sqrt(var)
+- 
++                 middle[i] = m
+- @app.post("/api/analysis/technical")
++                 upper[i] = m + k * sd
+- def technical_analysis(inp: TechnicalInput):
++                 lower[i] = m - k * sd
+-     closes = inp.close
++         return upper, middle, lower
+-     n = len(closes)
++ 
+-     def sma(period: int):
++     sma20 = sma(20)
+-         out = [None] * n
++     rsi14 = rsi(14)
+-         if period <= 0:
++     upper, mid, lower = bbands(20, 2.0)
+-             return out
++ 
+-         s = 0.0
++     # Convert None to null via pydantic by returning directly
+-         for i, v in enumerate(closes):
++     return {
+-             s += v
++         "sma": sma20,
+-             if i >= period:
++         "rsi": rsi14,
+-                 s -= closes[i - period]
++         "bollinger_bands": {
+-             if i >= period - 1:
++             "upper": upper,
+-                 out[i] = s / period
++             "middle": mid,
+-         return out
++             "lower": lower,
+- 
++         },
+-     def rsi(period: int = 14):
++     }
+-         out = [None] * n
++ 
+-         if n == 0 or period <= 0:
++ @app.get("/")
+-             return out
++ def read_root():
+-         gains = [0.0] * n
++     return {"Hello": "World"}
+-         losses = [0.0] * n
++ 
+-         for i in range(1, n):
++ @app.get("/health")
+-             change = closes[i] - closes[i - 1]
++ def health():
+-             gains[i] = max(change, 0.0)
++     return {"status": "ok"}
+-             losses[i] = -min(change, 0.0)
++ 
+-         avg_gain = sum(gains[1:period + 1]) / period if n > period else 0.0
++ # ----- Optional: Journal CRUD (in-memory) -----
+-         avg_loss = sum(losses[1:period + 1]) / period if n > period else 0.0
++ class JournalNote(BaseModel):
+-         if n > period:
++     id: int
+-             rs = (avg_gain / avg_loss) if avg_loss != 0 else float('inf')
++     title: str
+-             out[period] = 100 - (100 / (1 + rs))
++     body: str
+-         for i in range(period + 1, n):
++     tags: List[str]
+-             avg_gain = ((avg_gain * (period - 1)) + gains[i]) / period
++     date: str  # ISO string
+-             avg_loss = ((avg_loss * (period - 1)) + losses[i]) / period
++ 
+-             rs = (avg_gain / avg_loss) if avg_loss != 0 else float('inf')
++ _journal_store_by_user: Dict[str, List[JournalNote]] = {}
+-             out[i] = 100 - (100 / (1 + rs))
++ def _get_user_key(authorization: str) -> str:
+-         return out
++     # Dev-friendly: use bearer token as a user key; fallback to 'public'
+-     def bbands(period: int = 20, k: float = 2.0):
++     if authorization and authorization.startswith("Bearer "):
+-         upper = [None] * n
++         return authorization.split(" ", 1)[1]
+-         middle = [None] * n
++     return "public"
+-         lower = [None] * n
++ 
+-         for i in range(n):
++ @app.get("/api/journal", response_model=List[JournalNote])
+-             if i >= period - 1:
++ def list_journal(query: Optional[str] = None, tag: Optional[str] = None, date_from: Optional[str] = None, date_to: Optional[str] = None, authorization: str = Header(default="")):
+-                 window = closes[i - period + 1:i + 1]
++     def to_date_only(iso: str):
+-                 m = sum(window) / period
++         try:
+-                 var = sum((x - m) ** 2 for x in window) / period
++             d = datetime.fromisoformat(iso)
+-                 sd = sqrt(var)
++             return datetime(d.year, d.month, d.day)
+-                 middle[i] = m
++         except (ValueError, TypeError):
+-                 upper[i] = m + k * sd
++             return None
+-                 lower[i] = m - k * sd
++     q = (query or "").lower().strip()
+-         return upper, middle, lower
++     frm = datetime.fromisoformat(date_from) if date_from else None
+- 
++     to = datetime.fromisoformat(date_to) if date_to else None
+-     sma20 = sma(20)
++     out: List[JournalNote] = []
+-     rsi14 = rsi(14)
++     user_key = _get_user_key(authorization)
+-     upper, mid, lower = bbands(20, 2.0)
++     store = _journal_store_by_user.get(user_key, [])
+- 
++     for n in store:
+-     # Convert None to null via pydantic by returning directly
++         txt = f"{n.title} {n.body}".lower()
+-     return {
++         if q and q not in txt:
+-         "sma": sma20,
++             continue
+-         "rsi": rsi14,
++         if tag and tag not in n.tags:
+-         "bollinger_bands": {
++             continue
+-             "upper": upper,
++         if frm or to:
+-             "middle": mid,
++             nd = to_date_only(n.date)
+-             "lower": lower,
++             if not nd:
+-         },
++                 continue
+-     }
++             if frm and nd < frm:
+- 
++                 continue
+- @app.get("/")
++             if to:
+- def read_root():
++                 end = datetime(to.year, to.month, to.day, 23, 59, 59, 999000)
+-     return {"Hello": "World"}
++                 if nd > end:
+- 
++                     continue
+- @app.get("/health")
++         out.append(n)
+- def health():
++     # newest first
+-     return {
++     out.sort(key=lambda x: x.date, reverse=True)
+-         "status": "ok",
++     return out
+-         "environment": environment,
++ 
+-         "timestamp": datetime.now().isoformat(),
++ class JournalCreate(BaseModel):
+-         "version": "1.0.0"
++     title: str = ""
+-     }
++     body: str = ""
+- # ----- Optional: Journal CRUD (in-memory) -----
++     tags: List[str] = []
+- class JournalNote(BaseModel):
++ @app.post("/api/journal", response_model=JournalNote)
+-     id: int
++ def create_journal(payload: JournalCreate, authorization: str = Header(default="")):
+-     title: str
++     nid = int(datetime.utcnow().timestamp() * 1000)
+-     body: str
++     note = JournalNote(id=nid, title=payload.title.strip(), body=payload.body.strip(), tags=list(dict.fromkeys(payload.tags)), date=datetime.utcnow().isoformat())
+-     tags: List[str]
++     user_key = _get_user_key(authorization)
+-     date: str  # ISO string
++     if user_key not in _journal_store_by_user:
+- 
++         _journal_store_by_user[user_key] = []
+- _journal_store_by_user: Dict[str, List[JournalNote]] = {}
++     _journal_store_by_user[user_key].insert(0, note)
+- def _get_user_key(authorization: str) -> str:
++     return note
+-     # Dev-friendly: use bearer token as a user key; fallback to 'public'
++ class JournalUpdate(BaseModel):
+-     if authorization and authorization.startswith("Bearer "):
++     title: Optional[str] = None
+-         return authorization.split(" ", 1)[1]
++     body: Optional[str] = None
+-     return "public"
++     tags: Optional[List[str]] = None
+- @app.get("/api/journal", response_model=List[JournalNote])
++ @app.put("/api/journal/{note_id}", response_model=JournalNote)
+- def list_journal(query: Optional[str] = None, tag: Optional[str] = None, date_from: Optional[str] = None, date_to: Optional[str] = None, authorization: str = Header(default="")):
++ def update_journal(note_id: int, payload: JournalUpdate, authorization: str = Header(default="")):
+-     def to_date_only(iso: str):
++     user_key = _get_user_key(authorization)
+-         try:
++     store = _journal_store_by_user.get(user_key, [])
+-             d = datetime.fromisoformat(iso)
++     for i, n in enumerate(store):
+-             return datetime(d.year, d.month, d.day)
++         if n.id == note_id:
+-         except (ValueError, TypeError):
++             updated = n.copy(update={
+-             return None
++                 "title": payload.title if payload.title is not None else n.title,
+-     q = (query or "").lower().strip()
++                 "body": payload.body if payload.body is not None else n.body,
+-     frm = datetime.fromisoformat(date_from) if date_from else None
++                 "tags": list(dict.fromkeys(payload.tags)) if payload.tags is not None else n.tags,
+-     to = datetime.fromisoformat(date_to) if date_to else None
++             })
+-     out: List[JournalNote] = []
++             store[i] = updated
+-     user_key = _get_user_key(authorization)
++             _journal_store_by_user[user_key] = store
+-     store = _journal_store_by_user.get(user_key, [])
++             return updated
+-     for n in store:
++     raise HTTPException(status_code=404, detail="Note not found")
+-         txt = f"{n.title} {n.body}".lower()
++ 
+-         if q and q not in txt:
++ @app.delete("/api/journal/{note_id}")
+-             continue
++ def delete_journal(note_id: int, authorization: str = Header(default="")):
+-         if tag and tag not in n.tags:
++     user_key = _get_user_key(authorization)
+-             continue
++     store = _journal_store_by_user.get(user_key, [])
+-         if frm or to:
++     for i, n in enumerate(store):
+-             nd = to_date_only(n.date)
++         if n.id == note_id:
+-             if not nd:
++             store.pop(i)
+-                 continue
++             _journal_store_by_user[user_key] = store
+-             if frm and nd < frm:
++             return {"ok": True}
+-                 continue
++     raise HTTPException(status_code=404, detail="Note not found")
+-             if to:
++ 
+-                 end = datetime(to.year, to.month, to.day, 23, 59, 59, 999000)
++ if __name__ == "__main__":
+-                 if nd > end:
++     import uvicorn
+-                     continue
+-         out.append(n)
+-     # newest first
+-     out.sort(key=lambda x: x.date, reverse=True)
+-     return out
+- class JournalCreate(BaseModel):
+-     title: str = ""
+-     body: str = ""
+-     tags: List[str] = []
+- 
+- @app.post("/api/journal", response_model=JournalNote)
+- def create_journal(payload: JournalCreate, authorization: str = Header(default="")):
+-     nid = int(datetime.utcnow().timestamp() * 1000)
+-     note = JournalNote(id=nid, title=payload.title.strip(), body=payload.body.strip(), tags=list(dict.fromkeys(payload.tags)), date=datetime.utcnow().isoformat())
+-     user_key = _get_user_key(authorization)
+-     if user_key not in _journal_store_by_user:
+-         _journal_store_by_user[user_key] = []
+-     _journal_store_by_user[user_key].insert(0, note)
+-     return note
+- 
+- class JournalUpdate(BaseModel):
+-     title: Optional[str] = None
+-     body: Optional[str] = None
+-     tags: Optional[List[str]] = None
+- 
+- @app.put("/api/journal/{note_id}", response_model=JournalNote)
+- def update_journal(note_id: int, payload: JournalUpdate, authorization: str = Header(default="")):
+-     user_key = _get_user_key(authorization)
+-     store = _journal_store_by_user.get(user_key, [])
+-     for i, n in enumerate(store):
+-         if n.id == note_id:
+-             updated = n.copy(update={
+-                 "title": payload.title if payload.title is not None else n.title,
+-                 "body": payload.body if payload.body is not None else n.body,
+-                 "tags": list(dict.fromkeys(payload.tags)) if payload.tags is not None else n.tags,
+-             })
+-             store[i] = updated
+-             _journal_store_by_user[user_key] = store
+-             return updated
+-     raise HTTPException(status_code=404, detail="Note not found")
+- 
+- @app.delete("/api/journal/{note_id}")
+- def delete_journal(note_id: int, authorization: str = Header(default="")):
+-     user_key = _get_user_key(authorization)
+-     store = _journal_store_by_user.get(user_key, [])
+-     for i, n in enumerate(store):
+-         if n.id == note_id:
+-             store.pop(i)
+-             _journal_store_by_user[user_key] = store
+-             return {"ok": True}
+-     raise HTTPException(status_code=404, detail="Note not found")
+- 
+- if __name__ == "__main__":
+-     import uvicorn
+- 

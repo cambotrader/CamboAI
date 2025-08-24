@@ -64,6 +64,13 @@ CACHE_MISSES = Counter(
     ['cache_type']
 )
 
+# Provider usage metrics
+MARKET_DATA_PROVIDER_USED = Counter(
+    'market_data_provider_used_total',
+    'Count of market data provider usage by domain and provider',
+    ['domain', 'provider']
+)
+
 # Database metrics
 DB_CONNECTION_POOL = Gauge(
     'db_connection_pool_size',
@@ -110,6 +117,10 @@ class MetricsManager:
             CACHE_HITS.labels(cache_type=cache_type).inc()
         else:
             CACHE_MISSES.labels(cache_type=cache_type).inc()
+
+    @staticmethod
+    def record_provider_used(domain: str, provider: str):
+        MARKET_DATA_PROVIDER_USED.labels(domain=domain, provider=provider).inc()
 
     @staticmethod
     def update_db_pool_status(status: str, count: int):

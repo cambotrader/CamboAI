@@ -1,0 +1,8 @@
+2025-08-03 17:22:41Z - Launching Flask backend...
+2025-08-03 17:22:41Z - ? Flask backend launched.
+2025-08-03 17:22:41Z - Launching React frontend...
+2025-08-03 17:22:41Z - ? React launch failed: This command cannot be run due to the error: %1 is not a valid Win32 application.
+2025-08-03 17:22:41Z - ?? Dashboard script completed.
+2025-08-03 17:31:26Z - 🚀 Dashboard launch sequence initiated.
+2025-08-03 17:31:26Z - �
+2025-08-03 17:31:26Z - 🎯 Dashboard launch sequence completed.

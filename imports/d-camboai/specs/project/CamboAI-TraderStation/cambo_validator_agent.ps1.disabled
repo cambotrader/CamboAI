@@ -1,0 +1,238 @@
+# Cambo Validator Agent
+# Validates module dependencies and system requirements
+
+param(
+    [string]$ModuleName,
+    [switch]$CheckAll,
+    [switch]$Verbose
+)
+
+# Import required modules
+. "$PSScriptRoot\Modules\reason_logger.ps1"
+
+$manifestPath = "C:\Users\johnl\Modules\module_manifest.json"
+$logFile = "$env:USERPROFILE\Logs\validator_agent.log"
+
+function Write-ValidatorLog {
+    param([string]$Message, [string]$Level = "INFO")
+    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $logEntry = "$timestamp [$Level] VALIDATOR: $Message"
+    Add-Content -Path $logFile -Value $logEntry
+    if ($Verbose -or $Level -eq "ERROR") {
+        Write-Host $logEntry -ForegroundColor $(if($Level -eq "ERROR"){"Red"}elseif($Level -eq "WARN"){"Yellow"}else{"Cyan"})
+    }
+}
+
+function Get-ModuleManifest {
+    try {
+        if (Test-Path $manifestPath) {
+            return Get-Content $manifestPath | ConvertFrom-Json
+        } else {
+            Write-ValidatorLog "Manifest file not found at $manifestPath" "ERROR"
+            return @()
+        }
+    } catch {
+        Write-ValidatorLog "Error loading manifest: $($_.Exception.Message)" "ERROR"
+        return @()
+    }
+}
+
+function Test-ModuleExists {
+    param([string]$ModuleName)
+    
+    $modulePath = "C:\Users\johnl\Modules\$ModuleName"
+    $exists = Test-Path $modulePath
+    
+    if ($exists) {
+        Write-ValidatorLog "Module file exists: $ModuleName" "INFO"
+    } else {
+        Write-ValidatorLog "Module file missing: $ModuleName" "ERROR"
+    }
+    
+    return $exists
+}
+
+function Test-ModuleDependencies {
+    param([object]$Module, [object[]]$AllModules)
+    
+    $validationResult = @{
+        IsValid = $true
+        MissingDependencies = @()
+        DisabledDependencies = @()
+        CircularDependencies = @()
+    }
+    
+    if (-not $Module.depends_on -or $Module.depends_on.Count -eq 0) {
+        Write-ValidatorLog "Module '$($Module.name)' has no dependencies" "INFO"
+        return $validationResult
+    }
+    
+    Write-ValidatorLog "Validating dependencies for module '$($Module.name)'"
+    
+    foreach ($dependency in $Module.depends_on) {
+        $depModule = $AllModules | Where-Object { $_.name -eq $dependency }
+        
+        if (-not $depModule) {
+            Write-ValidatorLog "Missing dependency: '$dependency' for module '$($Module.name)'" "ERROR"
+            $validationResult.MissingDependencies += $dependency
+            $validationResult.IsValid = $false
+        } elseif (-not $depModule.enabled) {
+            Write-ValidatorLog "Disabled dependency: '$dependency' for module '$($Module.name)'" "WARN"
+            $validationResult.DisabledDependencies += $dependency
+            $validationResult.IsValid = $false
+        } else {
+            Write-ValidatorLog "Valid dependency: '$dependency' for module '$($Module.name)'" "INFO"
+        }
+    }
+    
+    return $validationResult
+}
+
+function Test-CircularDependencies {
+    param([object[]]$AllModules)
+    
+    $circularDeps = @()
+    
+    foreach ($module in $AllModules) {
+        $visited = @()
+        $path = @()
+        
+        if (Test-CircularDependencyRecursive -ModuleName $module.name -AllModules $AllModules -Visited $visited -Path $path) {
+            $circularDeps += "Circular dependency detected involving: $($path -join ' -> ')"
+        }
+    }
+    
+    return $circularDeps
+}
+
+function Test-CircularDependencyRecursive {
+    param([string]$ModuleName, [object[]]$AllModules, [string[]]$Visited, [string[]]$Path)
+    
+    if ($ModuleName -in $Path) {
+        return $true
+    }
+    
+    if ($ModuleName -in $Visited) {
+        return $false
+    }
+    
+    $Visited += $ModuleName
+    $Path += $ModuleName
+    
+    $module = $AllModules | Where-Object { $_.name -eq $ModuleName }
+    if ($module -and $module.depends_on) {
+        foreach ($dependency in $module.depends_on) {
+            if (Test-CircularDependencyRecursive -ModuleName $dependency -AllModules $AllModules -Visited $Visited -Path $Path) {
+                return $true
+            }
+        }
+    }
+    
+    $Path = $Path | Where-Object { $_ -ne $ModuleName }
+    return $false
+}
+
+function Get-ModuleValidationReport {
+    param([object]$Module, [object[]]$AllModules)
+    
+    $report = @{
+        ModuleName = $Module.name
+        Enabled = $Module.enabled
+        FileExists = Test-ModuleExists -ModuleName $Module.name
+        Dependencies = Test-ModuleDependencies -Module $Module -AllModules $AllModules
+        CanStart = $false
+    }
+    
+    $report.CanStart = $report.FileExists -and $report.Dependencies.IsValid -and $Module.enabled
+    
+    return $report
+}
+
+function Show-ValidationSummary {
+    param([object[]]$Reports, [string[]]$CircularDeps)
+    
+    Write-ValidatorLog "=== VALIDATION SUMMARY ===" "INFO"
+    
+    $totalModules = $Reports.Count
+    $enabledModules = ($Reports | Where-Object { $_.Enabled }).Count
+    $validModules = ($Reports | Where-Object { $_.CanStart }).Count
+    
+    Write-ValidatorLog "Total modules: $totalModules"
+    Write-ValidatorLog "Enabled modules: $enabledModules"
+    Write-ValidatorLog "Valid modules (can start): $validModules"
+    
+    if ($CircularDeps.Count -gt 0) {
+        Write-ValidatorLog "CIRCULAR DEPENDENCIES DETECTED:" "ERROR"
+        foreach ($circular in $CircularDeps) {
+            Write-ValidatorLog "  $circular" "ERROR"
+        }
+    }
+    
+    Write-ValidatorLog "=== MODULE DETAILS ===" "INFO"
+    foreach ($report in $Reports) {
+        $status = if ($report.CanStart) { "✓ READY" } elseif ($report.Enabled) { "⚠ ISSUES" } else { "○ DISABLED" }
+        Write-ValidatorLog "$status $($report.ModuleName)"
+        
+        if (-not $report.FileExists) {
+            Write-ValidatorLog "    ✗ File missing" "ERROR"
+        }
+        
+        if ($report.Dependencies.MissingDependencies.Count -gt 0) {
+            Write-ValidatorLog "    ✗ Missing dependencies: $($report.Dependencies.MissingDependencies -join ', ')" "ERROR"
+        }
+        
+        if ($report.Dependencies.DisabledDependencies.Count -gt 0) {
+            Write-ValidatorLog "    ⚠ Disabled dependencies: $($report.Dependencies.DisabledDependencies -join ', ')" "WARN"
+        }
+    }
+}
+
+# Main execution
+Write-ValidatorLog "=== Cambo Validator Agent Started ==="
+
+$manifest = Get-ModuleManifest
+if ($manifest.Count -eq 0) {
+    Write-ValidatorLog "No modules found in manifest. Exiting." "ERROR"
+    exit 1
+}
+
+Log-Reason "Validator agent started - checking module dependencies"
+
+if ($ModuleName) {
+    # Validate specific module
+    $module = $manifest | Where-Object { $_.name -eq $ModuleName }
+    if (-not $module) {
+        Write-ValidatorLog "Module '$ModuleName' not found in manifest" "ERROR"
+        exit 1
+    }
+    
+    $report = Get-ModuleValidationReport -Module $module -AllModules $manifest
+    Show-ValidationSummary -Reports @($report) -CircularDeps @()
+    
+    if ($report.CanStart) {
+        Write-ValidatorLog "Module '$ModuleName' is valid and can be started" "INFO"
+        exit 0
+    } else {
+        Write-ValidatorLog "Module '$ModuleName' has validation issues" "ERROR"
+        exit 1
+    }
+} else {
+    # Validate all modules
+    $reports = @()
+    foreach ($module in $manifest) {
+        $reports += Get-ModuleValidationReport -Module $module -AllModules $manifest
+    }
+    
+    $circularDeps = Test-CircularDependencies -AllModules $manifest
+    Show-ValidationSummary -Reports $reports -CircularDeps $circularDeps
+    
+    $hasErrors = ($reports | Where-Object { -not $_.CanStart -and $_.Enabled }).Count -gt 0 -or $circularDeps.Count -gt 0
+    
+    if ($hasErrors) {
+        Write-ValidatorLog "Validation completed with errors" "ERROR"
+        exit 1
+    } else {
+        Write-ValidatorLog "All enabled modules passed validation" "INFO"
+        exit 0
+    }
+}

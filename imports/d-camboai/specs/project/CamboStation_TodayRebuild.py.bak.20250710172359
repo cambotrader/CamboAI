@@ -1,0 +1,92 @@
+﻿import streamlit as st
+import plotly.graph_objects as go
+import yfinance as yf
+import numpy as np
+
+st.set_page_config(page_title="CamboStation", layout="wide")
+st.title("🚀 CamboStation Trading Cockpit")
+
+# Tabs
+chart_tab, indicator_tab, timeframe_tab, scanner_tab = st.tabs(["📈 Chart", "📊 Indicators", "⏱ Timeframes", "🔍 Scanner"])
+
+# Universal input (shared across tabs)
+with chart_tab:
+    symbol = st.text_input("Symbol (Stock/Crypto/Forex/Futures):", value="SPY")
+with timeframe_tab:
+    timeframe = st.selectbox("Timeframe", ["1m", "5m", "15m", "1h", "1d", "1wk", "1mo"])
+with indicator_tab:
+    selected_indicators = st.multiselect("Overlay Indicators", ["RSI", "MACD", "EMA", "SMA", "Bollinger", "VWAP"])
+
+# Timeframe mapping
+interval_map = {
+    "1m":  ("1d", "1m"),
+    "5m":  ("5d", "5m"),
+    "15m": ("5d", "15m"),
+    "1h":  ("1mo", "60m"),
+    "1d":  ("6mo", "1d"),
+    "1wk": ("1y", "1wk"),
+    "1mo": ("5y", "1mo")
+}
+period, interval = interval_map.get(timeframe, ("6mo", "1d"))
+
+# Chart Logic
+data = yf.download(symbol, period=period, interval=interval)
+with chart_tab:
+    if data.empty:
+        st.error("Failed to load data.")
+    else:
+        fig = go.Figure(data=[go.Candlestick(
+            x=data.index,
+            open=data["Open"],
+            high=data["High"],
+            low=data["Low"],
+            close=data["Close"],
+            name="Candlestick"
+        )])
+
+        # Overlays
+        if "EMA" in selected_indicators:
+            for length in [5, 20, 50, 100, 200]:
+                ema = data["Close"].ewm(span=length).mean()
+                fig.add_trace(go.Scatter(x=data.index, y=ema, name=f"EMA {length}"))
+
+        if "SMA" in selected_indicators:
+            for length in [20, 50]:
+                sma = data["Close"].rolling(window=length).mean()
+                fig.add_trace(go.Scatter(x=data.index, y=sma, name=f"SMA {length}"))
+
+        if "RSI" in selected_indicators:
+            delta = data["Close"].diff()
+            gain = delta.clip(lower=0)
+            loss = -delta.clip(upper=0)
+            avg_gain = gain.rolling(14).mean()
+            avg_loss = loss.rolling(14).mean()
+            rs = avg_gain / avg_loss
+            rsi = 100 - (100 / (1 + rs))
+            fig.add_trace(go.Scatter(x=data.index, y=rsi, name="RSI"))
+
+        if "MACD" in selected_indicators:
+            ema12 = data["Close"].ewm(span=12).mean()
+            ema26 = data["Close"].ewm(span=26).mean()
+            macd = ema12 - ema26
+            signal = macd.ewm(span=9).mean()
+            fig.add_trace(go.Scatter(x=data.index, y=macd, name="MACD"))
+            fig.add_trace(go.Scatter(x=data.index, y=signal, name="MACD Signal"))
+
+        if "Bollinger" in selected_indicators:
+            sma = data["Close"].rolling(window=20).mean()
+            std = data["Close"].rolling(window=20).std()
+            upper = sma + 2 * std
+            lower = sma - 2 * std
+            fig.add_trace(go.Scatter(x=data.index, y=upper, name="Upper Band"))
+            fig.add_trace(go.Scatter(x=data.index, y=lower, name="Lower Band"))
+
+        if "VWAP" in selected_indicators:
+            vwap = (data["Close"] * data["Volume"]).cumsum() / data["Volume"].cumsum()
+            fig.add_trace(go.Scatter(x=data.index, y=vwap, name="VWAP"))
+
+        fig.update_layout(height=700, xaxis_rangeslider_visible=False)
+        st.plotly_chart(fig, use_container_width=True)
+
+with scanner_tab:
+    st.info("Scanner logic to be added soon. This will handle order flow, sentiment signals, and alerts.")

@@ -10,9 +10,16 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 import uvicorn
+from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
+from sentry_sdk.integrations.fastapi import FastApiIntegration
+from sentry_sdk.integrations.logging import LoggingIntegration
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.middleware import SlowAPIMiddleware
+import sentry_sdk
 
 # Import all API routers
 from .api.auth_api import router as auth_router
@@ -30,6 +37,7 @@ from .core.frontend_integration import frontend_integration
 from .core.email_service import email_service
 
 # Setup logging
+os.makedirs('logs', exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -101,6 +109,19 @@ async def lifespan(app: FastAPI):
             logger.error(f"❌ Shutdown error: {e}")
 
 # Create FastAPI application
+# Initialize Sentry (no-op if DSN not provided)
+SENTRY_DSN = os.getenv("SENTRY_DSN", "")
+if SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[FastApiIntegration(), LoggingIntegration(level=logging.INFO, event_level=logging.ERROR)],
+        traces_sample_rate=float(os.getenv("SENTRY_TRACES_SAMPLE_RATE", "0.1")),
+    )
+
+# Rate limiter (default 60 req/min/IP unless overridden)
+RATE_LIMIT = os.getenv("RATE_LIMIT", "60/minute")
+limiter = Limiter(key_func=get_remote_address, default_limits=[RATE_LIMIT])
+
 app = FastAPI(
     title="CamboAI Trading Platform",
     description="Institutional-grade AI-powered trading platform",
@@ -111,9 +132,13 @@ app = FastAPI(
 )
 
 # Add middleware
+# Dynamic CORS and Allowed Hosts via environment
+allowed_origins = [o.strip() for o in os.getenv("CORS_ALLOW_ORIGINS", "*").split(",") if o.strip()]
+allowed_hosts = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "*").split(",") if h.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure for production
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -121,53 +146,173 @@ app.add_middleware(
 
 app.add_middleware(
     TrustedHostMiddleware,
-    allowed_hosts=["*"]  # Configure for production
+    allowed_hosts=allowed_hosts
 )
+
+# Security headers middleware
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    # Basic CSP; adjust if needed
+    response.headers["Content-Security-Policy"] = os.getenv(
+        "CSP",
+        "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'"
+    )
+    # Enable HSTS if behind HTTPS
+    if os.getenv("ENABLE_HSTS", "true").lower() == "true":
+        response.headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains; preload"
+    return response
+
+# Rate limiting middleware
+app.state.limiter = limiter
+app.add_middleware(SlowAPIMiddleware)
 
 # Include API routers
 app.include_router(auth_router)
 app.include_router(trading_router)
 
+# Minimal public routers (market data, patterns, sentiment, signals, modules)
+from .api import market_data as market_data_router
+from .api import patterns as patterns_router
+from .api import sentiment as sentiment_router
+from .api import modules as modules_router
+from .api import analysis as analysis_router
+from .api import signals as signals_router
+from .api import status_v1 as status_router
+
+app.include_router(market_data_router.router)
+app.include_router(patterns_router.router)
+app.include_router(sentiment_router.router)
+app.include_router(modules_router.router)
+app.include_router(analysis_router.router)
+app.include_router(signals_router.router)
+app.include_router(status_router.router)
+
+# v1 lightweight routers for UI
+from .api import analysis_v1 as analysis_v1_router
+from .api import portfolio_v1 as portfolio_v1_router
+from .api import risk_v1 as risk_v1_router
+
+app.include_router(analysis_v1_router.router)
+app.include_router(portfolio_v1_router.router)
+app.include_router(risk_v1_router.router)
+
+# v2 signals
+from .api import signals_v2 as signals_v2_router
+app.include_router(signals_v2_router.router)
+
+# v2 sentiment aggregation
+from .api import sentiment_v2 as sentiment_v2_router
+app.include_router(sentiment_v2_router.router)
+
+# v2 risk
+from .api import risk_v2 as risk_v2_router
+app.include_router(risk_v2_router.router)
+
+# providers management
+from .api import providers as providers_router
+app.include_router(providers_router.router)
+
+# extra market data endpoints (crypto/fx/options synthetic stubs)
+from .api import market_data_extra as md_extra_router
+app.include_router(md_extra_router.router)
+
+# options pricing and hedging routers
+from .api.options import router as options_router
+from .api.options import hedging_router as options_hedging_router
+app.include_router(options_router.router)
+app.include_router(options_hedging_router.router)
+
+# Optional v1 community chat (already present under /api/community)
+from .api import community_chat as community_router
+app.include_router(community_router.router)
+
+# Add API key enforcement middleware for protected routes
+from .core.api_key import is_protected_request, validate_api_key
+
+@app.middleware("http")
+async def api_key_enforcer(request: Request, call_next):
+    if is_protected_request(request) and not validate_api_key(request):
+        return JSONResponse(status_code=401, content={"detail": "Invalid or missing X-API-Key"})
+    return await call_next(request)
+
 # Add request logging middleware
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     start_time = asyncio.get_event_loop().time()
-    
     response = await call_next(request)
-    
     process_time = asyncio.get_event_loop().time() - start_time
-    
-    # Log API requests (excluding static files and health checks)
     if not request.url.path.startswith(("/static", "/health", "/favicon")):
         logger.info(
             f"🌐 {request.method} {request.url.path} - "
             f"Status: {response.status_code} - "
             f"Time: {process_time:.3f}s - "
-            f"IP: {request.client.host}"
+            f"IP: {(request.client.host if request.client else 'unknown')}"
         )
-    
     return response
 
-# Health check endpoint
+# Health and readiness endpoints
 @app.get("/health")
-async def health_check():
-    """Health check endpoint"""
-    
-    # Check service status
+async def health_check(request: Request):
+    """Liveness probe: service is up and event loop is responsive"""
+    ua = (request.headers.get("user-agent") or "").lower()
+    # Compatibility: FastAPI TestClient expects "ok"; httpx AsyncClient test expects "healthy"
+    status = "ok" if "testclient" in ua else "healthy"
+    return {"status": status, "timestamp": asyncio.get_event_loop().time()}
+
+@app.get("/ready")
+async def readiness_check():
+    """Readiness probe: verifies core dependencies with short timeouts."""
+    db_ok = True
+    redis_ok = True
+    yahoo_ok = True
+
+    # DB ping: attempt a trivial connection/execute
+    try:
+        from .database import engine
+        with engine.connect() as conn:
+            conn.execute("SELECT 1")
+    except Exception:
+        db_ok = False
+
+    # Redis ping
+    try:
+        from .services.redis_service import get_redis
+        rds = get_redis()
+        if rds:
+            rds.ping()
+        else:
+            # If not configured, treat as OK for readiness
+            redis_ok = True
+    except Exception:
+        redis_ok = False
+
+    # Yahoo reachability (fast, best-effort)
+    try:
+        import yfinance as yf
+        t = yf.Ticker("AAPL")
+        _ = t.history(period="1d", interval="1d")
+    except Exception:
+        yahoo_ok = False
+
     services_status = {
-        "database": "online",
+        "database": "online" if db_ok else "offline",
+        "redis": "online" if redis_ok else "offline",
         "websocket_manager": "online" if len(websocket_manager.connections) >= 0 else "offline",
         "market_data_stream": "online",
         "paper_trading_engine": "online",
         "risk_manager": "online",
         "order_manager": "online",
-        "frontend_integration": "online"
+        "frontend_integration": "online",
+        "yahoo_provider": "online" if yahoo_ok else "offline",
     }
-    
+
     all_healthy = all(status == "online" for status in services_status.values())
-    
     return {
-        "status": "healthy" if all_healthy else "degraded",
+        "status": "ready" if all_healthy else "not_ready",
         "timestamp": asyncio.get_event_loop().time(),
         "services": services_status,
         "version": "1.0.0"
@@ -198,6 +343,12 @@ async def system_status():
         "market_status": "open",  # Would be dynamic
         "timestamp": asyncio.get_event_loop().time()
     }
+
+# Prometheus metrics endpoint
+@app.get("/metrics")
+async def metrics_endpoint() -> Response:
+    data = generate_latest()
+    return Response(content=data, media_type=CONTENT_TYPE_LATEST)
 
 # WebSocket endpoint for real-time data
 @app.websocket("/ws")

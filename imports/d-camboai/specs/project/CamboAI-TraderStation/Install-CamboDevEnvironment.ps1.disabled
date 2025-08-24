@@ -1,0 +1,58 @@
+param (
+    [string]$ProjectName = "CamboAI-TraderStation",
+    [string]$VSCodePath = "code"
+)
+
+# 1. VS Code Extension Stack
+$extensions = @(
+    "bolt-ai.code-editor",
+    "langchain.langchain-sdk",
+    "finbert.sentiment-plugin",
+    "ms-vscode.PowerShell",
+    "ms-python.python",
+    "GitHub.copilot",
+    "zencoder.agentic-toolkit",
+    "redhat.vscode-xml"
+)
+
+Write-Host "🧠 Installing VS Code extensions..."
+foreach ($ext in $extensions) {
+    Start-Process $VSCodePath -ArgumentList "--install-extension", "$ext", "--force" -Wait
+}
+
+# 2. Folder Structure
+Write-Host "📁 Creating GitHub repo structure..."
+$folders = @(
+    "apps/frontend", "apps/backend", "apps/ai-services", "apps/plugin-marketplace",
+    "packages/charting-lib", "packages/sentiment-core", "packages/strategy-engine", "packages/sdk",
+    "plugins/community", "plugins/official", "docs/api-reference", ".github/workflows", "config"
+)
+
+foreach ($folder in $folders) {
+    New-Item -ItemType Directory -Path "./$ProjectName/$folder" -Force | Out-Null
+}
+
+# 3. README + CI/CD Workflow
+Set-Content -Path "./$ProjectName/README.md" -Value "# $ProjectName"
+
+$workflow = @"
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [ main ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Dependencies
+        run: npm install
+      - name: Run Tests
+        run: npm test
+      - name: Deploy
+        run: echo 'Deploying to Render/AWS...'
+"@
+
+Set-Content -Path "./$ProjectName/.github/workflows/deploy.yml" -Value $workflow
+
+Write-Host "✅ Cambo Dev Environment is now installed and ready to roll!"

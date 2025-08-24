@@ -1,0 +1,162 @@
+# Cambo AI Trader Station - Master Runner
+# Orchestrates all AI modules based on manifest configuration
+
+param(
+    [switch]$Debug,
+    [switch]$Force,
+    [string]$LogLevel = "INFO"
+)
+
+# Import required modules
+. "$PSScriptRoot\Modules\reason_logger.ps1"
+
+$manifestPath = "C:\Users\johnl\Modules\module_manifest.json"
+$logFile = "$env:USERPROFILE\Logs\master_runner.log"
+
+function Write-Log {
+    param([string]$Message, [string]$Level = "INFO")
+    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $logEntry = "$timestamp [$Level] $Message"
+    Add-Content -Path $logFile -Value $logEntry
+    if ($Debug -or $Level -eq "ERROR") {
+        Write-Host $logEntry -ForegroundColor $(if($Level -eq "ERROR"){"Red"}elseif($Level -eq "WARN"){"Yellow"}else{"Green"})
+    }
+}
+
+function Get-ModuleManifest {
+    try {
+        if (Test-Path $manifestPath) {
+            $manifest = Get-Content $manifestPath | ConvertFrom-Json
+            Write-Log "Loaded manifest with $($manifest.Count) modules"
+            return $manifest
+        } else {
+            Write-Log "Manifest file not found at $manifestPath" "ERROR"
+            return @()
+        }
+    } catch {
+        Write-Log "Error loading manifest: $($_.Exception.Message)" "ERROR"
+        return @()
+    }
+}
+
+function Test-ModuleDependencies {
+    param([object]$Module, [object[]]$AllModules)
+    
+    if (-not $Module.depends_on -or $Module.depends_on.Count -eq 0) {
+        return $true
+    }
+    
+    foreach ($dependency in $Module.depends_on) {
+        $depModule = $AllModules | Where-Object { $_.name -eq $dependency }
+        if (-not $depModule) {
+            Write-Log "Dependency '$dependency' not found for module '$($Module.name)'" "WARN"
+            return $false
+        }
+        if (-not $depModule.enabled) {
+            Write-Log "Dependency '$dependency' is disabled for module '$($Module.name)'" "WARN"
+            return $false
+        }
+    }
+    return $true
+}
+
+function Start-Module {
+    param([object]$Module)
+    
+    $modulePath = "C:\Users\johnl\Modules\$($Module.name)"
+    
+    if (-not (Test-Path $modulePath)) {
+        Write-Log "Module file not found: $modulePath" "ERROR"
+        return $false
+    }
+    
+    try {
+        Write-Log "Starting module: $($Module.name)"
+        Log-Reason "Module '$($Module.name)' started by master_runner"
+        
+        # Start module in background
+        $job = Start-Job -ScriptBlock {
+            param($ModulePath, $WebhookUrl)
+            & $ModulePath
+        } -ArgumentList $modulePath, $Module.webhook_url
+        
+        Write-Log "Module '$($Module.name)' started with Job ID: $($job.Id)"
+        return $true
+    } catch {
+        Write-Log "Error starting module '$($Module.name)': $($_.Exception.Message)" "ERROR"
+        return $false
+    }
+}
+
+function Stop-AllModules {
+    Write-Log "Stopping all running module jobs..."
+    Get-Job | Where-Object { $_.Name -like "*cambo*" -or $_.State -eq "Running" } | Stop-Job -PassThru | Remove-Job
+    Write-Log "All module jobs stopped"
+}
+
+# Main execution
+Write-Log "=== Cambo Master Runner Started ==="
+Write-Log "Debug Mode: $Debug, Force Mode: $Force, Log Level: $LogLevel"
+
+# Load manifest
+$manifest = Get-ModuleManifest
+if ($manifest.Count -eq 0) {
+    Write-Log "No modules found in manifest. Exiting." "ERROR"
+    exit 1
+}
+
+# Stop existing modules if Force is specified
+if ($Force) {
+    Stop-AllModules
+}
+
+# Process each module
+$startedModules = @()
+$skippedModules = @()
+
+foreach ($module in $manifest) {
+    Write-Log "Processing module: $($module.name)"
+    
+    if (-not $module.enabled) {
+        Write-Log "Module '$($module.name)' is disabled. Skipping."
+        $skippedModules += $module.name
+        continue
+    }
+    
+    # Check dependencies
+    if (-not (Test-ModuleDependencies -Module $module -AllModules $manifest)) {
+        Write-Log "Dependencies not met for module '$($module.name)'. Skipping." "WARN"
+        $skippedModules += $module.name
+        continue
+    }
+    
+    # Start the module
+    if (Start-Module -Module $module) {
+        $startedModules += $module.name
+    } else {
+        $skippedModules += $module.name
+    }
+    
+    # Small delay between module starts
+    Start-Sleep -Milliseconds 500
+}
+
+# Summary
+Write-Log "=== Execution Summary ==="
+Write-Log "Started modules: $($startedModules -join ', ')"
+Write-Log "Skipped modules: $($skippedModules -join ', ')"
+Write-Log "=== Master Runner Complete ==="
+
+# Keep script running if in debug mode
+if ($Debug) {
+    Write-Log "Debug mode - Press Ctrl+C to exit"
+    try {
+        while ($true) {
+            Start-Sleep -Seconds 5
+            $runningJobs = Get-Job | Where-Object { $_.State -eq "Running" }
+            Write-Log "Running jobs: $($runningJobs.Count)"
+        }
+    } catch {
+        Write-Log "Debug monitoring stopped"
+    }
+}

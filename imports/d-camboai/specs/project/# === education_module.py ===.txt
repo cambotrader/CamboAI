@@ -1,0 +1,34 @@
+# === education_module.py ===
+
+pattern_glossary = {
+    "Hammer": "A bullish reversal candlestick pattern.",
+    "Doji": "Indecision in the market, often a turning point.",
+    "Head and Shoulders": "A bearish reversal chart pattern.",
+    "Double Top": "A bearish pattern signaling resistance."
+}
+
+tutorial_content = [
+    "Welcome to CamboStation Education Center.",
+    "Learn how to identify candlestick and chart patterns.",
+    "Understand sentiment zones and overlay signals.",
+    "Master glyph interpretation and strategy composition."
+]
+pattern_glossary.update({
+    "Bullish Engulfing": "A reversal pattern where a larger green candle overtakes a smaller red one.",
+    "Triple Bottom": "Three equal lows indicating strong support and a bullish reversal.",
+    "Morning Star": "A three-candle pattern signaling the end of a downtrend.",
+    "Rising Wedge": "A bearish continuation pattern with converging upward sloping trendlines."
+})
+tutorial_content = [
+    {"title": "Welcome", "level": "Beginner", "content": "Welcome to CamboStation Education Center."},
+    {"title": "Candlestick Patterns", "level": "Beginner", "content": "Learn how to identify candlestick patterns like Doji, Hammer, and Morning Star."},
+    {"title": "Chart Structures", "level": "Intermediate", "content": "Explore complex patterns like Head & Shoulders or Wedges."},
+    {"title": "Sentiment Zones", "level": "Advanced", "content": "Decode FinBERT-generated zones and apply TradingView overlays."}
+]
+def get_learning_tip(topic):
+    tips = {
+        "candlestick": "Focus on body size and wicks — they reveal market emotion.",
+        "chart": "Volume confirmation is key for validating chart patterns.",
+        "sentiment": "Sentiment zones help you anticipate market mood shifts before volume reacts."
+    }
+    return tips.get(topic, "No tip available for this topic.")

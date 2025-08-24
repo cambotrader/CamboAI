@@ -1,5 +1,5 @@
-from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Boolean, Text, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Boolean, Text, ForeignKey, JSON, UniqueConstraint
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
@@ -37,6 +37,7 @@ class User(Base):
     portfolios = relationship("Portfolio", back_populates="user")
     api_keys = relationship("BrokerAPIKey", back_populates="user")
     alerts = relationship("Alert", back_populates="user")
+    profile = relationship("UserProfile", back_populates="user", uselist=False)
 
 class Portfolio(Base):
     __tablename__ = "portfolios"
@@ -163,6 +164,18 @@ class RiskMetric(Base):
     alpha = Column(Float)
     volatility = Column(Float)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+class UserProfile(Base):
+    __tablename__ = "user_profiles"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, unique=True)
+    ui_preferences = Column(JSON)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = relationship("User", back_populates="profile")
+    __table_args__ = (UniqueConstraint('user_id', name='uq_user_profile_user_id'),)
 
 # Dependency to get database session
 def get_db():

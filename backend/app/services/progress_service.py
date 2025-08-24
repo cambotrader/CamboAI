@@ -11,7 +11,8 @@ os.makedirs(LOG_DIR, exist_ok=True)
 
 def log_progress(module: str, event: str, details: Optional[str] = None) -> None:
     ts = datetime.utcnow().isoformat()
-    line = f"{ts}\t{module}\t{event}\t{(details or '').replace('\n',' ').strip()}\n"
+    sanitized = (details or "").replace("\n", " ").strip()
+    line = f"{ts}\t{module}\t{event}\t{sanitized}\n"
     with open(LOG_PATH, "a", encoding="utf-8", errors="ignore") as f:
         f.write(line)
 

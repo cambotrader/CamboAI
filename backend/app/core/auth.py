@@ -36,7 +36,8 @@ API_KEY_EXPIRE_DAYS = 365
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Security schemes
-security = HTTPBearer()
+# Do not auto-raise 403 on missing Authorization; let deps decide and return 400 if needed
+security = HTTPBearer(auto_error=False)
 api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
 class UserRole(Enum):
@@ -112,9 +113,14 @@ class SecurityMonitor:
             "data_requests": (500, 60)    # 500 data requests per minute
         }
         
-        # Start monitoring tasks
-        asyncio.create_task(self._cleanup_expired_data())
-        asyncio.create_task(self._analyze_security_patterns())
+        # Start monitoring tasks if an event loop is running
+        try:
+            loop = asyncio.get_running_loop()
+            loop.create_task(self._cleanup_expired_data())
+            loop.create_task(self._analyze_security_patterns())
+        except RuntimeError:
+            # No running loop (e.g., during import in tests). We'll start tasks during app startup.
+            pass
     
     def record_failed_login(self, identifier: str, ip_address: str, user_agent: str):
         """Record failed login attempt"""
@@ -471,10 +477,12 @@ async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db)
 ) -> User:
-    """Get current authenticated user from JWT token"""
+    """Get current authenticated user from JWT token.
+    If no Authorization header is provided, behave like missing auth and raise 401 in protected endpoints.
+    """
     
     # Security checks
-    client_ip = request.client.host
+    client_ip = (request.client.host if request.client else "unknown")
     user_agent = request.headers.get("user-agent", "")
     
     if security_monitor.is_ip_blocked(client_ip):
@@ -489,6 +497,10 @@ async def get_current_user(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="Rate limit exceeded"
         )
+    
+    # Allow endpoints to handle missing credentials uniformly
+    if not credentials or not credentials.credentials:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing Authorization token")
     
     # Decode token
     token_data = auth_manager.decode_token(credentials.credentials)
@@ -508,12 +520,19 @@ async def get_current_user_api_key(
     api_key: Optional[str] = Depends(api_key_header),
     db: Session = Depends(get_db)
 ) -> Optional[User]:
-    """Authenticate user via API key"""
+    """Authenticate user via API key from header.
+    Support simple shared key via env (X_API_KEY) for tests/CI returning None user when only shared key present.
+    """
     
     if not api_key:
+        # Also allow simple shared key via header matching env for read-only context
+        from .api_key import get_expected_key
+        provided = request.headers.get("X-API-Key") or request.headers.get("x-api-key")
+        if provided and get_expected_key() and provided.strip() == get_expected_key():
+            return None
         return None
     
-    # Parse API key (format: key_id:key_secret)
+    # Parse API key (format: key_id:key_secret), else treat as shared key and return None
     try:
         key_id, key_secret = api_key.split(":", 1)
     except ValueError:

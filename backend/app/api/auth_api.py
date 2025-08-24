@@ -6,7 +6,7 @@ Complete authentication system with registration, login, 2FA, and security manag
 from fastapi import APIRouter, Depends, HTTPException, status, Request, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from pydantic import BaseModel, EmailStr, validator
+from pydantic import BaseModel, EmailStr, field_validator
 from typing import Dict, Any, Optional, List
 from datetime import datetime, timedelta
 import secrets
@@ -35,16 +35,18 @@ class UserRegistration(BaseModel):
     terms_accepted: bool = True
     marketing_consent: bool = False
     
-    @validator('username')
-    def validate_username(cls, v):
+    @field_validator('username')
+    @classmethod
+    def validate_username(cls, v: str) -> str:
         if len(v) < 3 or len(v) > 20:
             raise ValueError('Username must be 3-20 characters')
         if not v.isalnum():
             raise ValueError('Username must be alphanumeric')
         return v.lower()
-    
-    @validator('password')
-    def validate_password(cls, v):
+
+    @field_validator('password')
+    @classmethod
+    def validate_password(cls, v: str) -> str:
         if len(v) < 8:
             raise ValueError('Password must be at least 8 characters')
         if not any(c.isupper() for c in v):
@@ -54,15 +56,18 @@ class UserRegistration(BaseModel):
         if not any(c.isdigit() for c in v):
             raise ValueError('Password must contain digit')
         return v
-    
-    @validator('confirm_password')
-    def validate_passwords_match(cls, v, values):
-        if 'password' in values and v != values['password']:
+
+    @field_validator('confirm_password')
+    @classmethod
+    def validate_passwords_match(cls, v: str, info):
+        password = info.data.get('password') if hasattr(info, 'data') else None
+        if password is not None and v != password:
             raise ValueError('Passwords do not match')
         return v
-    
-    @validator('terms_accepted')
-    def validate_terms(cls, v):
+
+    @field_validator('terms_accepted')
+    @classmethod
+    def validate_terms(cls, v: bool) -> bool:
         if not v:
             raise ValueError('Terms and conditions must be accepted')
         return v
@@ -88,9 +93,11 @@ class PasswordResetConfirm(BaseModel):
     password: str
     confirm_password: str
     
-    @validator('confirm_password')
-    def validate_passwords_match(cls, v, values):
-        if 'password' in values and v != values['password']:
+    @field_validator('confirm_password')
+    @classmethod
+    def validate_passwords_match(cls, v: str, info):
+        password = info.data.get('password') if hasattr(info, 'data') else None
+        if password is not None and v != password:
             raise ValueError('Passwords do not match')
         return v
 
@@ -99,9 +106,11 @@ class PasswordChange(BaseModel):
     new_password: str
     confirm_new_password: str
     
-    @validator('confirm_new_password')
-    def validate_passwords_match(cls, v, values):
-        if 'new_password' in values and v != values['new_password']:
+    @field_validator('confirm_new_password')
+    @classmethod
+    def validate_passwords_match(cls, v: str, info):
+        new_password = info.data.get('new_password') if hasattr(info, 'data') else None
+        if new_password is not None and v != new_password:
             raise ValueError('Passwords do not match')
         return v
 
@@ -136,7 +145,7 @@ async def register_user(
 ):
     """Register new user account"""
     
-    client_ip = request.client.host
+    client_ip = (request.client.host if request.client else "unknown")
     user_agent = request.headers.get("user-agent", "")
     
     # Security checks
@@ -255,7 +264,7 @@ async def login_user(
 ):
     """Authenticate user and return tokens"""
     
-    client_ip = request.client.host
+    client_ip = (request.client.host if request.client else "unknown")
     user_agent = request.headers.get("user-agent", "")
     
     # Security checks
@@ -343,7 +352,7 @@ async def logout_user(
 ):
     """Logout user and invalidate tokens"""
     
-    client_ip = request.client.host
+    client_ip = (request.client.host if request.client else "unknown")
     user_agent = request.headers.get("user-agent", "")
     
     # Get token from authorization header
@@ -415,7 +424,7 @@ async def forgot_password(
 ):
     """Initiate password reset process"""
     
-    client_ip = request.client.host
+    client_ip = (request.client.host if request.client else "unknown")
     
     # Rate limiting
     if not security_monitor.check_rate_limit(f"reset:{client_ip}", "login"):
@@ -492,7 +501,7 @@ async def change_password(
         user_id=str(current_user.id),
         event_type="password_changed",
         details={"username": current_user.username},
-        ip_address=request.client.host
+        ip_address=(request.client.host if request.client else "unknown")
     )
     
     return {"message": "Password changed successfully"}

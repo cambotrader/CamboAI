@@ -4,6 +4,7 @@ import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
 import { QueryProvider } from '@/components/query-provider'
 import { Toaster } from '@/components/ui/toaster'
+import ErrorBoundary from '@/components/error-boundary'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -37,15 +38,33 @@ export default function RootLayout({
         <meta name="theme-color" content="#1976d2" />
         <style dangerouslySetInnerHTML={{
           __html: `
-            /* Prevent browser extension interference */
+            /* Prevent browser extension interference and persistent popups */
             .translate-tooltip-mtz,
             .translate-tooltip,
             [class*="translate"],
             [class*="extension"],
-            [hidden="null"] {
+            [class*="popup"],
+            [class*="modal"],
+            [class*="notification"],
+            [class*="toast"]:not([data-camboai]),
+            [hidden="null"],
+            [data-extension],
+            [data-popup],
+            div[style*="position: fixed"]:not([data-camboai]) {
               display: none !important;
               visibility: hidden !important;
               opacity: 0 !important;
+              pointer-events: none !important;
+              z-index: -9999 !important;
+            }
+            
+            /* Specifically target model change popups */
+            *[class*="model"]:not([data-camboai]),
+            *[id*="model"]:not([data-camboai]),
+            div:contains("Model can't be changed"),
+            div:contains("model"),
+            div:contains("chat") {
+              display: none !important;
             }
             
             /* Prevent hydration flash */
@@ -62,21 +81,86 @@ export default function RootLayout({
         }} />
       </head>
       <body className={inter.className} suppressHydrationWarning>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <QueryProvider>
-            <div className="min-h-screen bg-background">
-              {children}
-            </div>
-            <Toaster />
-          </QueryProvider>
-        </ThemeProvider>
+        <ErrorBoundary>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <QueryProvider>
+              <div className="min-h-screen bg-background">
+                {children}
+              </div>
+              <Toaster />
+            </QueryProvider>
+          </ThemeProvider>
+        </ErrorBoundary>
         <script dangerouslySetInnerHTML={{
           __html: `
+            // Prevent persistent popups and notifications
+            let popupCount = 0;
+            const maxPopups = 3;
+            
+            // Override alert, confirm, and prompt to prevent spam
+            const originalAlert = window.alert;
+            const originalConfirm = window.confirm;
+            const originalPrompt = window.prompt;
+            
+            window.alert = function(message) {
+              if (popupCount >= maxPopups) {
+                console.warn('Too many popups blocked:', message);
+                return;
+              }
+              popupCount++;
+              setTimeout(() => popupCount = Math.max(0, popupCount - 1), 5000);
+              return originalAlert.call(this, message);
+            };
+            
+            window.confirm = function(message) {
+              if (popupCount >= maxPopups) {
+                console.warn('Too many popups blocked:', message);
+                return false;
+              }
+              popupCount++;
+              setTimeout(() => popupCount = Math.max(0, popupCount - 1), 5000);
+              return originalConfirm.call(this, message);
+            };
+            
+            window.prompt = function(message, defaultText) {
+              if (popupCount >= maxPopups) {
+                console.warn('Too many popups blocked:', message);
+                return null;
+              }
+              popupCount++;
+              setTimeout(() => popupCount = Math.max(0, popupCount - 1), 5000);
+              return originalPrompt.call(this, message, defaultText);
+            };
+            
+            // Prevent extension interference
+            const observer = new MutationObserver((mutations) => {
+              mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                  if (node.nodeType === 1) {
+                    const element = node;
+                    // Remove extension-related elements
+                    if (element.className && (
+                      element.className.includes('translate') ||
+                      element.className.includes('extension') ||
+                      element.className.includes('popup')
+                    )) {
+                      element.remove();
+                    }
+                  }
+                });
+              });
+            });
+            
+            observer.observe(document.body, {
+              childList: true,
+              subtree: true
+            });
+            
             setTimeout(() => {
               document.body.classList.add('hydrated');
             }, 100);

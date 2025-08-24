@@ -1,0 +1,270 @@
+# Stable Cambo Toggle API - No Window Flickering
+param(
+    [int]$Port = 8080,
+    [switch]$Debug
+)
+
+# Import required modules
+try {
+    . "C:\Users\johnl\Modules\reason_logger.ps1"
+    Write-Host "Reason logger loaded successfully" -ForegroundColor Green
+} catch {
+    Write-Host "Warning: Could not load reason logger: $($_.Exception.Message)" -ForegroundColor Yellow
+}
+
+$manifestPath = "C:\Users\johnl\Modules\module_manifest.json"
+
+function Start-ToggleAPI {
+    param([int]$Port)
+    
+    Write-Host "Cambo Toggle API Starting..." -ForegroundColor Blue
+    Write-Host "Port: $Port" -ForegroundColor Gray
+    Write-Host "Manifest: $manifestPath" -ForegroundColor Gray
+    
+    try {
+        $listener = New-Object System.Net.HttpListener
+        $listener.Prefixes.Add("http://localhost:$Port/")
+        $listener.Start()
+        
+        Write-Host "API Server Started Successfully!" -ForegroundColor Green
+        Write-Host "Listening on: http://localhost:$Port" -ForegroundColor Cyan
+        Write-Host "Available endpoints:" -ForegroundColor White
+        Write-Host "  GET  /api/modules - Get all modules" -ForegroundColor Gray
+        Write-Host "  POST /api/modules/{name}/toggle - Toggle module" -ForegroundColor Gray
+        Write-Host "  GET  /api/modules/{name}/history - Get toggle history" -ForegroundColor Gray
+        Write-Host "  GET  /api/validate - Validate all modules" -ForegroundColor Gray
+        Write-Host ""
+        Write-Host "Press Ctrl+C to stop the server" -ForegroundColor Yellow
+        
+        while ($listener.IsListening) {
+            try {
+                $context = $listener.GetContext()
+                $request = $context.Request
+                $response = $context.Response
+                
+                # Enable CORS
+                $response.Headers.Add("Access-Control-Allow-Origin", "*")
+                $response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+                $response.Headers.Add("Access-Control-Allow-Headers", "Content-Type")
+                
+                if ($request.HttpMethod -eq "OPTIONS") {
+                    $response.StatusCode = 200
+                    $response.Close()
+                    continue
+                }
+                
+                $url = $request.Url.AbsolutePath
+                $method = $request.HttpMethod
+                
+                Write-Host "$(Get-Date -Format 'HH:mm:ss') $method $url" -ForegroundColor Cyan
+                
+                try {
+                    $responseData = Handle-Request -Method $method -Url $url -Request $request
+                    $response.StatusCode = 200
+                    $response.ContentType = "application/json"
+                    Write-Host "  -> 200 OK" -ForegroundColor Green
+                } catch {
+                    $responseData = @{ 
+                        error = $_.Exception.Message
+                        timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+                    } | ConvertTo-Json
+                    $response.StatusCode = 500
+                    $response.ContentType = "application/json"
+                    Write-Host "  -> 500 Error: $($_.Exception.Message)" -ForegroundColor Red
+                }
+                
+                $buffer = [System.Text.Encoding]::UTF8.GetBytes($responseData)
+                $response.ContentLength64 = $buffer.Length
+                $response.OutputStream.Write($buffer, 0, $buffer.Length)
+                $response.Close()
+                
+            } catch {
+                Write-Host "Request handling error: $($_.Exception.Message)" -ForegroundColor Red
+                try { $response.Close() } catch { }
+            }
+        }
+    } catch {
+        Write-Host "Failed to start API server: $($_.Exception.Message)" -ForegroundColor Red
+        throw
+    } finally {
+        if ($listener) {
+            $listener.Stop()
+            Write-Host "API Server Stopped" -ForegroundColor Yellow
+        }
+    }
+}
+
+function Handle-Request {
+    param($Method, $Url, $Request)
+    
+    switch -Regex ($Url) {
+        "^/api/modules$" {
+            if ($Method -eq "GET") {
+                return Get-AllModules
+            }
+        }
+        "^/api/modules/([^/]+)/toggle$" {
+            if ($Method -eq "POST") {
+                $moduleName = $Matches[1]
+                return Toggle-Module -ModuleName $moduleName -Request $Request
+            }
+        }
+        "^/api/modules/([^/]+)/history$" {
+            if ($Method -eq "GET") {
+                $moduleName = $Matches[1]
+                return Get-ModuleHistory -ModuleName $moduleName
+            }
+        }
+        "^/api/validate$" {
+            if ($Method -eq "GET") {
+                return Invoke-Validation
+            }
+        }
+        "^/api/status$" {
+            if ($Method -eq "GET") {
+                return @{
+                    status = "running"
+                    timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+                    port = $Port
+                } | ConvertTo-Json
+            }
+        }
+        default {
+            throw "Endpoint not found: $Method $Url"
+        }
+    }
+}
+
+function Get-AllModules {
+    if (-not (Test-Path $manifestPath)) {
+        throw "Manifest file not found at: $manifestPath"
+    }
+    
+    $manifest = Get-Content $manifestPath | ConvertFrom-Json
+    
+    $enrichedModules = @()
+    foreach ($module in $manifest) {
+        $modulePath = "C:\Users\johnl\Modules\$($module.name)"
+        $enrichedModule = $module | Select-Object *, @{
+            Name = "file_exists"
+            Expression = { Test-Path $modulePath }
+        }, @{
+            Name = "last_modified"
+            Expression = { 
+                if (Test-Path $modulePath) {
+                    (Get-Item $modulePath).LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")
+                } else {
+                    $null
+                }
+            }
+        }
+        $enrichedModules += $enrichedModule
+    }
+    
+    return $enrichedModules | ConvertTo-Json -Depth 3
+}
+
+function Toggle-Module {
+    param($ModuleName, $Request)
+    
+    # Read request body
+    $reader = New-Object System.IO.StreamReader($Request.InputStream)
+    $body = $reader.ReadToEnd()
+    $reader.Close()
+    
+    $requestData = if ($body) { $body | ConvertFrom-Json } else { @{} }
+    
+    if (-not (Test-Path $manifestPath)) {
+        throw "Manifest file not found at: $manifestPath"
+    }
+    
+    $manifest = Get-Content $manifestPath | ConvertFrom-Json
+    $module = $manifest | Where-Object { $_.name -eq $ModuleName }
+    
+    if (-not $module) {
+        throw "Module '$ModuleName' not found in manifest"
+    }
+    
+    # Toggle the enabled state
+    $newState = -not $module.enabled
+    $module.enabled = $newState
+    
+    # Save the updated manifest
+    $manifest | ConvertTo-Json -Depth 3 | Set-Content $manifestPath
+    
+    # Log the toggle event if logger is available
+    try {
+        $source = if ($requestData.source) { $requestData.source } else { "API" }
+        if (Get-Command "Log-ToggleEvent" -ErrorAction SilentlyContinue) {
+            Log-ToggleEvent -ModuleName $ModuleName -NewState $newState -Source $source
+        }
+    } catch {
+        Write-Host "Warning: Could not log toggle event: $($_.Exception.Message)" -ForegroundColor Yellow
+    }
+    
+    return @{
+        module = $ModuleName
+        enabled = $newState
+        message = "Module $ModuleName $(if($newState){'enabled'}else{'disabled'}) successfully"
+        timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    } | ConvertTo-Json
+}
+
+function Get-ModuleHistory {
+    param($ModuleName)
+    
+    try {
+        if (Get-Command "Get-ToggleHistory" -ErrorAction SilentlyContinue) {
+            $history = Get-ToggleHistory -ModuleName $ModuleName -Last 20
+        } else {
+            $history = @()
+        }
+    } catch {
+        $history = @()
+    }
+    
+    return @{
+        module = $ModuleName
+        history = $history
+        count = $history.Count
+    } | ConvertTo-Json
+}
+
+function Invoke-Validation {
+    try {
+        $validationScript = "$PSScriptRoot\cambo_validator_agent.ps1"
+        if (-not (Test-Path $validationScript)) {
+            throw "Validator script not found at: $validationScript"
+        }
+        
+        $result = & $validationScript -CheckAll 2>&1
+        $exitCode = $LASTEXITCODE
+        
+        return @{
+            success = $exitCode -eq 0
+            output = ($result | Out-String).Trim()
+            timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+            exit_code = $exitCode
+        } | ConvertTo-Json
+    } catch {
+        return @{
+            success = $false
+            error = $_.Exception.Message
+            timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        } | ConvertTo-Json
+    }
+}
+
+# Main execution
+Write-Host "========================================" -ForegroundColor Blue
+Write-Host "    Cambo Toggle API - Stable Version" -ForegroundColor White
+Write-Host "========================================" -ForegroundColor Blue
+
+try {
+    Start-ToggleAPI -Port $Port
+} catch {
+    Write-Host "Fatal Error: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "Press Enter to exit..." -ForegroundColor Yellow
+    Read-Host
+    exit 1
+}

@@ -1,0 +1,6 @@
+﻿SOURCE: D:\CamboAI\backend\Dockerfile.simple
+TARGET: D:\CamboAI\camboai\backend\Dockerfile.simple
+==== DIFF (lines prefixed with - are only in SOURCE; + are only in TARGET) ====
++   && pip install --no-cache-dir fastapi==0.103.2 uvicorn[standard]==0.23.2 PyJWT==2.4.0
+- COPY requirements.simple.txt /app/
+-   && pip install --no-cache-dir -r requirements.simple.txt

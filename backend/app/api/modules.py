@@ -125,7 +125,7 @@ async def create_alert_rule(rule: Dict[str, Any]):
 async def run_alerts():
     log_progress("alerts", "run")
     # Return no alerts or sample
-    return {"alerts": []}
+    return {"alerts": [], "evaluated": 0}
 
 # 7) Universal scanner stub
 class ScannerRequest(BaseModel):

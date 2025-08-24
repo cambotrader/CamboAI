@@ -1,0 +1,3 @@
+﻿SOURCE: D:\CamboAI\web\next-env.d.ts
+TARGET: D:\CamboAI\camboai\web\next-env.d.ts
+==== DIFF (lines prefixed with - are only in SOURCE; + are only in TARGET) ====

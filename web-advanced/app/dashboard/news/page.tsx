@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { ConnectDataPanel } from '@/components/dashboard/connect-data-panel';
 
 type NewsArticle = {
   title: string;
@@ -126,6 +127,8 @@ export default function NewsPage() {
           🔄 Refresh Mood
         </Button>
       </div>
+
+      <ConnectDataPanel />
 
       {/* Market Mood Overview */}
       {marketMood && (

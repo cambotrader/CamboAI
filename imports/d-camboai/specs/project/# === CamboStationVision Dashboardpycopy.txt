@@ -1,0 +1,808 @@
+# === CamboStationVision Dashboard.py ===
+# Intergalactic Edition | Part 1: Core Imports, Logo, Layout, Sidebar, Routing
+
+import streamlit as st
+import pandas as pd
+import yfinance as yf
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+from ta.trend import SMAIndicator, EMAIndicator
+from ta.momentum import RSIIndicator, StochasticOscillator
+from ta.volume import VolumeWeightedAveragePrice, OnBalanceVolumeIndicator
+from ta.volatility import BollingerBands, AverageTrueRange
+from ta.momentum import ROCIndicator
+from ta.trend import MACD
+
+from PIL import Image
+import streamlit.components.v1 as components
+
+# === Advanced AI Modules ===
+from modules.finbert_analytics import analyze_headlines
+from modules.glyph_renderer import render_glyph
+from modules.strategy_lab import StrategyLab
+from modules.symbolic_engines import (
+    identity_myth_engine,
+    persona_volatility_tracker,
+    belief_codex,
+    ritual_composer,
+    signal_overlay,
+)
+from modules.pattern_detection import (
+    detect_candlestick_patterns,
+    detect_chart_patterns,
+    annotate_patterns_on_chart,
+)
+from modules.export_engine import (
+    export_chart_as_image,
+    export_journal_to_markdown,
+)
+from modules.voice_interface import interpret_command
+from modules.education_module import pattern_glossary, tutorial_content
+
+# === CONFIG ===
+st.set_page_config(
+    page_title="CamboStation™",
+    page_icon="📊",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# === LOGO ===
+logo = Image.open("assets/logo.png")
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    st.image(logo, use_column_width=True)
+    st.markdown(
+        """
+        <h1 style='text-align: center; color: #1E90FF;'>Welcome to CamboStationVision™</h1>
+        <h3 style='text-align: center; color: gray;'>Out-of-this-Galaxy Trading Intelligence Engine</h3>
+        """,
+        unsafe_allow_html=True
+    )
+
+# === SIDEBAR ===
+st.sidebar.image(logo, width=150)
+st.sidebar.title("🧭 Navigation")
+selected_tab = st.sidebar.selectbox("Choose a Module", [
+    "📊 Dashboard",
+    "📐 Structure Scanner",
+    "📈 Candle Scanner",
+    "✍️ Pattern Journal",
+    "🎯 Strategy Lab",
+    "🎓 Education Tab",
+    "🌐 TradingView Module Widget"
+])
+
+st.sidebar.markdown("---")
+st.sidebar.subheader("✨ Control Panel")
+show_glyphs = st.sidebar.checkbox("Render Glyph Intelligence", value=True)
+show_finbert = st.sidebar.checkbox("Activate FinBERT Sentiment Zones", value=True)
+show_tradingview = st.sidebar.checkbox("Show TradingView Widget", value=True)
+show_news = st.sidebar.checkbox("Show yFinance News", value=True)
+show_cnbc = st.sidebar.checkbox("Embed CNBC Stream", value=True)
+show_glossary = st.sidebar.checkbox("Show Pattern Glossary", value=True)
+
+st.sidebar.markdown("---")
+st.sidebar.caption("🛠️ Powered by CamboStation AI Fusion Core")
+
+# === Begin Tab Routing Logic ===
+if selected_tab == "📊 Dashboard":
+    # Chart logic begins in Part 2
+    pass
+elif selected_tab == "📐 Structure Scanner":
+    # Module logic begins in Part 3
+    pass
+elif selected_tab == "📈 Candle Scanner":
+    # Module logic begins in Part 3
+    pass
+elif selected_tab == "✍️ Pattern Journal":
+    # Glossary logic begins in Part 7
+    pass
+elif selected_tab == "🎯 Strategy Lab":
+    # StrategyLab logic begins in Part 5
+    pass
+elif selected_tab == "🎓 Education Tab":
+    # Education logic begins in Part 7
+    pass
+elif selected_tab == "🌐 TradingView Module Widget":
+    # TradingView embed begins in Part 6
+    pass
+# === Begin Chart Rendering ===
+if selected_tab == "📊 Dashboard":
+
+    st.subheader("📈 Market Overview")
+    ticker = st.text_input("Enter a Ticker (e.g., AAPL)", value="SPY")
+    interval = st.selectbox("Time Interval", ["1d", "1h", "5m", "15m"])
+    period = st.selectbox("History Period", ["1mo", "3mo", "6mo", "1y", "2y"])
+
+    if ticker:
+        df = yf.download(ticker, period=period, interval=interval)
+        df.dropna(inplace=True)
+
+        # === Indicators ===
+        df["SMA50"] = SMAIndicator(df["Close"], window=50).sma_indicator()
+        df["SMA200"] = SMAIndicator(df["Close"], window=200).sma_indicator()
+        df["EMA20"] = EMAIndicator(df["Close"], window=20).ema_indicator()
+        df["VWAP"] = VolumeWeightedAveragePrice(
+            high=df["High"], low=df["Low"], close=df["Close"], volume=df["Volume"]
+        ).volume_weighted_average_price()
+        df["RSI"] = RSIIndicator(df["Close"], window=14).rsi()
+        macd = MACD(df["Close"])
+        df["MACD"] = macd.macd()
+        df["MACD_signal"] = macd.macd_signal()
+        boll = BollingerBands(df["Close"])
+        df["BB_upper"] = boll.bollinger_hband()
+        df["BB_lower"] = boll.bollinger_lband()
+        df["Volume_bar"] = df["Volume"]
+
+        # === Candlestick Chart ===
+        fig = make_subplots(rows=2, cols=1, shared_xaxes=True,
+                            specs=[[{"secondary_y": False}], [{"secondary_y": False}]],
+                            row_heights=[0.7, 0.3])
+
+        fig.add_trace(
+            go.Candlestick(
+                x=df.index,
+                open=df["Open"], high=df["High"],
+                low=df["Low"], close=df["Close"],
+                name="Candles"
+            ), row=1, col=1
+        )
+
+        # === Overlays ===
+        fig.add_trace(go.Scatter(x=df.index, y=df["SMA50"], mode='lines',
+                                 name='SMA50', line=dict(color='blue')), row=1, col=1)
+        fig.add
+# === Pattern Detection & Overlay ===
+        # Detect Candlestick Patterns
+        candlestick_matches = detect_candlestick_patterns(df)
+
+        for match in candlestick_matches:
+            fig.add_annotation(
+                text=f"{match['pattern']} {match['emoji']}",
+                x=match['index'],
+                y=match['high'],
+                showarrow=True,
+                arrowhead=2,
+                font=dict(color="black", size=12),
+                bgcolor="#F0F8FF"
+            )
+
+        # Detect Chart Patterns (Structure)
+        chart_patterns = detect_chart_patterns(df)
+
+        for pattern in chart_patterns:
+            fig.add_shape(
+                type="rect",
+                x0=pattern["start"],
+                x1=pattern["end"],
+                y0=pattern["low"],
+                y1=pattern["high"],
+                line=dict(color=pattern["color"], width=2),
+                fillcolor=pattern["fill"],
+                opacity=0.2,
+                layer="below"
+            )
+            fig.add_annotation(
+                text=pattern["label"],
+                x=pattern["start"],
+                y=pattern["high"],
+                showarrow=False,
+                font=dict(color="white", size=13),
+                bgcolor=pattern["color"]
+            )
+
+        st.info(f"🕵️ {len(candlestick_matches)} candlestick patterns detected | 📐 {len(chart_patterns)} chart structures identified.")
+
+        # === Export Button ===
+        with st.expander("📤 Export This Chart"):
+            export_chart_as_image(fig, filename=f"{ticker}_pattern_chart.png")
+            st.success("Chart image prepared for download.")
+        # === Symbolic Intelligence Suite ===
+        with st.expander("🧬 CamboStation Symbolic Intelligence"):
+
+            # Identity Myth Engine
+            identity_score = identity_myth_engine(df)
+            st.metric(label="Identity Score", value=identity_score)
+
+            # Volatility Persona Tracker
+            volatility_state = persona_volatility_tracker(df)
+            st.metric(label="Emotional Volatility State", value=volatility_state)
+
+            # Belief Codex Tags
+            belief_tags = belief_codex(df)
+            st.json({"Belief Tags": belief_tags})
+
+            # Signal Overlay Confirmation
+            signal_strength = signal_overlay(df)
+            st.metric(label="Signal Confirmation Strength", value=f"{signal_strength}%")
+
+            # Ritual Composer Output
+            ritual_status = ritual_composer(signal_strength, identity_score)
+            st.success(f"🧘 Ritual Status: {ritual_status}")
+
+            # Glyph Rendering (Optional)
+            if show_glyphs:
+                fusion_svg = render_glyph(identity_score, volatility_state, belief_tags, ritual_status)
+                st.image(fusion_svg, caption="🗿 Fusion Glyph Rendered from Symbolic Metrics")
+        # === Strategy Execution Engine ===
+        with st.expander("🎯 Strategy Lab: Tactical Deployment"):
+
+            strategy_lab = StrategyLab()
+            available_strategies = strategy_lab.list_strategies()
+            selected_strategy = st.selectbox("Choose a Strategy to Deploy", available_strategies)
+
+            if st.button(f"⚡ Execute '{selected_strategy}' Strategy"):
+                execution_result = strategy_lab.run_strategy(selected_strategy, df)
+
+                st.success(f"✅ '{selected_strategy}' executed successfully.")
+                st.metric(label="Signal Accuracy", value=f"{execution_result['signal_strength']}%")
+                st.metric(label="Expected Return", value=f"{execution_result['expected_return']}%")
+                st.metric(label="Risk Level", value=execution_result['risk_level'])
+
+                # Strategy commentary from AI Oracle
+                st.caption("🧠 Tactical Commentary")
+                st.markdown(f"> {execution_result['commentary']}")
+
+                # Log into Execution Playlist
+                strategy_lab.log_execution(
+                    strategy=selected_strategy,
+                    signal_strength=execution_result['signal_strength'],
+                    return_estimate=execution_result['expected_return'],
+                    commentary=execution_result['commentary']
+                )
+                st.info("📝 Execution saved to your Tactical Playlist.")
+
+            # Optional: Show last five executions
+            with st.expander("📂 Strategy Execution History"):
+                history = strategy_lab.load_execution_history()
+                for record in history[-5:]:
+                    st.markdown(f"- **{record['timestamp']}** | {record['strategy']} → `{record['commentary']}`")
+        # === External Feeds & Widgets ===
+        with st.expander("🌐 External Intelligence Modules"):
+
+            # === TradingView Widget ===
+            if show_tradingview:
+                st.subheader("📊 TradingView Interface")
+                tv_symbol = st.text_input("Enter TradingView Ticker (e.g. NASDAQ:AAPL)", value=f"NASDAQ:{ticker}")
+                tv_interval = st.selectbox("Chart Interval", ["1D", "1W", "1M"])
+                tv_theme = st.radio("Theme", ["Light", "Dark"], horizontal=True)
+
+                components.html(f"""
+                <div class="tradingview-widget-container">
+                  <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_e1e55&symbol={tv_symbol}&interval={tv_interval}&theme={tv_theme.lower()}&style=1&locale=en&utm_source=&utm_medium=widget&utm_campaign=chart&utm_term=" width="100%" height="500" frameborder="0"></iframe>
+                </div>
+                """, height=500)
+
+            # === CNBC Stream Embed ===
+            if show_cnbc:
+                st.subheader("📺 CNBC Live Stream")
+                components.html(f"""
+                <iframe width="100%" height="500" src="https://www.youtube.com/embed/live_stream?channel=UCrp_UI8XtuYfpiqluWLD7Lw" 
+                frameborder="0" allowfullscreen></iframe>
+                """, height=500)
+
+            # === yFinance News Feed ===
+            if show_news:
+                st.subheader("📰 Recent Headlines from yFinance")
+                news_items = yf.Ticker(ticker).news[:6]
+                for n in news_items:
+                    st.markdown(f"**{n['title']}**")
+                    st.caption(f"{n['publisher']} • {pd.to_datetime(n['providerPublishTime'], unit='s').strftime('%b %d, %Y')}")
+                    st.write(n['link'])
+                    st.markdown("---")
+    # === Pattern Journal & Glossary ===
+    elif selected_tab == "✍️ Pattern Journal":
+        st.header("📝 Pattern Journal")
+        journal_text = st.text_area("Enter your notes or pattern commentary here:")
+        if st.button("💾 Save to Markdown"):
+            export_journal_to_markdown(ticker, journal_text)
+            st.success("Journal entry exported successfully.")
+
+    # === Education Tab ===
+    elif selected_tab == "🎓 Education Tab":
+        st.header("🎓 CamboStation Learning Portal")
+        st.markdown("Explore key candlestick formations, chart patterns, and indicator logic below.")
+
+        for tutorial in tutorial_content:
+            with st.expander(f"📘 {tutorial['title']}"):
+                st.markdown(tutorial["description"])
+                st.image(tutorial["image"], use_column_width=True)
+                st.caption(tutorial["caption"])
+
+    # === Pattern Glossary ===
+    if show_glossary:
+        with st.expander("📚 Candlestick Pattern Glossary"):
+            glossary = pattern_glossary()
+            for entry in glossary:
+                st.markdown(f"- **{entry['emoji']} {entry['name']}**: {entry['description']}")
+    # === Voice Command Interface ===
+    with st.expander("🔊 Voice Command Center (Experimental)"):
+
+        st.caption("🎙️ Say a phrase like:")
+        st.markdown("- “Scan BTC for inverse head & shoulders”")
+        st.markdown("- “Activate ritual module”")
+        st.markdown("- “Render glyph on volatility surge”")
+
+        voice_input = st.text_input("🗣️ Enter your command phrase:")
+        if st.button("🧠 Interpret Voice Command"):
+            voice_response = interpret_command(voice_input, df)
+            st.info(f"🧠 CamboStation Response: {voice_response}")
+
+    # === Export Hub ===
+    with st.expander("📤 Export Systems"):
+
+        st.markdown("⬇️ Export current glyph, chart, and journal")
+
+        if st.button("🖼️ Export Chart as Annotated Image"):
+            export_chart_as_image(fig, filename=f"{ticker}_cosmic_chart.png")
+            st.success("📸 Chart exported successfully.")
+
+        if st.button("🗿 Export Glyph Snapshot"):
+            st.image(fusion_svg, caption="Exported Glyph")
+            st.success("🗿 Glyph exported as image.")
+
+        if st.button("📓 Export Pattern Journal to Markdown"):
+            export_journal_to_markdown(ticker, journal_text)
+            st.success("📘 Pattern journal saved.")
+
+    # === Final Boot Diagnostic ===
+    with st.expander("🚀 CamboStation Boot Sequence"):
+        st.success("📊 Charting engine fused")
+        st.success("📐 Pattern scanners deployed")
+        st.success("🧠 AI commentary active")
+        st.success("🗿 Glyph renderer humming")
+        st.success("🎯 Strategy engine locked")
+        st.success("📤 Export systems online")
+
+
+# === CamboStationVision™ Dashboard.py ===
+# Intergalactic Edition | Monolithic File | Block A: Core Boot + Navigation
+
+import streamlit as st
+import pandas as pd
+import numpy as np
+import yfinance as yf
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+from ta.trend import SMAIndicator, EMAIndicator, MACD
+from ta.momentum import RSIIndicator, StochasticOscillator
+from ta.volume import VolumeWeightedAveragePrice, OnBalanceVolumeIndicator
+from ta.volatility import BollingerBands, AverageTrueRange
+from ta.others import ROCIndicator
+
+from PIL import Image
+import streamlit.components.v1 as components
+
+# === Custom Cambo Modules ===
+from finbert_analytics import analyze_headlines
+from glyph_renderer import render_glyph
+from strategy_lab import StrategyLab
+from symbolic_engines import (
+    identity_myth_engine,
+    persona_volatility_tracker,
+    belief_codex,
+    ritual_composer,
+    signal_overlay,
+)
+from pattern_detection import (
+    detect_candlestick_patterns,
+    detect_chart_patterns,
+)
+from export_engine import (
+    export_chart_as_image,
+    export_journal_to_markdown,
+)
+from voice_interface import interpret_command
+from education_module import pattern_glossary, tutorial_content
+
+# === Page Configuration ===
+st.set_page_config(
+    page_title="CamboStationVision™",
+    page_icon="🧠",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# === Interface Header ===
+logo = Image.open("assets/logo.png")
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    st.image(logo, use_column_width=True)
+    st.markdown(
+        """
+        <h1 style='text-align: center; color:#00BFFF;'>CamboStationVision™</h1>
+        <h4 style='text-align: center; color:gray;'>Out-of-This-Galaxy Tactical Intelligence Engine</h4>
+        """,
+        unsafe_allow_html=True
+    )
+
+# === Sidebar Controls ===
+st.sidebar.image(logo, width=150)
+st.sidebar.title("🧭 Navigation")
+selected_tab = st.sidebar.selectbox("Choose a Tab", [
+    "📊 Dashboard",
+    "📐 Structure Scanner",
+    "📈 Candle Scanner",
+    "✍️ Pattern Journal",
+    "🎯 Strategy Lab",
+    "🎓 Education Tab",
+    "🌐 TradingView Module Widget"
+])
+
+st.sidebar.subheader("✨ Fusion Control Panel")
+show_glyphs = st.sidebar.checkbox("Render Fusion Glyphs", value=True)
+show_finbert = st.sidebar.checkbox("Show FinBERT Sentiment Zones", value=True)
+show_tradingview = st.sidebar.checkbox("TradingView Widget", value=True)
+show_cnbc = st.sidebar.checkbox("CNBC Stream", value=True)
+show_news = st.sidebar.checkbox("yFinance News Feed", value=True)
+show_glossary = st.sidebar.checkbox("Pattern Glossary", value=True)
+
+st.sidebar.markdown("---")
+st.sidebar.caption("🛠️ CamboStation AI Trader Station")
+# === Charting Engine with Full Indicators ===
+if selected_tab == "📊 Dashboard":
+
+    st.subheader("📈 Ticker Overview")
+    ticker = st.text_input("Enter a Ticker (e.g. AAPL)", value="SPY")
+    interval = st.selectbox("Time Interval", ["1d", "1h", "5m", "15m"])
+    period = st.selectbox("History Period", ["1mo", "3mo", "6mo", "1y", "2y"])
+
+    if ticker:
+        df = yf.download(ticker, period=period, interval=interval)
+        df.dropna(inplace=True)
+
+        # === Core Indicators ===
+        df["SMA50"] = SMAIndicator(df["Close"], window=50).sma_indicator()
+        df["SMA200"] = SMAIndicator(df["Close"], window=200).sma_indicator()
+        df["EMA20"] = EMAIndicator(df["Close"], window=20).ema_indicator()
+        df["VWAP"] = VolumeWeightedAveragePrice(
+            high=df["High"], low=df["Low"], close=df["Close"], volume=df["Volume"]
+        ).volume_weighted_average_price()
+        df["RSI"] = RSIIndicator(df["Close"], window=14).rsi()
+        macd = MACD(df["Close"])
+        df["MACD"] = macd.macd()
+        df["MACD_signal"] = macd.macd_signal()
+        boll = BollingerBands(df["Close"])
+        df["BB_upper"] = boll.bollinger_hband()
+        df["BB_lower"] = boll.bollinger_lband()
+        df["Volume_bar"] = df["Volume"]
+
+        # === Candlestick Chart ===
+        fig = make_subplots(rows=2, cols=1, shared_xaxes=True,
+                            specs=[[{"secondary_y": False}], [{"secondary_y": False}]],
+                            row_heights=[0.7, 0.3])
+
+        fig.add_trace(go.Candlestick(
+            x=df.index,
+            open=df["Open"], high=df["High"],
+            low=df["Low"], close=df["Close"],
+            name="Candles"
+        ), row=1, col=1)
+
+        # === Overlay Indicators ===
+        fig.add_trace(go.Scatter(x=df.index, y=df["SMA50"], name="SMA50",
+                                 line=dict(color="blue")), row=1, col=1)
+        fig.add_trace(go.Scatter(x=df.index, y=df["SMA200"], name="SMA200",
+                                 line=dict(color="red")), row=1, col=1)
+        fig.add_trace(go.Scatter(x=df.index, y=df["EMA20"], name="EMA20",
+                                 line=dict(color="orange")), row=1, col=1)
+        fig.add_trace(go.Scatter(x=df.index, y=df["VWAP"], name="VWAP",
+                                 line=dict(color="purple")), row=1, col=1)
+        fig.add_trace(go.Scatter(x=df.index, y=df["BB_upper"], name="BB Upper",
+                                 line=dict(dash="dot", color="gray")), row=1, col=1)
+        fig.add_trace(go.Scatter(x=df.index, y=df["BB_lower"], name="BB Lower",
+                                 line=dict(dash="dot", color="gray")), row=1, col=1)
+
+        # === MACD + Volume Bars ===
+        fig.add_trace(go.Scatter(x=df.index, y=df["MACD"], name="MACD",
+                                 line=dict(color="green")), row=2, col=1)
+        fig.add_trace(go.Scatter(x=df.index, y=df["MACD_signal"], name="MACD Signal",
+                                 line=dict(color="orange")), row=2, col=1)
+        fig.add_trace(go.Bar(x=df.index, y=df["Volume_bar"], name="Volume"), row=2, col=1)
+
+        # === FinBERT Sentiment Zones ===
+        if show_finbert:
+            headlines = yf.Ticker(ticker).news[:8]
+            scored = analyze_headlines(headlines)
+            for h in scored:
+                sentiment_color = "#90EE90" if h['sentiment'] == "positive" else "#FFCCCB" if h['sentiment'] == "negative" else "#D3D3D3"
+                fig.add_vrect(
+                    x0=h['time'] - pd.Timedelta(minutes=30),
+                    x1=h['time'] + pd.Timedelta(minutes=30),
+                    fillcolor=sentiment_color,
+                    opacity=0.3,
+                    layer="below",
+                    line_width=0
+                )
+                fig.add_annotation(
+                    text=f"{h['sentiment'].capitalize()}: {h['headline'][:60]}",
+                    x=h['time'], y=df["High"].max(),
+                    showarrow=True, arrowhead=1
+                )
+
+        fig.update_layout(title=f"CamboStation Chart: {ticker}", height=800)
+        st.plotly_chart(fig, use_container_width=True)
+        # === Candlestick Pattern Detection ===
+        candlestick_matches = detect_candlestick_patterns(df)
+        for match in candlestick_matches:
+            fig.add_annotation(
+                text=f"{match['pattern']} {match['emoji']}",
+                x=match['index'],
+                y=match['high'],
+                showarrow=True,
+                arrowhead=2,
+                font=dict(color="black", size=12),
+                bgcolor="#F0F8FF"
+            )
+
+        # === Chart Pattern Detection ===
+        chart_patterns = detect_chart_patterns(df)
+        for pattern in chart_patterns:
+            fig.add_shape(
+                type="rect",
+                x0=pattern["start"],
+                x1=pattern["end"],
+                y0=pattern["low"],
+                y1=pattern["high"],
+                line=dict(color=pattern["color"], width=2),
+                fillcolor=pattern["fill"],
+                opacity=0.2,
+                layer="below"
+            )
+            fig.add_annotation(
+                text=pattern["label"],
+                x=pattern["start"],
+                y=pattern["high"],
+                showarrow=False,
+                font=dict(color="white", size=13),
+                bgcolor=pattern["color"]
+            )
+
+        # === Detection Summary ===
+        st.info(f"🕵️ {len(candlestick_matches)} candlestick patterns found | 📐 {len(chart_patterns)} structural patterns detected")
+
+        # === Chart Export ===
+        with st.expander("📤 Export Chart"):
+            export_chart_as_image(fig, filename=f"{ticker}_pattern_chart.png")
+            st.success("📸 Pattern chart saved successfully.")
+        # === Symbolic Intelligence Engine ===
+        with st.expander("🧬 CamboStation Symbolic Intelligence"):
+
+            # Identity Myth Engine
+            identity_score = identity_myth_engine(df)
+            st.metric(label="Identity Score", value=identity_score)
+
+            # Volatility Persona Tracker
+            volatility_state = persona_volatility_tracker(df)
+            st.metric(label="Emotional Volatility", value=volatility_state)
+
+            # Belief Codex Extraction
+            belief_tags = belief_codex(df)
+            st.json({"Belief Codex": belief_tags})
+
+            # Signal Confirmation Overlay
+            signal_strength = signal_overlay(df)
+            st.metric(label="Signal Strength", value=f"{signal_strength}%")
+
+            # Ritual Composer Output
+            ritual_status = ritual_composer(signal_strength, identity_score)
+            st.success(f"🧘 Ritual Status: {ritual_status}")
+
+            # Glyph Rendering (if toggled)
+            if show_glyphs:
+                fusion_svg = render_glyph(
+                    identity_score=identity_score,
+                    volatility_state=volatility_state,
+                    belief_tags=belief_tags,
+                    ritual_status=ritual_status
+                )
+                st.image(fusion_svg, caption="🗿 Fusion Glyph — Rendered from Symbolic Metrics")
+        # === Strategy Lab Execution Module ===
+        with st.expander("🎯 Strategy Lab: Tactical Deployment"):
+
+            strategy_lab = StrategyLab()
+            available_strategies = strategy_lab.list_strategies()
+            selected_strategy = st.selectbox("Choose a Strategy", available_strategies)
+
+            if st.button(f"⚡ Execute '{selected_strategy}' Now"):
+                execution_result = strategy_lab.run_strategy(selected_strategy, df)
+
+                st.success(f"✅ Strategy '{selected_strategy}' Executed Successfully")
+                st.metric(label="Signal Strength", value=f"{execution_result['signal_strength']}%")
+                st.metric(label="Expected Return", value=f"{execution_result['expected_return']}%")
+                st.metric(label="Risk Profile", value=execution_result['risk_level'])
+
+                st.caption("🧠 AI Commentary")
+                st.markdown(f"> {execution_result['commentary']}")
+
+                # Save Execution Log
+                strategy_lab.log_execution(
+                    strategy=selected_strategy,
+                    signal_strength=execution_result['signal_strength'],
+                    return_estimate=execution_result['expected_return'],
+                    commentary=execution_result['commentary']
+                )
+                st.info("📂 Execution saved to Tactical Playlist")
+
+            # Show Execution History
+            with st.expander("📜 Recent Executions"):
+                history = strategy_lab.load_execution_history()
+                for record in history[-5:]:
+                    st.markdown(f"- **{record['timestamp']}** | {record['strategy']} → `{record['commentary']}`")
+    # === External Intelligence Module ===
+    elif selected_tab == "🌐 TradingView Module Widget":
+
+        st.header("🌐 CamboStation External Feeds")
+        st.caption("Live sentiment, global charting tools, and real-time headlines")
+
+        # === TradingView Embed Widget ===
+        if show_tradingview:
+            st.subheader("📊 TradingView Interface")
+            tv_symbol = st.text_input("Enter TradingView Ticker (e.g. NASDAQ:AAPL)", value=f"NASDAQ:{ticker}")
+            tv_interval = st.selectbox("Chart Interval", ["1D", "1W", "1M"])
+            tv_theme = st.radio("Theme", ["Light", "Dark"], horizontal=True)
+
+            components.html(f"""
+            <div class="tradingview-widget-container">
+              <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_e1e55&symbol={tv_symbol}&interval={tv_interval}&theme={tv_theme.lower()}&style=1&locale=en&utm_source=&utm_medium=widget&utm_campaign=chart&utm_term=" width="100%" height="500" frameborder="0"></iframe>
+            </div>
+            """, height=500)
+
+        # === CNBC Video Embed ===
+        if show_cnbc:
+            st.subheader("📺 CNBC Live Stream")
+            st.caption("Market news from the frontline")
+            components.html(f"""
+            <iframe width="100%" height="500" src="https://www.youtube.com/embed/live_stream?channel=UCrp_UI8XtuYfpiqluWLD7Lw" 
+            frameborder="0" allowfullscreen></iframe>
+            """, height=500)
+
+        # === yFinance News Feed ===
+        if show_news:
+            st.subheader("📰 yFinance News Stream")
+            st.caption("Recent headlines and sentiment scanning")
+            try:
+                news_items = yf.Ticker(ticker).news[:6]
+                for n in news_items:
+                    st.markdown(f"**{n['title']}**")
+                    st.caption(f"{n['publisher']} • {pd.to_datetime(n['providerPublishTime'], unit='s').strftime('%b %d, %Y')}")
+                    st.write(n['link'])
+                    st.markdown("---")
+            except Exception as e:
+                st.warning("⚠️ Could not load news stream — data may be unavailable.")
+    # === Pattern Journal ===
+    elif selected_tab == "✍️ Pattern Journal":
+        st.header("📝 Pattern Journal")
+        st.caption("Log your observations, setups, and strategy notes")
+        journal_text = st.text_area("Enter journal commentary for this asset or pattern:")
+        if st.button("💾 Save Entry"):
+            export_journal_to_markdown(ticker, journal_text)
+            st.success("📓 Journal saved to Markdown file")
+
+    # === Education Tab ===
+    elif selected_tab == "🎓 Education Tab":
+        st.header("🎓 CamboStation Learning Portal")
+        st.markdown("Explore foundational candlestick patterns, chart formations, and indicator logic")
+
+        for tutorial in tutorial_content:
+            with st.expander(f"📘 {tutorial['title']}"):
+                st.markdown(tutorial["description"])
+                st.image(tutorial["image"], use_column_width=True)
+                st.caption(tutorial["caption"])
+
+    # === Pattern Glossary ===
+    if show_glossary:
+        with st.expander("📚 Candlestick Pattern Glossary"):
+            glossary = pattern_glossary()
+            for entry in glossary:
+                st.markdown(f"- **{entry['emoji']} {entry['name']}** — {entry['description']}")
+    # === Pattern Journal ===
+    elif selected_tab == "✍️ Pattern Journal":
+        st.header("📝 Pattern Journal")
+        st.caption("Log your observations, setups, and strategy notes")
+        journal_text = st.text_area("Enter journal commentary for this asset or pattern:")
+        if st.button("💾 Save Entry"):
+            export_journal_to_markdown(ticker, journal_text)
+            st.success("📓 Journal saved to Markdown file")
+
+    # === Education Tab ===
+    elif selected_tab == "🎓 Education Tab":
+        st.header("🎓 CamboStation Learning Portal")
+        st.markdown("Explore foundational candlestick patterns, chart formations, and indicator logic")
+
+        for tutorial in tutorial_content:
+            with st.expander(f"📘 {tutorial['title']}"):
+                st.markdown(tutorial["description"])
+                st.image(tutorial["image"], use_column_width=True)
+                st.caption(tutorial["caption"])
+
+    # === Pattern Glossary ===
+    if show_glossary:
+        with st.expander("📚 Candlestick Pattern Glossary"):
+            glossary = pattern_glossary()
+            for entry in glossary:
+                st.markdown(f"- **{entry['emoji']} {entry['name']}** — {entry['description']}")
+# 🎙️ Narration Tab Import
+from modules.narration_tab import render_narration_tab
+
+# 🎙️ Narration Tab Injection
+with st.tabs(["Dashboard", "Narration"])[1]:
+    render_narration_tab()
+# 🎙️ Narration Tab Import
+from modules.narration_tab import render_narration_tab
+
+# 🎙️ Narration Tab Injection
+with st.tabs(["Dashboard", "Narration"])[1]:
+    render_narration_tab()
+# 📡 Feed Tab Import
+from modules.feed_tab import render_feed_tab
+
+# 📡 Feed Tab Injection
+with st.tabs(["Dashboard", "Feed Scanner"])[1]:
+    render_feed_tab()
+# 🧩 Cockpit Mode Toggle
+mode = st.radio("Choose cockpit mode:", ["TradeView", "LearningView"])
+
+# 🧩 Dynamic Tab Layout
+if mode == "TradeView":
+    tab_names = ["Dashboard", "Strategy", "Feed Scanner"]
+else:
+    tab_names = ["Dashboard", "Education", "Narration"]
+
+tabs = st.tabs(tab_names)
+
+# 🛠️ Tab Routing
+with tabs[0]:
+    st.header("📊 Main Dashboard View")  # Replace with main dashboard logic
+if mode == "TradeView":
+    from modules.strategy_lab import render_strategy_tab
+    from modules.feed_tab import render_feed_tab
+    with tabs[1]:
+        render_strategy_tab()
+    with tabs[2]:
+        render_feed_tab()
+else:
+    from modules.education_tab import render_education_tab
+    from modules.narration_tab import render_narration_tab
+    with tabs[1]:
+        render_education_tab()
+    with tabs[2]:
+        render_narration_tab()
+from modules.quiz_tab import render_quiz_tab
+
+with st.tabs(["Dashboard", "Quiz"])[1]:
+    render_quiz_tab()
+# 🎨 UI Mode Toggle Injection
+ui_mode = st.selectbox("Choose UI Mode:", ["Minimal", "Expanded Strategy", "Instructor"])
+
+st.caption(f"🧩 Current mode: {ui_mode}")
+# 🎨 Cockpit UI Mode Toggle
+mode_view = st.radio("Select Cockpit Mode:", ["Minimal", "Expanded Strategy", "Instructor"])
+
+if mode_view == "Minimal":
+    st.markdown("💡 Minimal Mode: Dashboard only")
+    st.header("📊 Core Dashboard")
+elif mode_view == "Expanded Strategy":
+    st.markdown("🔧 Strategy Mode: Dashboard + Strategy + Feed + Notifications")
+    from modules.strategy_lab import render_strategy_tab
+    from modules.feed_tab import render_feed_tab
+    from modules.notify_tab import render_notify_tab
+    render_strategy_tab()
+    render_feed_tab()
+    render_notify_tab()
+elif mode_view == "Instructor":
+    st.markdown("🎓 Instructor Mode: Education + Quiz + FinBERT")
+    from modules.education_tab import render_education_tab
+    from modules.quiz_tab import render_quiz_tab
+    from modules.finbert_tab import render_finbert_tab
+    render_education_tab()
+    render_quiz_tab()
+    render_finbert_tab()
+# 🧬 FinBERT Tab Import
+from modules.finbert_tab import render_finbert_tab
+
+# 🧬 FinBERT Tab Injection
+with st.tabs(["Dashboard", "FinBERT"])[1]:
+    render_finbert_tab()

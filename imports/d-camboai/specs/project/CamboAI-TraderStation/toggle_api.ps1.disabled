@@ -1,0 +1,207 @@
+# Cambo Toggle API
+# PowerShell-based API for updating module toggles
+
+param(
+    [int]$Port = 8080,
+    [switch]$Debug
+)
+
+# Import required modules
+. "$PSScriptRoot\Modules\reason_logger.ps1"
+
+$manifestPath = "C:\Users\johnl\Modules\module_manifest.json"
+
+# Simple HTTP server function
+function Start-ToggleAPI {
+    param([int]$Port)
+    
+    $listener = New-Object System.Net.HttpListener
+    $listener.Prefixes.Add("http://localhost:$Port/")
+    $listener.Start()
+    
+    Write-Host "🚀 Cambo Toggle API started on http://localhost:$Port" -ForegroundColor Green
+    Write-Host "Available endpoints:" -ForegroundColor Cyan
+    Write-Host "  GET  /api/modules - Get all modules" -ForegroundColor Cyan
+    Write-Host "  POST /api/modules/{name}/toggle - Toggle module" -ForegroundColor Cyan
+    Write-Host "  GET  /api/modules/{name}/history - Get toggle history" -ForegroundColor Cyan
+    Write-Host "  GET  /api/validate - Validate all modules" -ForegroundColor Cyan
+    
+    try {
+        while ($listener.IsListening) {
+            $context = $listener.GetContext()
+            $request = $context.Request
+            $response = $context.Response
+            
+            # Enable CORS
+            $response.Headers.Add("Access-Control-Allow-Origin", "*")
+            $response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+            $response.Headers.Add("Access-Control-Allow-Headers", "Content-Type")
+            
+            if ($request.HttpMethod -eq "OPTIONS") {
+                $response.StatusCode = 200
+                $response.Close()
+                continue
+            }
+            
+            $url = $request.Url.AbsolutePath
+            $method = $request.HttpMethod
+            
+            Write-Host "$(Get-Date -Format 'HH:mm:ss') $method $url" -ForegroundColor Yellow
+            
+            try {
+                $responseData = Handle-Request -Method $method -Url $url -Request $request
+                $response.StatusCode = 200
+                $response.ContentType = "application/json"
+            } catch {
+                $responseData = @{ error = $_.Exception.Message } | ConvertTo-Json
+                $response.StatusCode = 500
+                $response.ContentType = "application/json"
+                Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
+            }
+            
+            $buffer = [System.Text.Encoding]::UTF8.GetBytes($responseData)
+            $response.ContentLength64 = $buffer.Length
+            $response.OutputStream.Write($buffer, 0, $buffer.Length)
+            $response.Close()
+        }
+    } finally {
+        $listener.Stop()
+    }
+}
+
+function Handle-Request {
+    param($Method, $Url, $Request)
+    
+    switch -Regex ($Url) {
+        "^/api/modules$" {
+            if ($Method -eq "GET") {
+                return Get-AllModules
+            }
+        }
+        "^/api/modules/([^/]+)/toggle$" {
+            if ($Method -eq "POST") {
+                $moduleName = $Matches[1]
+                return Toggle-Module -ModuleName $moduleName -Request $Request
+            }
+        }
+        "^/api/modules/([^/]+)/history$" {
+            if ($Method -eq "GET") {
+                $moduleName = $Matches[1]
+                return Get-ModuleHistory -ModuleName $moduleName
+            }
+        }
+        "^/api/validate$" {
+            if ($Method -eq "GET") {
+                return Invoke-Validation
+            }
+        }
+        default {
+            throw "Endpoint not found: $Method $Url"
+        }
+    }
+}
+
+function Get-AllModules {
+    if (-not (Test-Path $manifestPath)) {
+        throw "Manifest file not found"
+    }
+    
+    $manifest = Get-Content $manifestPath | ConvertFrom-Json
+    
+    # Add additional metadata
+    $enrichedModules = @()
+    foreach ($module in $manifest) {
+        $modulePath = "C:\Users\johnl\Modules\$($module.name)"
+        $enrichedModule = $module | Select-Object *, @{
+            Name = "file_exists"
+            Expression = { Test-Path $modulePath }
+        }, @{
+            Name = "last_modified"
+            Expression = { 
+                if (Test-Path $modulePath) {
+                    (Get-Item $modulePath).LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")
+                } else {
+                    $null
+                }
+            }
+        }
+        $enrichedModules += $enrichedModule
+    }
+    
+    return $enrichedModules | ConvertTo-Json -Depth 3
+}
+
+function Toggle-Module {
+    param($ModuleName, $Request)
+    
+    # Read request body
+    $reader = New-Object System.IO.StreamReader($Request.InputStream)
+    $body = $reader.ReadToEnd()
+    $reader.Close()
+    
+    $requestData = if ($body) { $body | ConvertFrom-Json } else { @{} }
+    
+    if (-not (Test-Path $manifestPath)) {
+        throw "Manifest file not found"
+    }
+    
+    $manifest = Get-Content $manifestPath | ConvertFrom-Json
+    $module = $manifest | Where-Object { $_.name -eq $ModuleName }
+    
+    if (-not $module) {
+        throw "Module '$ModuleName' not found"
+    }
+    
+    # Toggle the enabled state
+    $newState = -not $module.enabled
+    $module.enabled = $newState
+    
+    # Save the updated manifest
+    $manifest | ConvertTo-Json -Depth 3 | Set-Content $manifestPath
+    
+    # Log the toggle event
+    $source = if ($requestData.source) { $requestData.source } else { "API" }
+    Log-ToggleEvent -ModuleName $ModuleName -NewState $newState -Source $source
+    
+    return @{
+        module = $ModuleName
+        enabled = $newState
+        message = "Module $ModuleName $(if($newState){'enabled'}else{'disabled'}) successfully"
+        timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    } | ConvertTo-Json
+}
+
+function Get-ModuleHistory {
+    param($ModuleName)
+    
+    $history = Get-ToggleHistory -ModuleName $ModuleName -Last 20
+    
+    return @{
+        module = $ModuleName
+        history = $history
+    } | ConvertTo-Json
+}
+
+function Invoke-Validation {
+    try {
+        $validationScript = "$PSScriptRoot\cambo_validator_agent.ps1"
+        if (-not (Test-Path $validationScript)) {
+            throw "Validator script not found"
+        }
+        
+        $result = & $validationScript -CheckAll -Verbose 2>&1
+        $exitCode = $LASTEXITCODE
+        
+        return @{
+            success = $exitCode -eq 0
+            output = $result -join "`n"
+            timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        } | ConvertTo-Json
+    } catch {
+        throw "Validation failed: $($_.Exception.Message)"
+    }
+}
+
+# Start the API server
+Write-Host "🔧 Initializing Cambo Toggle API..." -ForegroundColor Blue
+Start-ToggleAPI -Port $Port

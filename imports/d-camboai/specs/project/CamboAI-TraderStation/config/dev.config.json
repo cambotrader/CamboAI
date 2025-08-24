@@ -1,0 +1,12 @@
+{
+  "mode": "dev",
+  "apiKey": "your-dev-key",
+  "langChainEnabled": true,
+  "modules": ["chart_engine", "sentiment_panel", "strategy_sim"]
+}
+
+{
+  "mode": "dev",
+  "modules": ["chart_engine", "sentiment_panel", "strategy_sim"],
+  "langChainEnabled": true
+}

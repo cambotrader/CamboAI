@@ -1,0 +1,59 @@
+﻿SOURCE: D:\CamboAI\backend\requirements.simple.txt
+TARGET: D:\CamboAI\camboai\backend\requirements.simple.txt
+==== DIFF (lines prefixed with - are only in SOURCE; + are only in TARGET) ====
++ fastapi==0.68.0
+- # CamboAI Trading Platform - Simplified Dependencies for Render Deployment
++ uvicorn==0.15.0
+- # Core functionality only - production optimized
++ PyJWT==2.4.0
+- 
++ python-dotenv==0.19.2
+- # Core Framework  
++ httpx==0.24.1
+- fastapi==0.104.1
++ redis==4.0.2
+- uvicorn[standard]==0.24.0
+- pydantic==2.4.2
+- pydantic-settings==2.0.3
+- # Database & ORM
+- sqlalchemy==2.0.23
+- alembic==1.12.1
+- psycopg2-binary==2.9.7
+- 
+- # Authentication & Security
+- python-jose[cryptography]==3.3.0
+- passlib[bcrypt]==1.7.4
+- python-multipart==0.0.6
+- 
+- # HTTP Client & Basic I/O
+- httpx==0.25.1
+- aiofiles==23.2.1
+- requests==2.31.0
+- 
+- # Basic Data Processing
+- numpy==1.24.3
+- pandas==2.0.3
+- 
+- # Financial Data (lightweight)
+- yfinance==0.2.18
+- alpha-vantage==2.3.1
+- 
+- # AI & Machine Learning (lightweight)
+- openai==0.28.1
+- 
+- # Configuration & Environment
+- python-dotenv==1.0.0
+- click==8.1.7
+- 
+- # Logging & Monitoring
+- loguru==0.7.2
+- prometheus-client==0.17.1
+- 
+- # Time & Date
+- python-dateutil==2.8.2
+- pytz==2023.3
+- 
+- # Utilities
++ prometheus-fastapi-instrumentator==6.1.0
+- more-itertools==10.1.0
+- rich==13.6.0

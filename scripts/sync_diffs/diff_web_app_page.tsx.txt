@@ -1,0 +1,11 @@
+﻿SOURCE: D:\CamboAI\web\app\page.tsx
+TARGET: D:\CamboAI\camboai\web\app\page.tsx
+==== DIFF (lines prefixed with - are only in SOURCE; + are only in TARGET) ====
+- 'use client'
+- import { redirect } from 'next/navigation'
+- 
+- export default function IndexRedirect() {
+-   // Redirect root to dashboard main
++ C:\Users\johnl
+-   redirect('/dashboard')
+- }

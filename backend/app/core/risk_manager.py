@@ -129,10 +129,15 @@ class AdvancedRiskManager:
             "var_breaches": 0
         }
         
-        # Start background tasks
-        asyncio.create_task(self._risk_monitoring_loop())
-        asyncio.create_task(self._market_data_collector())
-        asyncio.create_task(self._performance_reporter())
+        # Start background tasks only if an event loop is running
+        try:
+            loop = asyncio.get_running_loop()
+            loop.create_task(self._risk_monitoring_loop())
+            loop.create_task(self._market_data_collector())
+            loop.create_task(self._performance_reporter())
+        except RuntimeError:
+            # No running loop during import (e.g., tests). Start on app startup.
+            pass
         
     async def initialize_account_limits(self, account: Account, db_session) -> bool:
         """Initialize risk limits for account"""

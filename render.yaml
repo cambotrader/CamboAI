@@ -1,16 +1,16 @@
 ﻿services:
   - type: web
-    name: camboai-traderstation-backend
+    name: camboai-backend
     env: python
     plan: free
     region: oregon
     repo: https://github.com/cambotrader/CamboAI
     branch: main
-    buildCommand: cd backend && pip install --no-cache-dir -r requirements.simple.txt
-    startCommand: cd backend && uvicorn simple_server:app --host 0.0.0.0 --port $PORT --workers 1
+    buildCommand: cd backend && pip install --no-cache-dir -r requirements.txt
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
     envVars:
       - key: PYTHON_VERSION
-        value: 3.9.16
+        value: 3.10.14
       - key: ENVIRONMENT
         value: production
       - key: DATABASE_URL

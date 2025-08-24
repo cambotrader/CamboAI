@@ -1,0 +1,501 @@
+﻿import streamlit as st
+import streamlit.components.v1 as components
+
+st.set_page_config(page_title="📊 CamboStation Chart", layout="wide")
+st.title("📊 CamboStation Live Feed")
+
+symbol = st.session_state.get("SCAN_TARGET_ASSET", "AAPL")
+
+import os
+
+
+COUNCIL_FUSION = st.checkbox("Council Fusion", value=True, key="cfg_fusion_today")
+AI_RESPOND_MODE = st.checkbox("AI Must Respond", value=True, key="cfg_ai_today")
+SENTIMENT_LOGIC = st.checkbox("Sentiment Logic", value=True, key="cfg_sentiment_today")
+AGENT_ROLE_SENTIMENT = st.checkbox("Agent Role Behavior", value=True, key="cfg_agent_today")
+SCAN_ENGINE = st.checkbox("Scan Engine", value=True, key="cfg_scan_today")
+STRATEGY_ALL_ON = st.checkbox("Strategy Modules", value=True, key="cfg_strategy_today")
+
+# 🔄 Safe Sync Sequence — toggles assigned above
+st.session_state["COUNCIL_FUSION"] = "on" if COUNCIL_FUSION else "off"
+st.session_state["AI_RESPOND_MODE"] = "on" if AI_RESPOND_MODE else "off"
+st.session_state["SENTIMENT_LOGIC"] = "on" if SENTIMENT_LOGIC else "off"
+st.session_state["AGENT_ROLE_SENTIMENT"] = "on" if AGENT_ROLE_SENTIMENT else "off"
+st.session_state["SCAN_ENGINE"] = "on" if SCAN_ENGINE else "off"
+st.session_state["STRATEGY_ALL_ON"] = "true" if STRATEGY_ALL_ON else "false"
+# 📈 Module 2: TradingView Chart Embed (Top of Dashboard)
+st.markdown("### 📈 Live TradingView Chart")
+
+selected_ticker = st.selectbox("Choose Ticker", ["BTCUSD", "AAPL", "SPY", "ETHUSD"], index=0)
+
+tradingview_embed = f"""
+<iframe src='https://s.tradingview.com/embed-widget/mini-symbol-overview/?symbol={selected_ticker}&theme=dark'
+width='100%' height='200' frameborder='0' allowtransparency='true' scrolling='no'></iframe>
+"""
+
+st.components.v1.html(tradingview_embed, height=200)
+# 🧱 Module 3: Support & Resistance Zones
+
+major_zones = [42000, 40500]
+minor_zones = [39800, 38800]
+
+st.markdown("### 🧱 Major Support & Resistance Levels")
+st.write(f"📍 Major Zones: {major_zones}")
+st.write(f"🔸 Minor Zones: {minor_zones}")
+
+# 🧠 Visual-style markers (simulated text overlay)
+st.markdown("### 🧠 Visual Zone Map (Text Overlay)")
+for level in major_zones:
+        st.markdown(f"🟥 Major Resistance @ `{level}`")
+for level in minor_zones:
+        st.markdown(f"🟩 Minor Support @ `{level}`")
+# ⚙️ Module 4: Pattern Detection + Zone Scanner Activation
+with st.sidebar.expander("📐 Pattern Engine", expanded=False):
+        toggle_zones = st.checkbox("Enable Support/Resistance Scanner", value=True, key="pattern_zones_today")
+toggle_patterns = st.checkbox("Enable Chart Pattern Detection", value=True, key="pattern_structures_today")
+
+# 🔄 Sync toggle states
+st.session_state["ZONE_SCANNER_ACTIVE"] = "on" if toggle_zones else "off"
+st.session_state["PATTERN_ENGINE_ACTIVE"] = "on" if toggle_patterns else "off"
+
+# 🔍 Pattern Engine Status Readout
+st.markdown("### 🧠 Pattern Engine Status")
+st.write(f"📍 Zone Scanner: {st.session_state['ZONE_SCANNER_ACTIVE']}")
+st.write(f"📐 Pattern Engine: {st.session_state['PATTERN_ENGINE_ACTIVE']}")
+# 🧩 Module 5: Optionable Asset Class Selector
+with st.sidebar.expander("🎯 Optionable Asset Classes", expanded=False):
+        selected_assets = st.multiselect(
+"Available Classes",
+[
+"Equities", "ETFs", "Indices", "Futures", "Commodities",
+"Crypto", "Currencies", "Bonds", "Warrants", "Options"
+],
+default=["Equities", "Crypto", "Options"]
+)
+st.session_state["optionable_assets"] = selected_assets
+# 🧠 Module 6: System Diagnostic Summary
+st.markdown("## 🧠 Cockpit Diagnostic Summary")
+
+col1, col2 = st.columns(2)
+
+with col1:
+        st.markdown("### 🔧 Toggle Status")
+st.write(f"🧠 Fusion: {st.session_state.get('COUNCIL_FUSION', 'undefined')}")
+st.write(f"🤖 AI Respond: {st.session_state.get('AI_RESPOND_MODE', 'undefined')}")
+st.write(f"📡 Sentiment Logic: {st.session_state.get('SENTIMENT_LOGIC', 'undefined')}")
+st.write(f"🎭 Agent Role: {st.session_state.get('AGENT_ROLE_SENTIMENT', 'undefined')}")
+st.write(f"🔎 Scan Engine: {st.session_state.get('SCAN_ENGINE', 'undefined')}")
+st.write(f"⚙️ Strategy Modules: {st.session_state.get('STRATEGY_ALL_ON', 'undefined')}")
+
+with col2:
+        st.markdown("### 🎯 Optionable Asset Classes")
+selected_classes = st.session_state.get("optionable_assets", [])
+if selected_classes:
+    for item in selected_classes:
+        st.markdown(f"✅ {item}")
+else:
+st.write("No classes selected.")
+
+# 🔍 Zone Summary
+st.markdown("### 📍 Zone Summary")
+major_zones = [42000, 40500]
+minor_zones = [39800, 38800]
+
+if resistance_levels:
+        for level in resistance_levels:
+                st.markdown(f"🟥 Major Resistance @ `{level}`")
+
+for level in minor_zones:
+        st.markdown(f"🟩 Minor Support: `{level}`")
+# 🧬 Module 7: Fusion Output Summary
+st.markdown("## 🧬 Council Fusion Status Panel")
+
+fusion_col1, fusion_col2 = st.columns(2)
+
+with fusion_col1:
+        st.markdown("### 🧠 Fused Logic Systems")
+st.write(f"🧠 COUNCIL_FUSION: {st.session_state.get('COUNCIL_FUSION', 'undefined')}")
+st.write(f"🤖 AI_RESPOND_MODE: {st.session_state.get('AI_RESPOND_MODE', 'undefined')}")
+st.write(f"📡 SENTIMENT_LOGIC: {st.session_state.get('SENTIMENT_LOGIC', 'undefined')}")
+st.write(f"🎭 AGENT_ROLE_SENTIMENT: {st.session_state.get('AGENT_ROLE_SENTIMENT', 'undefined')}")
+
+with fusion_col2:
+        st.markdown("### ⚙️ Scan & Strategy Readiness")
+st.write(f"🔎 SCAN_ENGINE: {st.session_state.get('SCAN_ENGINE', 'undefined')}")
+st.write(f"⚙️ STRATEGY_ALL_ON: {st.session_state.get('STRATEGY_ALL_ON', 'undefined')}")
+st.write(f"📐 PATTERN_ENGINE_ACTIVE: {st.session_state.get('PATTERN_ENGINE_ACTIVE', 'undefined')}")
+st.write(f"📍 ZONE_SCANNER_ACTIVE: {st.session_state.get('ZONE_SCANNER_ACTIVE', 'undefined')}")
+# 🎭 Module 8: Agent Persona Activation System
+with st.sidebar.expander("🎭 Agent Activation", expanded=False):
+        persona = st.selectbox(
+"Choose Agent Role",
+["Strategist", "Analyst", "Educator", "Narrator", "Observer"],
+index=0
+)
+emotional_tone = st.slider("Emotional Intensity", 0, 100, 40)
+
+st.session_state["agent_persona"] = persona
+st.session_state["emotional_intensity"] = emotional_tone
+
+# 🧠 Agent Status Panel
+st.markdown("### 🧠 Agent Behavior Settings")
+st.write(f"🎭 Active Persona: {st.session_state.get('agent_persona', 'unset')}")
+st.write(f"🌡️ Emotional Tone Level: {st.session_state.get('emotional_intensity', 'unset')}")
+# 🔎 Module 9: Scan Engine Shell
+with st.sidebar.expander("🔎 Scan Engine", expanded=False):
+        scan_target = st.text_input("Enter asset or symbol to scan:", value="BTCUSD")
+scan_styles = st.multiselect("Choose Scan Logic", [
+
+st.session_state["SCAN_TARGET_ASSET"] = scan_target
+st.session_state["SCAN_LOGIC_STYLES"] = scan_styles
+
+# 🔍 Scan Status Panel
+st.markdown("### 🔍 Scan Engine Parameters")
+st.write(f"🔘 Target Asset: {st.session_state.get('SCAN_TARGET_ASSET', 'unset')}")
+st.write(f"🧪 Selected Logic Styles: {st.session_state.get('SCAN_LOGIC_STYLES', 'none selected')}")
+# 📘 Module 10: Strategy Narrative Console
+with st.sidebar.expander("📘 Strategy Narrative", expanded=False):
+        strategy_mode = st.selectbox("Choose Strategy Mode", [
+"Offensive", "Defensive", "Adaptive", "Sentinel", "Mythic"
+], index=2)
+
+output_style = st.selectbox("Narrative Output Style", [
+"Declarative", "Descriptive", "Poetic", "Tactical"
+], index=1)
+
+expression_level = st.slider("Narrative Intensity", 0, 100, 55)
+
+st.session_state["STRATEGY_MODE"] = strategy_mode
+st.session_state["NARRATIVE_STYLE"] = output_style
+st.session_state["NARRATIVE_INTENSITY"] = expression_level
+
+# 🎙️ Narrative Console Preview
+st.markdown("### 🎙️ Strategy Narrative Console")
+st.write(f"📘 Mode: {st.session_state.get('STRATEGY_MODE', 'unset')}")
+st.write(f"🗣️ Style: {st.session_state.get('NARRATIVE_STYLE', 'unset')}")
+st.write(f"🌡️ Intensity: {st.session_state.get('NARRATIVE_INTENSITY', 'unset')}")
+# ✅ Sidebar Diagnostics Expanders
+
+with st.sidebar.expander("🧬 Council Fusion Status"):
+        
+with st.sidebar.expander("⚙️ Scan & Strategy Readiness"):
+        
+with st.sidebar.expander("🎭 Agent Behavior Settings"):
+        
+with st.sidebar.expander("🔍 Scan Engine Parameters"):
+        
+with st.sidebar.expander("🎙️ Strategy Narrative Console"):
+        
+with st.sidebar.expander("🎯 Optionable Asset Selector"):
+        optionable_assets = st.multiselect("Choose Asset Classes", [
+"Equities", "Crypto", "Options", "Bonds", "Commodities"
+], default=["Equities", "Crypto", "Options", "Bonds"])
+st.session_state["optionable_assets"] = optionable_assets
+
+with st.sidebar.expander("📐 Pattern Engine Status"):
+        
+with st.sidebar.expander("📚 Learn Trading [Coming Soon]"):
+        st.write("🚧 Education System Phase 5 Pending Deployment")
+st.write("🎭 Agents will teach as: Educator, Analyst, Strategist")
+
+
+# 📈 Tactical Intelligence Panel
+st.markdown("### 🧠 Tactical Intelligence Panel")
+
+ticker = st.session_state.get("SCAN_TARGET_ASSET", "BTCUSD")
+st.write(f"🔘 Asset Selected: **{ticker}**")
+
+strategy_mode = st.session_state.get("STRATEGY_MODE", "Adaptive")
+st.write(f"📘 Strategy Game Plan: **{strategy_mode} Mode Activated**")
+
+agent_role = st.session_state.get("agent_persona", "Strategist")
+intensity = st.session_state.get("NARRATIVE_INTENSITY", 50)
+style = st.session_state.get("NARRATIVE_STYLE", "Descriptive")
+
+st.markdown("### 🎙️ Council Communication")
+st.markdown(f"> *The {agent_role} observes {ticker} with calculated {style.lower()} tone, emotional intensity at {intensity}. Conditions align with {strategy_mode.lower()} posture — asset prepared for tactical overlay.*")
+
+if st.session_state.get("PATTERN_ENGINE_ACTIVE", True):
+            st.markdown("### 📐 Pattern Recognition Output")
+st.write(f"✅ Scanner active on {ticker}. Awaiting breakout or reversal structure.")
+else:
+st.write("🛑 Pattern engine offline.")
+
+st.markdown("### 📍 Zone Map Summary")
+st.write("🟥 Resistance: [42000, 40500]")
+st.write("🟩 Support: [39800, 38800]")
+
+st.markdown("### 📡 Sentiment Overlay [Coming Soon]")
+st.write("🚧 Twitter/Reddit analysis under development for Phase 3")
+st.write("🧠 Agent tone will adapt to social signal shifts")
+
+st.markdown("### 📚 Education Prompt [Coming Soon]")
+st.write("🧭 Type 'Learn Trading' in sidebar to enter Education Mode once deployed")
+# 🔧 Sidebar Diagnostics & Expanded Panels
+
+with st.sidebar.expander("🧬 Council Fusion Status"):
+        
+with st.sidebar.expander("⚙️ Scan & Strategy Readiness"):
+        
+with st.sidebar.expander("🎭 Agent Behavior Settings"):
+        
+with st.sidebar.expander("🔍 Scan Engine Parameters"):
+        
+with st.sidebar.expander("🎙️ Strategy Narrative Console"):
+        
+with st.sidebar.expander("🎯 Optionable Asset Selector"):
+        optionable_assets = st.multiselect("Choose Asset Classes", [
+"Equities", "Crypto", "Options", "Bonds", "Commodities"
+], default=["Equities", "Crypto", "Options", "Bonds"])
+st.session_state["optionable_assets"] = optionable_assets
+
+with st.sidebar.expander("📐 Pattern Engine Status"):
+        
+with st.sidebar.expander("📚 Learn Trading [Coming Soon]"):
+        st.write("🚧 Education System Phase 5 Pending Deployment")
+st.write("🎭 Agents will teach through roleplay and quizzes")
+st.write("📘 Modules include: Strategy, Structures, Emotional Tone")
+
+# 🧠 Tactical Intelligence Panel
+
+st.markdown("### 🧠 Tactical Intelligence Panel")
+ticker = st.session_state.get("SCAN_TARGET_ASSET", "BTCUSD")
+strategy_mode = st.session_state.get("STRATEGY_MODE", "Adaptive")
+agent_role = st.session_state.get("agent_persona", "Strategist")
+intensity = st.session_state.get("NARRATIVE_INTENSITY", 50)
+style = st.session_state.get("NARRATIVE_STYLE", "Descriptive")
+
+st.write(f"🔘 Asset Selected: **{ticker}**")
+st.write(f"📘 Strategy Game Plan: **{strategy_mode} Mode Activated**")
+
+st.markdown("### 🎙️ Council Communication")
+st.markdown(f"> The {agent_role} observes {ticker} with {style.lower()} tone and intensity {intensity}. Conditions suggest a {strategy_mode.lower()} posture.")
+
+if st.session_state.get("PATTERN_ENGINE_ACTIVE", True):
+            st.markdown("### 📐 Pattern Recognition Output")
+st.write(f"✅ Scanner active on {ticker}. Awaiting breakout zone.")
+else:
+st.write("🛑 Pattern engine offline.")
+
+st.markdown("### 📍 Zone Map Summary")
+st.write("🟥 Resistance: [42000, 40500]")
+st.write("🟩 Support: [39800, 38800]")
+
+st.markdown("### 📡 Sentiment Overlay [Coming Soon]")
+st.write("🚧 Twitter/Reddit integration begins in Phase 3")
+
+st.markdown("### 📚 Education Prompt")
+st.write("💡 Visit '📚 Learn Trading' tab once Phase 5 is online")
+import streamlit.components.v1 as components
+
+st.set_page_config(page_title='📊 TradingView Chart', layout='wide')
+st.title('📊 CamboStation Live Chart Feed')
+
+import streamlit.components.v1 as components
+
+import streamlit.components.v1 as components
+
+import streamlit.components.v1 as components
+
+import streamlit.components.v1 as components
+
+import streamlit.components.v1 as components
+
+import streamlit.components.v1 as components
+
+import streamlit as st
+import streamlit.components.v1 as components
+
+st.set_page_config(page_title="📊 CamboStation Chart", layout="wide")
+st.title("📊 CamboStation Live Feed")
+
+symbol = st.session_state.get("SCAN_TARGET_ASSET", "AAPL")
+
+components.html(f"""
+<script src='https://s3.tradingview.com/tv.js'></script>
+<div id='tv_chart'></div>
+<script>
+new TradingView.widget({{
+  container_id: "tv_chart",
+  width: "100%",
+  height: 620,
+  symbol: "{symbol}",
+  interval: "15",
+  timezone: "Etc/UTC",
+  theme: "dark",
+  style: "1",
+  toolbar_bg: "#2c2c2e",
+  enable_publishing: false,
+  hide_side_toolbar: false,
+  allow_symbol_change: true
+}});
+</script>
+""", height=620)
+st.set_page_config(page_title="📊 CamboStation Chart", layout="wide")
+st.title("📊 CamboStation Live Feed")
+
+symbol = st.session_state.get("SCAN_TARGET_ASSET", "AAPL")
+
+components.html(f"""
+<script src='https://s3.tradingview.com/tv.js'></script>
+<div id='tv_chart'></div>
+<script>
+new TradingView.widget({{
+  container_id: "tv_chart",
+  width: "100%",
+  height: 620,
+  symbol: "{symbol}",
+  interval: "15",
+  timezone: "Etc/UTC",
+  theme: "dark",
+  style: "1",
+  toolbar_bg: "#2c2c2e",
+  enable_publishing: false,
+  hide_side_toolbar: false,
+  allow_symbol_change: true
+}});
+</script>
+""", height=620)
+st.set_page_config(page_title="📊 CamboStation Chart", layout="wide")
+st.title("📊 CamboStation Live Feed")
+
+symbol = st.session_state.get("SCAN_TARGET_ASSET", "AAPL")
+
+components.html(f"""
+<script src='https://s3.tradingview.com/tv.js'></script>
+<div id='tv_chart'></div>
+<script>
+new TradingView.widget({{
+  container_id: "tv_chart",
+  width: "100%",
+  height: 620,
+  symbol: "{symbol}",
+  interval: "15",
+  timezone: "Etc/UTC",
+  theme: "dark",
+  style: "1",
+  toolbar_bg: "#2c2c2e",
+  enable_publishing: false,
+  hide_side_toolbar: false,
+  allow_symbol_change: true
+}});
+</script>
+""", height=620)
+st.set_page_config(page_title="📊 CamboStation Chart", layout="wide")
+st.title("📊 CamboStation Live Feed")
+
+symbol = st.session_state.get("SCAN_TARGET_ASSET", "AAPL")
+
+components.html(f"""
+<script src='https://s3.tradingview.com/tv.js'></script>
+<div id='tv_chart'></div>
+<script>
+new TradingView.widget({{
+  container_id: "tv_chart",
+  width: "100%",
+  height: 620,
+  symbol: "{symbol}",
+  interval: "15",
+  timezone: "Etc/UTC",
+  theme: "dark",
+  style: "1",
+  toolbar_bg: "#2c2c2e",
+  enable_publishing: false,
+  hide_side_toolbar: false,
+  allow_symbol_change: true
+}});
+</script>
+""", height=620)
+st.set_page_config(page_title="📊 CamboStation Chart", layout="wide")
+st.title("📊 CamboStation Live Feed")
+
+symbol = st.session_state.get("SCAN_TARGET_ASSET", "AAPL")
+
+components.html(f"""
+<script src='https://s3.tradingview.com/tv.js'></script>
+<div id='tv_chart'></div>
+<script>
+new TradingView.widget({{
+  container_id: "tv_chart",
+  width: "100%",
+  height: 620,
+  symbol: "{symbol}",
+  interval: "15",
+  timezone: "Etc/UTC",
+  theme: "dark",
+  style: "1",
+  toolbar_bg: "#2c2c2e",
+  enable_publishing: false,
+  hide_side_toolbar: false,
+  allow_symbol_change: true
+}});
+</script>
+""", height=620)
+st.set_page_config(page_title="📊 Live TradingView", layout="wide")
+st.title("🚀 CamboStation Live Chart")
+
+symbol = st.session_state.get("SCAN_TARGET_ASSET", "AAPL")
+
+components.html(f"""
+<script src="https://s3.tradingview.com/tv.js"></script>
+<div id="tv_chart"></div>
+<script>
+new TradingView.widget({
+  container_id: "tv_chart",
+  width: "100%",
+  height: 600,
+  symbol: "{symbol}",
+  interval: "15",
+  timezone: "Etc/UTC",
+  theme: "dark",
+  style: "1",
+  toolbar_bg: "#2c2c2e",
+  enable_publishing: false,
+  hide_side_toolbar: false,
+  allow_symbol_change: true
+});
+</script>
+""", height=620)
+ticker = st.session_state.get('SCAN_TARGET_ASSET', 'AAPL')
+
+components.html(f\"\"\"
+<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+<script type="text/javascript">
+new TradingView.widget({
+  "width": "100%",
+  "height": 620,
+  "symbol": "{ticker}",
+  "interval": "15",
+  "timezone": "Etc/UTC",
+  "theme": "dark",
+  "style": "1",
+  "toolbar_bg": "#2c2c2e",
+  "enable_publishing": false,
+  "hide_side_toolbar": false,
+  "allow_symbol_change": true
+});
+</script>
+\"\"\", height=620)
+st.set_page_config(page_title="📊 TradingView Chart", layout="wide")
+st.title("📊 CamboStation Live Chart Feed")
+
+ticker = st.session_state.get("SCAN_TARGET_ASSET", "AAPL")
+
+components.html(f"""
+<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+<script type="text/javascript">
+new TradingView.widget({{
+"width": "100%",
+"height": 620,
+"symbol": "{ticker}",
+"interval": "15",
+"timezone": "Etc/UTC",
+"theme": "dark",
+"style": "1",
+"toolbar_bg": "#2c2c2e",
+"enable_publishing": false,
+"hide_top_toolbar": false,
+"allow_symbol_change": true
+}});
+</script>
+""", height=620)

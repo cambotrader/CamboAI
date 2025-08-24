@@ -105,11 +105,16 @@ class FrontendIntegrationService:
             "event_processing_errors": 0
         }
         
-        # Start background services
-        asyncio.create_task(self._message_dispatcher())
-        asyncio.create_task(self._data_aggregator())
-        asyncio.create_task(self._heartbeat_service())
-        asyncio.create_task(self._performance_monitor())
+        # Start background services only if an event loop is running
+        try:
+            loop = asyncio.get_running_loop()
+            loop.create_task(self._message_dispatcher())
+            loop.create_task(self._data_aggregator())
+            loop.create_task(self._heartbeat_service())
+            loop.create_task(self._performance_monitor())
+        except RuntimeError:
+            # No running loop during import (e.g., tests). Start on app startup.
+            pass
     
     async def register_user_connection(self, user_id: str, 
                                      initial_subscriptions: Dict[str, bool] = None) -> Dict[str, Any]:

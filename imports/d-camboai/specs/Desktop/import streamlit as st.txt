@@ -1,0 +1,22 @@
+import streamlit as st
+
+def render_tradingview_tab():
+    st.subheader("🌐 TradingView Integration")
+
+    st.markdown("### 📊 Embedded Widget (No Login, But Functional)")
+    st.markdown("""
+        <iframe 
+            src="https://s.tradingview.com/embed-widget/advanced-chart/?symbol=NASDAQ:AAPL&interval=D&theme=dark"
+            width="100%" 
+            height="600" 
+            frameborder="0" 
+            allowtransparency="true" 
+            scrolling="no"
+        ></iframe>
+    """, unsafe_allow_html=True)
+
+    st.markdown("---")
+    st.markdown("### 🔑 Launch Full TradingView Workspace + Login")
+    st.markdown("[Open TradingView Full Chart](https://www.tradingview.com/chart/)")
+
+    st.caption("⚙️ Embedded widget provides limited access. Full TradingView login opens in separate tab.")

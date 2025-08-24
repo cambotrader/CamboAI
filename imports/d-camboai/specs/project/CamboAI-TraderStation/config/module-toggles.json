@@ -1,0 +1,18 @@
+[
+    {
+        "active":  true,
+        "name":  "charting"
+    },
+    {
+        "active":  false,
+        "name":  "sentiment"
+    },
+    {
+        "active":  true,
+        "name":  "strategy"
+    },
+    {
+        "active":  false,
+        "name":  "education"
+    }
+]

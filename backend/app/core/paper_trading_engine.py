@@ -91,10 +91,15 @@ class RealisticPaperTradingEngine:
             "total_volume": 0.0,
         }
         
-        # Start background tasks
-        asyncio.create_task(self._order_processor())
-        asyncio.create_task(self._market_condition_updater())
-        asyncio.create_task(self._performance_monitor())
+        # Start background tasks only if an event loop is running
+        try:
+            loop = asyncio.get_running_loop()
+            loop.create_task(self._order_processor())
+            loop.create_task(self._market_condition_updater())
+            loop.create_task(self._performance_monitor())
+        except RuntimeError:
+            # No running loop during import (e.g., tests). Start on app startup.
+            pass
     
     async def submit_order(self, order: Order, db_session) -> ExecutionResult:
         """Submit order for paper trading execution"""

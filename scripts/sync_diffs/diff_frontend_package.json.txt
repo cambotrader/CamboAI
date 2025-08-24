@@ -1,0 +1,5 @@
+﻿SOURCE: D:\CamboAI\frontend\package.json
+TARGET: D:\CamboAI\camboai\frontend\package.json
+==== DIFF (lines prefixed with - are only in SOURCE; + are only in TARGET) ====
++     "name": "cambostation-vision",
+-     "name": "camboai-traderstation",

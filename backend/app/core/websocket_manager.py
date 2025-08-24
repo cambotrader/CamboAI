@@ -121,10 +121,15 @@ class WebSocketManager:
         self.heartbeat_interval = 30  # seconds
         self.connection_timeout = 300  # 5 minutes
         
-        # Start background tasks
-        asyncio.create_task(self._heartbeat_monitor())
-        asyncio.create_task(self._message_processor())
-        asyncio.create_task(self._performance_monitor())
+        # Start background tasks only if an event loop is running
+        try:
+            loop = asyncio.get_running_loop()
+            loop.create_task(self._heartbeat_monitor())
+            loop.create_task(self._message_processor())
+            loop.create_task(self._performance_monitor())
+        except RuntimeError:
+            # No running loop during import (e.g., tests). Start these on app startup.
+            pass
     
     async def initialize_redis(self, redis_url: str = "redis://localhost:6379"):
         """Initialize Redis connection for pub/sub"""

@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "CamboAI",
+			"path": "."
+		}
+	],
+	"settings": {
+		"terminal.integrated.stickyScroll.enabled": true,
+		"terminal.integrated.suggest.enabled": true,
+		"CodeGPT.apiKey": "Nvidia"
+	}
+}

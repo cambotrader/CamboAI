@@ -1,0 +1,65 @@
+CamboStation™ Vision — Full Modular Tactical Layout (Sniper-Format)
+
+📊 Market Chart Panel: Toggle-enabled chart interface with multi-source routing across TradingView, TC2000, Plotly, TrendSpider, OptionPlay, Investing.com, Binance, Coinbase, NinjaTrader, ThinkorSwim, Coinalyze, Yahoo Finance, MetaTrader, StockCharts, and Coinigy. Supports candlestick, OHLC, Heikin Ashi, Renko, DOM ladder, line, and volume charts. Overlays include RSI, MACD, SuperTrend, MA50/200, VWAP, Anchored VWAP, KAMA, Bollinger, and breakout zone shading. All chart types are checkbox-activated with dropdown filters by asset class: stocks, crypto, options, futures, forex, bonds, T-bills, warrants, and commodities.
+
+🕯️ Candlestick Pattern Lab: Detects 50+ patterns using checkbox toggles per formation and bias selector dropdown. Patterns are classified as Bullish 🟢, Bearish 🔴, Neutral ⚪, Volatile 🔄, and Advanced ⚙️ — including Hammer, Engulfing, Star series, Harami, Hanging Man, Doji variants, Piercing Line, Tweezer, and Three Soldiers/Crows. Each detection includes volume validation toggles, sentiment overlays, and AI explanations with confidence meter slider.
+
+📘 Chart Pattern Recognizer: Toggle-based scanner for formations like Head & Shoulders, Triangles (asc/desc/sym), Flags, Wedges, Broadening Tops, Cup & Handle, Island Reversals, Double/Triple Bottoms, Diamonds, Rounding Bottoms, Trap Zones, and V-bottoms. All patterns are bias-tagged and categorized with checkbox filters: 🟢, 🔴, ⚪, 🔄, ⚙️. Includes breakout zone toggle, pattern sensitivity slider, and annotation box switch.
+
+🧠 Options Strategy Hub: Drag-and-toggle interface for strategy selection by bias — Bullish 🟢, Bearish 🔴, Neutral ⚪, Volatile 🔄, Advanced ⚙️. Strategies include Covered Calls, Iron Condors, Jade Lizards, Butterflies, Box Spreads, Diagonals, Risk Reversals, Ratio Spreads, Double Diagonals, Synthetic Long/Shorts. Each strategy has toggleable payoff graph, breakeven calculator, IV skew map, stop-loss zone planner, and AI-generated commentary with scenario simulator switch.
+
+🎓 Advanced Education Center: Checkbox-enabled curriculum covering trading and investing across all asset classes. Features include tutorials on stocks, crypto, options, forex, bonds, warrants, T-bills, and commodities — spanning long/short-term investing, macro theory, money management, TA foundations, psychology, and market structure. Modules include quiz toggles, flashcard decks, voice Ask-AI, screenshot explainers, role-play simulations, mentorship mode, and image learner. Built with GitBook, MkDocs, Streamlit, and Binder.
+
+📉 Sentiment & News Intelligence: Toggle panel for FinBERT/VADER scoring from Reddit, Twitter/X, StockTwits, NewsAPI, Whale Alert, EDGAR, OpenInsider, macro reports, hedge fund notes, and earnings calls. Displays emoji tone filters, confidence grading, timestamp tagging, sentiment overlay on charts, and macro commentary switch. Includes toggle-based news feed filters per asset, source, tone, and event type.
+
+🔍 AI Strategy Engine & Screener Tab: Checkbox strategy builder with dropdown filters for price action, TA indicators, sentiment scoring, insider trades, macro overlays, options Greeks, and pattern matches. Supports logic chaining (e.g. “IF Bullish + RSI < 30 + breakout THEN suggest entry”). Output toggled between ranked watchlist, strategy preview, and trade planner view. Screener linked to chart modules, forecast engine, and replay tab.
+
+📔 AI Trading Journal & Journey Analyzer: Toggle-based entry system with voice input, screenshot attachments, bias classification, emotional flagging (FOMO, hesitation, overconfidence), sentiment snapshot, and strategy logic dropdown. AI reviews trade history and builds evolution map. Toggle enables per-trade feedback, correction suggestions, and mindset profiling dashboard.
+
+💼 Broker Integration Panel: Checkbox selection per broker: Alpaca, Robinhood, TDAmeritrade, Tradier, Interactive Brokers, Binance, Coinbase, Webull, Fidelity, NinjaTrader, OptionsPlay, Kraken, ThinkMarkets, eToro. Each broker supports execution toggles, Level 2/3 streaming, DOM ladder panel, portfolio sync, bracket orders, equity curve visualizer, account status box, and iframe switch.
+
+🧪 Backtesting & Simulation Lab: Strategy simulator with checkbox toggles for asset type, logic chain, indicator selection, sentiment layer, macro impact, and failure test. Powered by Backtrader, vectorbt, TA-Lib, mlfinlab. Outputs include Sharpe ratio, CAGR, Max Drawdown, Expectancy score, and replay toggle. Includes scenario builder switch and commentary box flag.
+
+🧩 AI Selector Panel: Assign agents per module via checkbox toggles. Supported AI: Copilot, ChatGPT, Gemini, Grok (X AI), Claude, TradeGPT, TTG AI, DeepSeek, LangChain, CrewAI, Perplexity AI. Sign-in enabled through API key loader, OAuth switch, browser redirect toggle, session embed. Preferences saved locally or per workspace. Each model can toggle commentary mode, educator mode, scanner, strategist, or journal analyst roles.
+
+🔗 Add-On Extensions (Toggle-Ready)
+
+📱 Mobile PWA Mode
+
+🔁 Trade Replay Engine
+
+🎙️ Voice Ask Mode (Whisper + ElevenLabs)
+
+📡 Macro Radar Panel
+
+📥 Pattern Image Learner
+
+📊 Strategy Snapshot Manager
+
+📈 Strategy Forecast Engine
+
+📚 Mentorship Mode
+
+🧬 Psychology Profiler
+
+📤 Broker Aggregator Tab
+
+🔁 Scenario Builder
+
+🧾 Tax Dashboard + 8949 Export
+
+💬 AI Feedback Thread
+
+🎬 Video Annotator (Coming Soon)
+
+🧠 CrewAI Multi-Agent Hub
+
+🧪 LangChain Plugin Expansion
+
+🔔 Webhook Automation Center
+
+🖥️ Layout Bookmarking & Workspace Profiles
+
+Each add-on includes its own checkbox in the launcher menu and per-tab toggles inside the cockpit. Watchlist builders, sentiment overlays, educational modules, trade graders, and automation triggers are all checkbox-controlled for visibility, routing, and activation.
+
+No switches missed. No bias left untagged. No module left static. Your CamboStation™ Vision cockpit is now officially switch-based, bias-aware, AI-selectable, and role-assignable — built for absolute control over every asset, every insight, every evolution.
