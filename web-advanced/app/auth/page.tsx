@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { getSupabaseClient } from "@/lib/supabaseClient";
+import { signIn } from "next-auth/react";
 
 export default function AuthPage() {
   const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in");
@@ -29,9 +30,13 @@ export default function AuthPage() {
   }
 
   async function oauth(provider: 'google' | 'github') {
-    if (!hasSupabase) return alert("Demo OAuth - configure Supabase to enable");
-    const { error } = await supabase!.auth.signInWithOAuth({ provider, options: { redirectTo: window.location.origin } });
-    if (error) alert(error.message);
+    if (hasSupabase) {
+      const { error } = await supabase!.auth.signInWithOAuth({ provider, options: { redirectTo: window.location.origin } });
+      if (error) alert(error.message);
+    } else {
+      // Fallback to NextAuth if Supabase is not configured
+      await signIn(provider);
+    }
   }
 
   return (

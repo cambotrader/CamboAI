@@ -1,4 +1,4 @@
-﻿import streamlit as st
+import streamlit as st
 import requests
 import pandas as pd
 
@@ -340,4 +340,4 @@ with education_tab:
         5. **Emotional Control**: Stick to your plan, avoid FOMO
         """)
         
-        st.caption("💡 Remember: Consistent small wins beat occasional big wins in trading!"))
+        st.caption("💡 Remember: Consistent small wins beat occasional big wins in trading!")

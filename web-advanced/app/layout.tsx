@@ -5,6 +5,8 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { QueryProvider } from '@/components/query-provider'
 import { Toaster } from '@/components/ui/toaster'
 import ErrorBoundary from '@/components/error-boundary'
+import { AuthProvider } from '@/components/auth-provider'
+import { Header } from '@/components/layout/header'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -89,10 +91,13 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <QueryProvider>
-              <div className="min-h-screen bg-background">
-                {children}
-              </div>
-              <Toaster />
+              <AuthProvider>
+                <Header />
+                <div className="min-h-screen bg-background">
+                  {children}
+                </div>
+                <Toaster />
+              </AuthProvider>
             </QueryProvider>
           </ThemeProvider>
         </ErrorBoundary>

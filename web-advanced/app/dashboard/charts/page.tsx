@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useToast } from '@/components/ui/use-toast';
 import dynamic from 'next/dynamic';
 import { ConnectDataPanel } from '@/components/dashboard/connect-data-panel';
 
@@ -54,6 +56,10 @@ export default function ChartsPage() {
   const [interval, setInterval] = useState<string>('1d');
   const [range, setRange] = useState<string>('1mo');
   const [typedSymbol, setTypedSymbol] = useState<string>('');
+  const [errorMsg, setErrorMsg] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [reloadTrigger, setReloadTrigger] = useState<number>(0);
+  const { toast } = useToast();
 
   // Calculate moving averages
   const calculateMA = (prices: number[], period: number): number[] => {
@@ -104,6 +110,19 @@ export default function ChartsPage() {
     const prefs = { marketType, interval, range, symbol: selectedSymbol };
     localStorage.setItem('charts_prefs', JSON.stringify(prefs));
   }, [marketType, interval, range, selectedSymbol]);
+
+  // Debounce reloading when controls change
+  useEffect(() => {
+    const t = setTimeout(() => {
+      loadSymbol(selectedSymbol);
+    }, 400);
+    return () => clearTimeout(t);
+  }, [marketType, interval, range]);
+
+  // Manual reload trigger
+  useEffect(() => {
+    if (reloadTrigger) loadSymbol(selectedSymbol);
+  }, [reloadTrigger]);
 
   useEffect(() => {
     generateAICommentary();
@@ -165,6 +184,8 @@ export default function ChartsPage() {
 
   const loadSymbol = async (symbol: string) => {
     setSelectedSymbol(symbol);
+    setErrorMsg('');
+    setLoading(true);
     try {
       const qs = new URLSearchParams({ type: marketType, symbol, interval, range }).toString();
       const res = await fetch(`/api/market/ohlc?${qs}`);
@@ -180,8 +201,13 @@ export default function ChartsPage() {
       }));
       if (prices.length > 0) {
         setChartData({ symbol, prices });
+      } else {
+        setErrorMsg('No data returned for this symbol/settings.');
       }
-    } catch (e) {
+    } catch (e: any) {
+      const msg = e?.message || 'Failed to load data';
+      setErrorMsg(msg);
+      toast({ title: 'Fetch Error', description: msg });
       const newData = {
         ...SAMPLE_DATA,
         symbol,
@@ -194,6 +220,8 @@ export default function ChartsPage() {
         }))
       };
       setChartData(newData);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -281,9 +309,15 @@ export default function ChartsPage() {
               loadSymbol(s);
             }}
           >Go</Button>
-          <Button size="sm" variant="outline" onClick={() => loadSymbol(selectedSymbol)}>Reload</Button>
+          <Button size="sm" variant="outline" onClick={() => setReloadTrigger(Date.now())}>{loading ? 'Loading...' : 'Reload'}</Button>
         </div>
       </div>
+
+      {errorMsg && (
+        <Alert className="border-l-4 border-red-500 bg-red-50 text-red-800">
+          <AlertDescription>{errorMsg}</AlertDescription>
+        </Alert>
+      )}
 
       <ConnectDataPanel />
 
