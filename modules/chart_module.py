@@ -30,19 +30,28 @@ def compute_indicators(df: pd.DataFrame) -> pd.DataFrame:
     Adds MA50, MA200, optional BB bands and RSI if ta is available.
     """
     df = df.copy()
-    if SMAIndicator:
-        df["MA50"] = SMAIndicator(close=df["Close"], window=50).sma_indicator()
-        df["MA200"] = SMAIndicator(close=df["Close"], window=200).sma_indicator()
-    else:
-        df["MA50"] = df["Close"].rolling(50).mean()
-        df["MA200"] = df["Close"].rolling(200).mean()
+    
+    # Handle multi-level columns from yfinance
+    if hasattr(df.columns, 'nlevels') and df.columns.nlevels > 1:
+        df.columns = df.columns.droplevel(1)
+    
+    # Ensure Close column is 1D for indicators
+    if "Close" in df.columns:
+        close_series = _safe_indicator_series(df["Close"])
+        
+        if SMAIndicator:
+            df["MA50"] = SMAIndicator(close=close_series, window=50).sma_indicator()
+            df["MA200"] = SMAIndicator(close=close_series, window=200).sma_indicator()
+        else:
+            df["MA50"] = close_series.rolling(50).mean()
+            df["MA200"] = close_series.rolling(200).mean()
 
-    if BollingerBands:
-        bb = BollingerBands(close=df["Close"], window=20)
-        df["BB_upper"] = bb.bollinger_hband()
-        df["BB_lower"] = bb.bollinger_lband()
-    if RSIIndicator:
-        df["RSI"] = RSIIndicator(close=df["Close"], window=14).rsi()
+        if BollingerBands:
+            bb = BollingerBands(close=close_series, window=20)
+            df["BB_upper"] = bb.bollinger_hband()
+            df["BB_lower"] = bb.bollinger_lband()
+        if RSIIndicator:
+            df["RSI"] = RSIIndicator(close=close_series, window=14).rsi()
     return df
 
 

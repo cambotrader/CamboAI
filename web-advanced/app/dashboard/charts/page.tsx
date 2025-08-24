@@ -53,6 +53,7 @@ export default function ChartsPage() {
   const [marketType, setMarketType] = useState<'stock' | 'crypto'>('stock');
   const [interval, setInterval] = useState<string>('1d');
   const [range, setRange] = useState<string>('1mo');
+  const [typedSymbol, setTypedSymbol] = useState<string>('');
 
   // Calculate moving averages
   const calculateMA = (prices: number[], period: number): number[] => {
@@ -82,6 +83,27 @@ export default function ChartsPage() {
       `📊 ${chartData.symbol} Analysis: ${change > 0 ? '🟢' : '🔴'} ${change}% today. ${randomPattern}. Current price: $${lastPrice.close.toFixed(2)}`
     );
   };
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('charts_prefs') || '{}');
+      if (saved.marketType) setMarketType(saved.marketType);
+      if (saved.interval) setInterval(saved.interval);
+      if (saved.range) setRange(saved.range);
+      if (saved.symbol) {
+        setSelectedSymbol(saved.symbol);
+        // trigger initial fetch
+        setTimeout(() => loadSymbol(saved.symbol), 0);
+      }
+    } catch {}
+  }, []);
+
+  // Persist preferences
+  useEffect(() => {
+    const prefs = { marketType, interval, range, symbol: selectedSymbol };
+    localStorage.setItem('charts_prefs', JSON.stringify(prefs));
+  }, [marketType, interval, range, selectedSymbol]);
 
   useEffect(() => {
     generateAICommentary();
@@ -236,7 +258,31 @@ export default function ChartsPage() {
           </>
         )}
 
-        <Button size="sm" variant="outline" onClick={() => loadSymbol(selectedSymbol)}>Reload</Button>
+        <div className="flex items-center gap-2">
+          <input
+            className="p-2 border rounded w-40"
+            placeholder={marketType === 'crypto' ? 'e.g., BTCUSDT' : 'e.g., AAPL'}
+            value={typedSymbol}
+            onChange={(e) => setTypedSymbol(e.target.value.toUpperCase().trim())}
+          />
+          <Button
+            size="sm"
+            onClick={() => {
+              const s = typedSymbol;
+              if (!s) return;
+              // Basic validation
+              const stockOk = /^[A-Z.]{1,10}$/.test(s);
+              const cryptoOk = /^[A-Z0-9]{5,15}$/.test(s); // e.g., BTCUSDT
+              if ((marketType === 'stock' && !stockOk) || (marketType === 'crypto' && !cryptoOk)) {
+                alert('Invalid symbol format');
+                return;
+              }
+              setSelectedSymbol(s);
+              loadSymbol(s);
+            }}
+          >Go</Button>
+          <Button size="sm" variant="outline" onClick={() => loadSymbol(selectedSymbol)}>Reload</Button>
+        </div>
       </div>
 
       <ConnectDataPanel />

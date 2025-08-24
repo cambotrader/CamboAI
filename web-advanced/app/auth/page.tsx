@@ -5,10 +5,34 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+import { getSupabaseClient } from "@/lib/supabaseClient";
+
 export default function AuthPage() {
   const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const supabase = getSupabaseClient();
+  const hasSupabase = !!supabase;
+
+  async function handleSubmit() {
+    if (!hasSupabase) return alert("Demo only - set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to enable Auth");
+    if (!email || !password) return alert("Email and password required");
+    if (mode === "sign-in") {
+      const { error } = await supabase!.auth.signInWithPassword({ email, password });
+      if (error) return alert(error.message);
+      alert("Signed in");
+    } else {
+      const { error } = await supabase!.auth.signUp({ email, password });
+      if (error) return alert(error.message);
+      alert("Check your email to confirm your account");
+    }
+  }
+
+  async function oauth(provider: 'google' | 'github') {
+    if (!hasSupabase) return alert("Demo OAuth - configure Supabase to enable");
+    const { error } = await supabase!.auth.signInWithOAuth({ provider, options: { redirectTo: window.location.origin } });
+    if (error) alert(error.message);
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-gray-50">
@@ -26,7 +50,7 @@ export default function AuthPage() {
               <label className="text-sm font-medium">Password</label>
               <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
             </div>
-            <Button className="w-full" onClick={() => alert("Demo only - hook up your auth here")}> 
+            <Button className="w-full" onClick={handleSubmit}> 
               {mode === "sign-in" ? "Sign In" : "Sign Up"}
             </Button>
 
@@ -35,8 +59,8 @@ export default function AuthPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline" onClick={() => alert("Demo OAuth (Google)")}>Google</Button>
-              <Button variant="outline" onClick={() => alert("Demo OAuth (GitHub)")}>GitHub</Button>
+              <Button variant="outline" onClick={() => oauth('google')}>Google</Button>
+              <Button variant="outline" onClick={() => oauth('github')}>GitHub</Button>
             </div>
 
             <div className="text-center text-sm text-gray-600">
