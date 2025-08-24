@@ -4,7 +4,21 @@ import pandas as pd
 
 # CamboAI TraderStation (temporary Streamlit cockpit)
 st.set_page_config(page_title='CamboAI TraderStation', layout='wide', initial_sidebar_state='expanded')
-st.title('📊 CamboAI TraderStation — Streamlit Cockpit (Temporary)')
+st.title('📊 CamboAI TraderStation — Streamlit Cockpit (Standalone)')
+
+# Check if running in standalone mode (no backend)
+def is_backend_available(url="http://localhost:8000"):
+    try:
+        response = requests.get(f"{url}/health", timeout=1)
+        return response.status_code == 200
+    except:
+        return False
+
+# Display mode indicator
+if is_backend_available():
+    st.success("🔗 Connected to CamboAI Backend API")
+else:
+    st.info("🚀 **Standalone Mode** - Charts & sentiment analysis working independently (Backend API not required)")
 
 st.sidebar.header('Control Panel')
 # Basic inputs
@@ -17,22 +31,23 @@ show_bands = st.sidebar.checkbox('Show Bollinger Bands', value=True)
 show_rsi = st.sidebar.checkbox('Compute RSI (tooltip only)', value=False)
 show_sentiment = st.sidebar.checkbox('Show Sentiment Panel', value=True)
 
-status_exp = st.sidebar.expander('Backend Status', expanded=False)
+status_exp = st.sidebar.expander('Backend Status (Optional)', expanded=False)
 with status_exp:
+    st.caption("⚡ App works independently - Backend connection is optional for enhanced features")
     backend_url = st.text_input('Backend URL', value='http://localhost:8000')
-    if st.button('Check Health/Ready', key='check_backend'):
+    if st.button('Test Backend Connection', key='check_backend'):
         headers = {'X-API-Key': api_key} if api_key else {}
         try:
-            h = requests.get(f"{backend_url}/health", headers=headers, timeout=5)
-            r = requests.get(f"{backend_url}/ready", headers=headers, timeout=5)
+            h = requests.get(f"{backend_url}/health", headers=headers, timeout=3)
+            r = requests.get(f"{backend_url}/ready", headers=headers, timeout=3)
             st.write('Health:', h.status_code, h.json() if str(h.headers.get('content-type','')).startswith('application/json') else h.text)
             st.write('Ready:', r.status_code, r.json() if str(r.headers.get('content-type','')).startswith('application/json') else r.text)
             if h.ok and r.ok:
-                st.success('Backend is reachable')
+                st.success('✅ Backend API connected successfully!')
             else:
-                st.warning('Backend returned non-OK status codes')
+                st.warning('⚠️ Backend returned non-OK status codes')
         except Exception as e:
-            st.error(f'Check failed: {e}')
+            st.info(f'ℹ️ Backend not available: {e}\n\n**No worries!** The app works perfectly in standalone mode.')
 
 st.divider()
 
