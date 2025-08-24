@@ -60,6 +60,13 @@ def render_chart(
     if df is None or df.empty:
         raise ValueError("Dataframe is empty. Provide OHLCV df with columns: Open,High,Low,Close,Volume")
 
+    # Ensure all OHLCV columns are 1D
+    df = df.copy()
+    ohlcv_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
+    for col in ohlcv_cols:
+        if col in df.columns:
+            df[col] = _safe_indicator_series(df[col])
+
     df = compute_indicators(df)
 
     fig = make_subplots(

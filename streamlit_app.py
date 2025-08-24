@@ -61,6 +61,16 @@ with chart_tab:
     with st.spinner('Loading price data...'):
         try:
             df = yf.download(symbol, period=period, interval=interval, auto_adjust=True, progress=False)
+            # Fix multi-level columns issue
+            if hasattr(df.columns, 'nlevels') and df.columns.nlevels > 1:
+                df.columns = df.columns.droplevel(1)
+            # Ensure columns are properly named and 1D
+            if not df.empty:
+                expected_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
+                for col in expected_cols:
+                    if col in df.columns:
+                        # Flatten any multi-dimensional columns
+                        df[col] = df[col].squeeze()
         except Exception as e:
             df = pd.DataFrame()
             st.warning(f'Unable to fetch data: {e}')
