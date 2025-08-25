@@ -1,0 +1,164 @@
+{
+  "files": [
+    {
+      "basename": "launch.py",
+      "path": "D:\\CamboAI\\camboai\\camboai\\docs\\specs\\project\\CamboAI-TraderStation\\launch.py",
+      "hash": "4ceb566622c92ca8803acfaa410187c46067a6ef5ea7b73287a1d59a2ace9c19",
+      "action": "archived_variant",
+      "archived_to": "D:\\CamboAI\\archive\\snapshots\\launch.py__variant1.py"
+    },
+    {
+      "basename": "launch.py",
+      "path": "D:\\CamboAI\\camboai\\camboai\\docs\\specs\\TraderStation\\launch.py",
+      "hash": "4ceb566622c92ca8803acfaa410187c46067a6ef5ea7b73287a1d59a2ace9c19",
+      "action": "archived_variant",
+      "archived_to": "D:\\CamboAI\\archive\\snapshots\\launch.py__variant2.py"
+    },
+    {
+      "basename": "launch.py",
+      "path": "D:\\CamboAI\\imports\\d-camboai\\specs\\project\\CamboAI-TraderStation\\launch.py",
+      "hash": "4ceb566622c92ca8803acfaa410187c46067a6ef5ea7b73287a1d59a2ace9c19",
+      "action": "archived_variant",
+      "archived_to": "D:\\CamboAI\\archive\\snapshots\\launch.py__variant3.py"
+    },
+    {
+      "basename": "launch.py",
+      "path": "D:\\CamboAI\\.venv_streamlit\\Lib\\site-packages\\setuptools\\launch.py",
+      "hash": "4f23d3f887354f612762f18edba81f3513f8cac065ae1a5b4634315ac88ee35e",
+      "action": "canonical"
+    },
+    {
+      "basename": "chart_module.py",
+      "path": "D:\\CamboAI\\camboai\\camboai\\docs\\specs\\project\\CamboAI-TraderStation\\chart_module.py",
+      "hash": "de5e0b38b8c9a69e0851a006abde855bf94ee4f856e06c9bd36fbc8249835028",
+      "action": "archived_variant",
+      "archived_to": "D:\\CamboAI\\archive\\snapshots\\chart_module.py__variant1.py"
+    },
+    {
+      "basename": "chart_module.py",
+      "path": "D:\\CamboAI\\camboai\\camboai\\docs\\specs\\project\\CamboStation309\\john-trading-hub\\chart_module.py",
+      "hash": "67b3baf0791e5500f040e3865e1dbf0d2c829f3572353ad9530cfff817b913b3",
+      "action": "archived_variant",
+      "archived_to": "D:\\CamboAI\\archive\\snapshots\\chart_module.py__variant2.py"
+    },
+    {
+      "basename": "chart_module.py",
+      "path": "D:\\CamboAI\\camboai\\camboai\\docs\\specs\\project\\CamboStation309\\john-trading-hub\\john-trading-hub\\chart_module.py",
+      "hash": "67b3baf0791e5500f040e3865e1dbf0d2c829f3572353ad9530cfff817b913b3",
+      "action": "archived_variant",
+      "archived_to": "D:\\CamboAI\\archive\\snapshots\\chart_module.py__variant3.py"
+    },
+    {
+      "basename": "chart_module.py",
+      "path": "D:\\CamboAI\\camboai\\camboai\\docs\\specs\\project\\GitHub\\CamboStationVision\\chart_module.py",
+      "hash": "67b3baf0791e5500f040e3865e1dbf0d2c829f3572353ad9530cfff817b913b3",
+      "action": "archived_variant",
+      "archived_to": "D:\\CamboAI\\archive\\snapshots\\chart_module.py__variant4.py"
+    },
+    {
+      "basename": "chart_module.py",
+      "path": "D:\\CamboAI\\camboai\\camboai\\docs\\specs\\TraderStation\\chart_module.py",
+      "hash": "de5e0b38b8c9a69e0851a006abde855bf94ee4f856e06c9bd36fbc8249835028",
+      "action": "archived_variant",
+      "archived_to": "D:\\CamboAI\\archive\\snapshots\\chart_module.py__variant5.py"
+    },
+    {
+      "basename": "chart_module.py",
+      "path": "D:\\CamboAI\\camboai\\modules\\chart_module.py",
+      "hash": "d0c59a14c907743f551bdd155215fdd1d16fa2210e299daf4d6a5838d255c63b",
+      "action": "archived_variant",
+      "archived_to": "D:\\CamboAI\\archive\\snapshots\\chart_module.py__variant6.py"
+    },
+    {
+      "basename": "chart_module.py",
+      "path": "D:\\CamboAI\\imports\\d-camboai\\specs\\project\\chart_module.py",
+      "hash": "d1a5185ffb860ce8442576ccb91e4fa1fa49a8aa62cc2b1c6594935c2c5d4d5f",
+      "action": "duplicate_same_hash_skipped"
+    },
+    {
+      "basename": "chart_module.py",
+      "path": "D:\\CamboAI\\imports\\d-camboai\\specs\\project\\CamboAI-TraderStation\\chart_module.py",
+      "hash": "de5e0b38b8c9a69e0851a006abde855bf94ee4f856e06c9bd36fbc8249835028",
+      "action": "archived_variant",
+      "archived_to": "D:\\CamboAI\\archive\\snapshots\\chart_module.py__variant7.py"
+    },
+    {
+      "basename": "chart_module.py",
+      "path": "D:\\CamboAI\\modules\\chart_module.py",
+      "hash": "1b2c3c0ab8d7d3c929c5bb2fa21661f09932bbaaa268277be4ac7a33d9939967",
+      "action": "archived_variant",
+      "archived_to": "D:\\CamboAI\\archive\\snapshots\\chart_module.py__variant8.py"
+    },
+    {
+      "basename": "chart_module.py",
+      "path": "D:\\CamboAI\\camboai\\camboai\\docs\\specs\\project\\chart_module.py",
+      "hash": "d1a5185ffb860ce8442576ccb91e4fa1fa49a8aa62cc2b1c6594935c2c5d4d5f",
+      "action": "canonical"
+    },
+    {
+      "basename": "sentiment_panel.py",
+      "path": "D:\\CamboAI\\camboai\\camboai\\docs\\specs\\TraderStation\\sentiment_panel.py",
+      "hash": "ec7cc007c73ee92f792940f9082671ab0b134d883744832d2a23ed1301185ecb",
+      "action": "duplicate_same_hash_skipped"
+    },
+    {
+      "basename": "sentiment_panel.py",
+      "path": "D:\\CamboAI\\imports\\d-camboai\\specs\\project\\CamboAI-TraderStation\\sentiment_panel.py",
+      "hash": "ec7cc007c73ee92f792940f9082671ab0b134d883744832d2a23ed1301185ecb",
+      "action": "duplicate_same_hash_skipped"
+    },
+    {
+      "basename": "sentiment_panel.py",
+      "path": "D:\\CamboAI\\camboai\\camboai\\docs\\specs\\project\\CamboAI-TraderStation\\sentiment_panel.py",
+      "hash": "ec7cc007c73ee92f792940f9082671ab0b134d883744832d2a23ed1301185ecb",
+      "action": "canonical"
+    },
+    {
+      "basename": "strategy_engine.py",
+      "path": "D:\\CamboAI\\camboai\\camboai\\docs\\specs\\project\\CamboAI-TraderStation\\strategy_engine.py",
+      "hash": "fc73a5826d32c40b6e44807fbea4ed07bde4bb5eb27171940952910c171a329b",
+      "action": "archived_variant",
+      "archived_to": "D:\\CamboAI\\archive\\snapshots\\strategy_engine.py__variant1.py"
+    },
+    {
+      "basename": "strategy_engine.py",
+      "path": "D:\\CamboAI\\camboai\\camboai\\docs\\specs\\TraderStation\\strategy_engine.py",
+      "hash": "fc73a5826d32c40b6e44807fbea4ed07bde4bb5eb27171940952910c171a329b",
+      "action": "archived_variant",
+      "archived_to": "D:\\CamboAI\\archive\\snapshots\\strategy_engine.py__variant2.py"
+    },
+    {
+      "basename": "strategy_engine.py",
+      "path": "D:\\CamboAI\\imports\\d-camboai\\specs\\project\\CamboAI-TraderStation\\strategy_engine.py",
+      "hash": "fc73a5826d32c40b6e44807fbea4ed07bde4bb5eb27171940952910c171a329b",
+      "action": "archived_variant",
+      "archived_to": "D:\\CamboAI\\archive\\snapshots\\strategy_engine.py__variant3.py"
+    },
+    {
+      "basename": "strategy_engine.py",
+      "path": "D:\\CamboAI\\modules\\strategy\\strategy_engine.py",
+      "hash": "633788fd5709bae975eda551fde8f465467328b945e164916a4d1e066d3f1973",
+      "action": "canonical"
+    },
+    {
+      "basename": "education_module.py",
+      "path": "D:\\CamboAI\\camboai\\modules\\education_module.py",
+      "hash": "e150bbecda511523fa6df275493bc5c926a106c83fddc6a5fa183e3439ce8040",
+      "action": "archived_variant",
+      "archived_to": "D:\\CamboAI\\archive\\snapshots\\education_module.py__variant1.py"
+    },
+    {
+      "basename": "education_module.py",
+      "path": "D:\\CamboAI\\modules\\education_module.py",
+      "hash": "e150bbecda511523fa6df275493bc5c926a106c83fddc6a5fa183e3439ce8040",
+      "action": "archived_variant",
+      "archived_to": "D:\\CamboAI\\archive\\snapshots\\education_module.py__variant2.py"
+    },
+    {
+      "basename": "education_module.py",
+      "path": "D:\\CamboAI\\camboai\\camboai\\docs\\specs\\project\\GitHub\\CamboStationVision\\modules\\education_module.py",
+      "hash": "3607ada86c76f4f28cb1c7763a5d3d196e22b2493c86640b1881d8a9205b10c2",
+      "action": "canonical"
+    }
+  ]
+}

@@ -1,4 +1,6 @@
-fastapi==0.68.0
+pip install cryptography matplotlib
+pip freeze > requirements.txtpip install cryptography matplotlib
+pip freeze > requirements.txtfastapi==0.68.0
 uvicorn==0.15.0
 sqlalchemy==1.4.23
 python-jose[cryptography]==3.3.0
@@ -10,6 +12,7 @@ ta-lib==0.4.24
 plotly==5.3.1
 websockets==10.0
 python-binance==1.0.15
+
 alpaca-trade-api==1.4.2
 finnhub-python==2.4.13
 requests==2.26.0
@@ -25,6 +28,9 @@ httpx==0.24.1
 transformers==4.11.3
 nltk==3.6.3
 PyJWT==2.4.0
+cryptography
+matplotlib
+scikit-learn
 # Testing dependencies
 pytest==7.4.0
 pytest-asyncio==0.21.1

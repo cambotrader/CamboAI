@@ -1,21 +1,19 @@
 filename,description,benefit_or_use
-d:\CamboAI\test_server.py,Test script for server functionality
-d:\CamboAI\test_server.py,Test script for server functionality,Helps verify that the backend server is running and responding correctly; useful for debugging and testing server endpoints.
-d:\CamboAI\test_imports.py,Test script for checking Python imports
-d:\CamboAI\test_imports.py,Test script for checking Python imports,Ensures all required Python modules are installed and importable; helps catch missing dependencies early.
-d:\CamboAI\backend\tests\test_modules_api.py,Unit test for backend API modules
-d:\CamboAI\backend\tests\test_metrics.py,Unit test for backend metrics
-d:\CamboAI\backend\tests\test_health.py,Unit test for backend health checks
-d:\CamboAI\backend\simple_server.py,Simplified backend server implementation
-d:\CamboAI\backend\app\core\metrics.py,Core metrics logic
-d:\CamboAI\backend\app\core\logging.py,Logging utilities
-d:\CamboAI\backend\app\main_simple.py,Main entry for simple backend
-d:\CamboAI\backend\app\main.py,Main entry for backend
-d:\CamboAI\backend\app\database_simple.py,Simple database logic
-d:\CamboAI\backend\app\database.py,Database logic
-d:\CamboAI\backend\app\models\memory.py,Memory model definitions
-d:\CamboAI\backend\app\models\learning.py,Learning model definitions
-d:\CamboAI\backend\app\models\social.py,Social model definitions
+d:\CamboAI\test_server.py,Test script for server functionality,Helps verify backend responsiveness; quick regression check for API availability.
+d:\CamboAI\test_imports.py,Test script for checking Python imports,Ensures dependencies are installed and importable; early detection of missing or mis-versioned packages.
+d:\CamboAI\backend\tests\test_modules_api.py,Unit test for backend API modules,Validates API module behaviors to prevent breaking changes and ensure contract stability.
+d:\CamboAI\backend\tests\test_metrics.py,Unit test for backend metrics,Protects accuracy of performance/usage metrics feeding monitoring & dashboards.
+d:\CamboAI\backend\tests\test_health.py,Unit test for backend health checks,Confirms health/ready endpoints behave; supports automated deployment verification.
+d:\CamboAI\backend\simple_server.py,Simplified backend server implementation,Lightweight server variant for rapid local iteration and reduced startup overhead.
+d:\CamboAI\backend\app\core\metrics.py,Core metrics logic,Centralizes metric definition & emission enabling observability and performance tuning.
+d:\CamboAI\backend\app\core\logging.py,Logging utilities,Provides structured logging helpers improving traceability and debugging speed.
+d:\CamboAI\backend\app\main_simple.py,Main entry for simple backend,Simplified bootstrap path lowering resource usage for demos or tests.
+d:\CamboAI\backend\app\main.py,Main entry for backend,Primary application entry configuring services and API routing.
+d:\CamboAI\backend\app\database_simple.py,Simple database logic,Minimal persistence layer used in simple mode reducing setup friction.
+d:\CamboAI\backend\app\database.py,Database logic,Full-featured persistence layer supporting production data operations.
+d:\CamboAI\backend\app\models\memory.py,Memory model definitions,Defines schemas for in-app memory/state enabling personalized contextual responses.
+d:\CamboAI\backend\app\models\learning.py,Learning model definitions,Structures learning-related entities powering adaptive/ML features.
+d:\CamboAI\backend\app\models\social.py,Social model definitions,Represents social/user interaction data enabling community & coaching features.
 d:\CamboAI\camboai\backend\app\core\metrics.py,Core metrics logic (camboai)
 d:\CamboAI\camboai\backend\app\core\logging.py,Logging utilities (camboai)
 d:\CamboAI\camboai\backend\app\main_simple.py,Main entry for simple backend (camboai)

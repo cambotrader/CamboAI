@@ -24,6 +24,9 @@ import sentry_sdk
 # Import all API routers
 from .api.auth_api import router as auth_router
 from .api.trading_api import router as trading_router
+from .api import brokers_api, orders_api, options_api
+from .api import ws_orders  # websocket router
+from .api import ws_market, patterns_api  # assuming existing routers
 from .database import engine, SessionLocal, Base
 
 # Import core services
@@ -35,6 +38,8 @@ from .core.risk_manager import risk_manager
 from .core.order_manager import order_manager
 from .core.frontend_integration import frontend_integration
 from .core.email_service import email_service
+from .services.external_feed import external_feed, _broadcast_tick  # callback
+from .services.orders_poll import orders_poller
 
 # Setup logging
 os.makedirs('logs', exist_ok=True)
@@ -908,3 +913,33 @@ if __name__ == "__main__":
         log_level="info",
         access_log=True
     )
+
+@app.on_event("startup")
+async def startup_events():
+    # External market feed
+    async def feed_runner():
+        try:
+            await external_feed.start("BTCUSDT", _broadcast_tick)
+        except Exception:
+            pass
+    asyncio.create_task(feed_runner())
+    # Orders poller
+    asyncio.create_task(orders_poller.start())
+    # Orders WS broadcast loop
+    asyncio.create_task(ws_orders._broadcast_loop())  # type: ignore
+
+@app.on_event("shutdown")
+async def shutdown_events():
+    try:
+        await external_feed.shutdown()
+    except Exception:
+        pass
+    orders_poller.stop()
+
+# Ignore data files and environment settings
+data/*.db
+data/secret_key.bin
+.env
+__pycache__/
+*.pyc
+.cache/

@@ -1,0 +1,13 @@
+{
+  "generated": "2025-08-24",
+  "features": [
+    {"key": "chart_engine", "name": "Multi-Source Chart Engine", "category": "core", "status": "PARTIAL", "priority": "P1", "module_path": "modules/chart_module.py", "notes": "Needs provider toggles"},
+    {"key": "candlestick_lab", "name": "Candlestick Pattern Lab", "category": "analysis", "status": "PARTIAL", "priority": "P1", "module_path": "modules/pattern_engine.py", "notes": "Expand catalog & bias tags"},
+    {"key": "chart_pattern_recognizer", "name": "Chart Pattern Recognizer", "category": "analysis", "status": "MISSING", "priority": "P1", "module_path": "modules/chart_patterns.py", "notes": "Detect H&S, Triangles"},
+    {"key": "strategy_engine", "name": "Strategy Engine & Screener", "category": "strategy", "status": "PLANNED", "priority": "P1", "module_path": "modules/strategy/strategy_engine.py", "notes": "Initial scaffold added"},
+    {"key": "scanner_framework", "name": "Universal Scanner", "category": "analysis", "status": "MISSING", "priority": "P1", "module_path": "modules/scan/scanner.py", "notes": "Pluggable sources"},
+    {"key": "trade_plan_generator", "name": "Trade Plan Generator", "category": "strategy", "status": "MISSING", "priority": "P1", "module_path": "modules/strategy/plan_generator.py", "notes": "Narrative synthesis"},
+    {"key": "sentiment_expanded", "name": "Expanded Sentiment & News", "category": "sentiment", "status": "PARTIAL", "priority": "P1", "module_path": "modules/news_sentiment.py", "notes": "Add FinBERT zones & multi-source"},
+    {"key": "finbert_zones", "name": "FinBERT Sentiment Zones", "category": "sentiment", "status": "MISSING", "priority": "P1", "module_path": "modules/sentiment/finbert.py", "notes": "Lexicon placeholder"}
+  ]
+}

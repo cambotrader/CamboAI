@@ -9,11 +9,16 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+# NOTE: This file is the active runtime chart module. A different spec variant was marked
+# canonical during consolidation. Reconciled differences:
+# - This runtime version includes multi-level column handling absent in archived variants.
+# - Retained existing indicator logic; future merge of any missing annotations to happen here.
+
 try:
     from ta.trend import SMAIndicator
     from ta.volatility import BollingerBands
     from ta.momentum import RSIIndicator
-except Exception:
+except ImportError:  # narrow exception
     SMAIndicator = None
     BollingerBands = None
     RSIIndicator = None
@@ -126,11 +131,15 @@ def render_chart(
     # Annotations (pattern markers etc.)
     if annotations:
         for ann in annotations:
-            fig.add_annotation(
-                x=ann.get("x"), y=ann.get("y", df["High"].max()), text=ann.get("text", ""),
-                showarrow=True, arrowhead=2, bgcolor="rgba(33,33,33,0.6)", font=dict(color="white"),
-                row=1, col=1,
-            )
+            try:
+                fig.add_annotation(
+                    x=ann.get("x"), y=ann.get("y", df["High"].max()), text=ann.get("text", ""),
+                    showarrow=True, arrowhead=2, bgcolor="rgba(33,33,33,0.6)", font=dict(color="white"),
+                    row=1, col=1,
+                )
+            except (KeyError, ValueError, TypeError):
+                # Skip invalid annotation without failing chart
+                continue
 
     fig.update_layout(
         title=title,

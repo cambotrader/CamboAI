@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+
 import { useToast } from '@/components/ui/use-toast';
 import dynamic from 'next/dynamic';
 import { ConnectDataPanel } from '@/components/dashboard/connect-data-panel';
+import { DateRangeCompact, DateRange } from '@/components/ui/date-range-compact';
+import { ShortcutsTooltip } from '@/components/ui/shortcuts-tooltip';
 
 // Dynamically import Plotly to avoid SSR issues
 const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
@@ -60,6 +62,11 @@ export default function ChartsPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [reloadTrigger, setReloadTrigger] = useState<number>(0);
   const { toast } = useToast();
+  const [fromDate, setFromDate] = useState<string>("");
+  const [toDate, setToDate] = useState<string>("");
+  const [preset, setPreset] = useState<string>("1mo");
+  const [truncated, setTruncated] = useState<boolean>(false);
+  const [clampInfo, setClampInfo] = useState<string>("");
 
   // Calculate moving averages
   const calculateMA = (prices: number[], period: number): number[] => {
@@ -97,6 +104,9 @@ export default function ChartsPage() {
       if (saved.marketType) setMarketType(saved.marketType);
       if (saved.interval) setInterval(saved.interval);
       if (saved.range) setRange(saved.range);
+      if (saved.fromDate) setFromDate(saved.fromDate);
+      if (saved.toDate) setToDate(saved.toDate);
+      if (saved.preset) setPreset(saved.preset);
       if (saved.symbol) {
         setSelectedSymbol(saved.symbol);
         // trigger initial fetch
@@ -107,17 +117,72 @@ export default function ChartsPage() {
 
   // Persist preferences
   useEffect(() => {
-    const prefs = { marketType, interval, range, symbol: selectedSymbol };
+    const prefs = { marketType, interval, range, symbol: selectedSymbol, fromDate, toDate, preset };
     localStorage.setItem('charts_prefs', JSON.stringify(prefs));
-  }, [marketType, interval, range, selectedSymbol]);
+  }, [marketType, interval, range, selectedSymbol, fromDate, toDate, preset]);
+
+  // Cap client-side date span per interval (prevent >1000 candles for crypto; keep reasonable for stocks)
+  function clampDateRange(baseFrom: string, baseTo: string): { from: string, to: string } {
+    setClampInfo("");
+    if (!baseFrom || !baseTo) return { from: baseFrom, to: baseTo } as any;
+    const from = new Date(baseFrom);
+    const to = new Date(baseTo);
+    if (to < from) return { from: baseFrom, to: baseTo } as any;
+
+    // Preset-driven span (days)
+    const presetDaysMap: Record<string, number> = {
+      '1d': 1,
+      '5d': 5,
+      '1mo': 30,
+      '3mo': 90,
+      '6mo': 180,
+      '1y': 365,
+      '2y': 730,
+      '5y': 1825,
+      '10y': 3650,
+      'ytd': 365,
+      'max': 36500,
+      'custom': 36500,
+    };
+
+    // Interval safety caps to keep requests reasonable
+    const daysByInterval: Record<string, number> = {
+      '1m': 1,   // tight cap to avoid frequent truncation
+      '2m': 2,
+      '5m': 5,
+      '15m': 15,
+      '1h': 45,
+      '4h': 120,
+      '1d': 1825,
+      '1wk': 3650,
+      '1mo': 36500,
+    };
+
+    const presetDays = presetDaysMap[preset] ?? 90;
+    const intervalMax = daysByInterval[interval] ?? 90;
+    const maxDays = Math.min(presetDays, intervalMax);
+
+    const ms = 86400000;
+    const spanDays = Math.ceil((to.getTime() - from.getTime()) / ms) + 1;
+    if (spanDays > maxDays) {
+      const newFrom = new Date(to.getTime() - (maxDays - 1) * ms);
+      setClampInfo(`capped to ${interval} limit (${maxDays}d)`);
+      return { from: newFrom.toISOString().slice(0,10), to: to.toISOString().slice(0,10) };
+    }
+    return { from: baseFrom, to: baseTo };
+  }
 
   // Debounce reloading when controls change
   useEffect(() => {
     const t = setTimeout(() => {
+      // Clamp range before loading
+      const clamped = clampDateRange(fromDate, toDate);
+      if (clamped.from !== fromDate) setFromDate(clamped.from);
+      if (clamped.to !== toDate) setToDate(clamped.to);
       loadSymbol(selectedSymbol);
     }, 400);
     return () => clearTimeout(t);
-  }, [marketType, interval, range]);
+  }, [marketType, interval, range, fromDate, toDate, preset]);
 
   // Manual reload trigger
   useEffect(() => {
@@ -127,6 +192,38 @@ export default function ChartsPage() {
   useEffect(() => {
     generateAICommentary();
   }, [chartData]);
+
+  // Keyboard shortcuts: R reload, Left/Right arrows to shift window
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'r' || e.key === 'R') {
+        e.preventDefault();
+        setReloadTrigger(Date.now());
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        const now = toDate ? new Date(toDate) : new Date();
+        const prev = (d: Date, days: number) => new Date(d.getTime() - days * 86400000);
+        let days = 30;
+        if (preset === '1d') days = 1; else if (preset === '5d') days = 5; else if (preset === '1mo') days = 30; else if (preset === '3mo') days = 90; else if (preset === '6mo') days = 180; else if (preset === '1y') days = 365;
+        const newTo = prev(now, days);
+        const newFrom = prev(newTo, days);
+        setFromDate(newFrom.toISOString().slice(0,10));
+        setToDate(newTo.toISOString().slice(0,10));
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        const baseFrom = fromDate ? new Date(fromDate) : new Date();
+        const nextDate = (d: Date, days: number) => new Date(d.getTime() + days * 86400000);
+        let days = 30;
+        if (preset === '1d') days = 1; else if (preset === '5d') days = 5; else if (preset === '1mo') days = 30; else if (preset === '3mo') days = 90; else if (preset === '6mo') days = 180; else if (preset === '1y') days = 365;
+        const newFrom = nextDate(baseFrom, days);
+        const newTo = nextDate(newFrom, days);
+        setFromDate(newFrom.toISOString().slice(0,10));
+        setToDate(newTo.toISOString().slice(0,10));
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [preset, fromDate, toDate]);
 
   const candlestickTrace = {
     x: chartData.prices.map(p => p.time),
@@ -187,7 +284,10 @@ export default function ChartsPage() {
     setErrorMsg('');
     setLoading(true);
     try {
-      const qs = new URLSearchParams({ type: marketType, symbol, interval, range }).toString();
+      const params: Record<string, string> = { type: marketType, symbol, interval, range };
+      if (fromDate) params.from = fromDate;
+      if (toDate) params.to = toDate;
+      const qs = new URLSearchParams(params).toString();
       const res = await fetch(`/api/market/ohlc?${qs}`);
       if (!res.ok) throw new Error(`Failed to fetch data (${res.status})`);
       const data = await res.json();
@@ -201,8 +301,14 @@ export default function ChartsPage() {
       }));
       if (prices.length > 0) {
         setChartData({ symbol, prices });
+        const wasTruncated = marketType === 'crypto' && !!data.truncated;
+        setTruncated(wasTruncated);
+        if (wasTruncated) {
+          toast({ title: 'Range truncated', description: 'Binance capped results at 1000 intervals. Narrow your range or use a higher interval.' });
+        }
       } else {
         setErrorMsg('No data returned for this symbol/settings.');
+        setTruncated(false);
       }
     } catch (e: any) {
       const msg = e?.message || 'Failed to load data';
@@ -229,6 +335,10 @@ export default function ChartsPage() {
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">📈 Advanced Charts</h1>
+        <div className="flex items-center gap-3 text-sm text-gray-500">
+          <span>Preset: {preset || 'custom'} {fromDate && toDate ? `(${fromDate} → ${toDate})` : ''}</span>
+          <ShortcutsTooltip />
+        </div>
         <div className="flex space-x-2">
           {(
             marketType === 'stock'
@@ -256,33 +366,56 @@ export default function ChartsPage() {
         {marketType === 'stock' ? (
           <>
             <select className="p-2 border rounded" value={interval} onChange={e => setInterval(e.target.value)}>
+              <option value="1m">1m</option>
+              <option value="2m">2m</option>
+              <option value="5m">5m</option>
+              <option value="15m">15m</option>
               <option value="1d">1d</option>
               <option value="1wk">1wk</option>
               <option value="1mo">1mo</option>
             </select>
-            <select className="p-2 border rounded" value={range} onChange={e => setRange(e.target.value)}>
-              <option value="5d">5d</option>
-              <option value="1mo">1mo</option>
-              <option value="3mo">3mo</option>
-              <option value="6mo">6mo</option>
-              <option value="1y">1y</option>
-            </select>
+            <DateRangeCompact
+              value={{ from: fromDate || undefined, to: toDate || undefined }}
+              onChange={(v, p) => {
+                setFromDate(v.from || "");
+                setToDate(v.to || "");
+                if (p) setPreset(p);
+                setReloadTrigger(Date.now());
+              }}
+            />
           </>
         ) : (
           <>
-            <select className="p-2 border rounded" value={interval} onChange={e => setInterval(e.target.value)}>
-              <option value="1m">1m</option>
-              <option value="5m">5m</option>
-              <option value="15m">15m</option>
-              <option value="1h">1h</option>
-              <option value="4h">4h</option>
-              <option value="1d">1d</option>
-            </select>
-            {/* Range unused for Binance; keep for API parity */}
-            <select className="p-2 border rounded" value={range} onChange={e => setRange(e.target.value)}>
-              <option value="1w">1w</option>
-              <option value="1mo">1mo</option>
-            </select>
+            <div className="flex items-center gap-2">
+              <select className="p-2 border rounded" value={interval} onChange={e => setInterval(e.target.value)}>
+                <option value="1m">1m</option>
+                <option value="5m">5m</option>
+                <option value="15m">15m</option>
+                <option value="1h">1h</option>
+                <option value="4h">4h</option>
+                <option value="1d">1d</option>
+              </select>
+              <div className="flex items-center gap-2">
+                <DateRangeCompact
+                  value={{ from: fromDate || undefined, to: toDate || undefined }}
+                  onChange={(v, p) => {
+                    setFromDate(v.from || "");
+                    setToDate(v.to || "");
+                    if (p) setPreset(p);
+                    setReloadTrigger(Date.now());
+                  }}
+                />
+                {clampInfo && (
+                  <span className="flex items-center gap-1 text-xs px-2 py-1 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                    <span title="Adjusted by preset + interval">ⓘ</span>
+                    <span>{clampInfo}</span>
+                  </span>
+                )}
+                {truncated && (
+                  <span className="text-xs px-2 py-1 rounded bg-amber-100 text-amber-800 border border-amber-200" title="Binance returned only 1000 candles">Truncated</span>
+                )}
+              </div>
+            </div>
           </>
         )}
 
@@ -293,6 +426,7 @@ export default function ChartsPage() {
             value={typedSymbol}
             onChange={(e) => setTypedSymbol(e.target.value.toUpperCase().trim())}
           />
+
           <Button
             size="sm"
             onClick={() => {
@@ -302,22 +436,43 @@ export default function ChartsPage() {
               const stockOk = /^[A-Z.]{1,10}$/.test(s);
               const cryptoOk = /^[A-Z0-9]{5,15}$/.test(s); // e.g., BTCUSDT
               if ((marketType === 'stock' && !stockOk) || (marketType === 'crypto' && !cryptoOk)) {
-                alert('Invalid symbol format');
+                toast({ title: 'Invalid symbol', description: 'Please check format.' });
+                return;
+              }
+              if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
+                toast({ title: 'Invalid range', description: 'From date must be before To date.' });
                 return;
               }
               setSelectedSymbol(s);
               loadSymbol(s);
             }}
           >Go</Button>
-          <Button size="sm" variant="outline" onClick={() => setReloadTrigger(Date.now())}>{loading ? 'Loading...' : 'Reload'}</Button>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" onClick={() => setReloadTrigger(Date.now())} title="R">{loading ? 'Loading...' : 'Reload'}</Button>
+            <Button size="sm" variant="outline" onClick={() => {
+              // Shift back the current window based on preset
+              const now = toDate ? new Date(toDate) : new Date();
+              const prev = (d: Date, days: number) => new Date(d.getTime() - days * 86400000);
+              let days = 30;
+              if (preset === '1d') days = 1; else if (preset === '5d') days = 5; else if (preset === '1mo') days = 30; else if (preset === '3mo') days = 90; else if (preset === '6mo') days = 180; else if (preset === '1y') days = 365;
+              const newTo = prev(now, days);
+              const newFrom = prev(newTo, days);
+              setFromDate(newFrom.toISOString().slice(0,10));
+              setToDate(newTo.toISOString().slice(0,10));
+            }} title="ArrowLeft">Last</Button>
+            <Button size="sm" variant="outline" onClick={() => {
+              const baseFrom = fromDate ? new Date(fromDate) : new Date();
+              const nextDate = (d: Date, days: number) => new Date(d.getTime() + days * 86400000);
+              let days = 30;
+              if (preset === '1d') days = 1; else if (preset === '5d') days = 5; else if (preset === '1mo') days = 30; else if (preset === '3mo') days = 90; else if (preset === '6mo') days = 180; else if (preset === '1y') days = 365;
+              const newFrom = nextDate(baseFrom, days);
+              const newTo = nextDate(newFrom, days);
+              setFromDate(newFrom.toISOString().slice(0,10));
+              setToDate(newTo.toISOString().slice(0,10));
+            }} title="ArrowRight">Next</Button>
+          </div>
         </div>
       </div>
-
-      {errorMsg && (
-        <Alert className="border-l-4 border-red-500 bg-red-50 text-red-800">
-          <AlertDescription>{errorMsg}</AlertDescription>
-        </Alert>
-      )}
 
       <ConnectDataPanel />
 

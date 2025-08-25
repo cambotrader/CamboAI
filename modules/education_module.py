@@ -17,6 +17,7 @@ PATTERN_GLOSSARY: Dict[str, str] = {
     "Double Bottom": "Bullish reversal after two failed lows.",
     "Rising Wedge": "Bearish-leaning compression channel.",
     "Falling Wedge": "Bullish-leaning compression channel.",
+    # Future enrichment: harmonic patterns, volume profile concepts.
 }
 
 # Tutorial content (sample curriculum outline)
@@ -26,6 +27,7 @@ TUTORIALS: List[Dict[str, str]] = [
     {"title": "Chart Structures", "level": "Intermediate", "content": "Head & Shoulders, Triangles, Wedges, Double/Triple setups."},
     {"title": "Sentiment Zones", "level": "Intermediate", "content": "Use FinBERT/heuristics to contextualize price action."},
     {"title": "Strategy Composition", "level": "Advanced", "content": "Combine structure + sentiment + risk into a trade plan."},
+    # ISSUE: quizzes/flashcards enrichment planned (track in issue tracker)
 ]
 
 TIP_MAP: Dict[str, str] = {
@@ -61,3 +63,5 @@ def interpret_command(command_text: str) -> Dict[str, List[str]]:
     if any(k in t for k in ["psych", "journal", "mind", "discipline"]):
         return {"Psychology": ["FOMO control", "process checklists", "risk discipline"]}
     return {"Help": ["Ask about patterns, indicators, macro events, or psychology"]}
+
+# Placeholder for merged improvements from archived variants (currently identical variants).

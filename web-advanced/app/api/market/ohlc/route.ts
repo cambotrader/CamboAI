@@ -14,6 +14,8 @@ export async function GET(req: NextRequest) {
     const type = (searchParams.get("type") || "stock").toLowerCase(); // 'stock' | 'crypto'
     const interval = searchParams.get("interval") || (type === "crypto" ? "1h" : "1d");
     const range = searchParams.get("range") || (type === "crypto" ? "1w" : "1mo");
+    const from = searchParams.get("from"); // YYYY-MM-DD
+    const to = searchParams.get("to");   // YYYY-MM-DD
 
     if (!symbol) return json({ error: "symbol is required" }, 400);
 
@@ -24,7 +26,10 @@ export async function GET(req: NextRequest) {
       };
       const iv = binanceIntervalMap[interval] || "1h";
 
-      const url = `https://api.binance.com/api/v3/klines?symbol=${encodeURIComponent(symbol)}&interval=${iv}&limit=500`;
+      const params = new URLSearchParams({ symbol, interval: iv, limit: '1000' });
+      if (from) params.set('startTime', String(new Date(from + 'T00:00:00Z').getTime()));
+      if (to) params.set('endTime', String(new Date(to + 'T23:59:59Z').getTime()));
+      const url = `https://api.binance.com/api/v3/klines?${params.toString()}`;
       const res = await fetch(url, { next: { revalidate: 60 } });
       if (!res.ok) return json({ error: "failed_fetch_binance", status: res.status }, 502);
       const raw = await res.json();
@@ -39,14 +44,26 @@ export async function GET(req: NextRequest) {
         v: parseFloat(k[5])
       }));
 
-      return json({ source: "binance", symbol, interval: iv, candles });
+      // Detect truncation (Binance caps at limit)
+      const truncated = Array.isArray(raw) && raw.length >= 1000;
+
+      return json({ source: "binance", symbol, interval: iv, candles, truncated });
     } else {
       // Yahoo Finance chart API
       // range examples: 1d,5d,1mo,3mo,6mo,1y,2y,5y,10y,ytd,max
       // interval examples: 1m,2m,5m,15m,1d,1wk,1mo
       const yfInterval = interval;
       const yfRange = range;
-      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=${yfInterval}&range=${yfRange}`;
+      const params = new URLSearchParams({ interval: yfInterval, range: yfRange });
+      if (from && to) {
+        // Use start/end timestamps if custom range provided
+        const start = Math.floor(new Date(from + 'T00:00:00Z').getTime() / 1000);
+        const end = Math.floor(new Date(to + 'T23:59:59Z').getTime() / 1000);
+        params.set('period1', String(start));
+        params.set('period2', String(end));
+        params.delete('range');
+      }
+      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?${params.toString()}`;
       const res = await fetch(url, { next: { revalidate: 60 } });
       if (!res.ok) return json({ error: "failed_fetch_yahoo", status: res.status }, 502);
       const data = await res.json();

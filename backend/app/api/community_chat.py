@@ -11,7 +11,7 @@ from app.models.social import ChatRoom as ChatRoomModel, ChatMessage as ChatMess
 
 router = APIRouter(prefix="/api/community", tags=["Community Chat"])
 
-Room = Literal["stocks", "options", "forex", "futures", "crypto", "lounge"]
+Room = Literal["stocks", "options", "forex", "futures", "crypto", "lounge", "debate"]
 
 DEFAULT_ROOMS = [
     {"slug": "stocks", "title": "Stocks"},
@@ -20,6 +20,7 @@ DEFAULT_ROOMS = [
     {"slug": "futures", "title": "Futures"},
     {"slug": "crypto", "title": "Crypto"},
     {"slug": "lounge", "title": "Anything / Lounge"},
+    {"slug": "debate", "title": "Debate Room"},
 ]
 
 class ChatMessage(BaseModel):

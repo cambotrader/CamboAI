@@ -1,343 +1,642 @@
-import streamlit as st
-import requests
+import os, json, threading, time, io, base64
+from datetime import datetime
 import pandas as pd
+import numpy as np
+import requests
+import streamlit as st
 
-# CamboAI TraderStation (temporary Streamlit cockpit)
-st.set_page_config(page_title='CamboAI TraderStation', layout='wide', initial_sidebar_state='expanded')
-st.title('🚀 CamboAI TraderStation — Complete AI Trading Platform')
-st.caption('📈 Charts • 🕯️ Pattern Detection • 🧠 AI Signals • 📰 Sentiment • 📚 Education')
+# External libs for visuals / clustering (guarded)
+try:
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+except ImportError:
+    matplotlib = None
+    plt = None
 
-# Check if running in standalone mode (no backend)
-def is_backend_available(url="http://localhost:8000"):
+try:
+    from sklearn.cluster import KMeans
+except ImportError:
+    KMeans = None
+
+# WebSocket client (for market data / orders)
+try:
+    import websocket
+except ImportError:
+    websocket = None
+
+# Ensure harmonic patterns & engine register
+from modules.patterns.harmonic import *  # noqa
+from modules.patterns.registry import registry as pattern_registry
+
+APP_BUILD_TAG = "post-SECRETS_ENFORCED_V1-2025-08-24"
+
+# ---------------- Session Init ----------------
+def _init_session():
+    if "nav_choice" not in st.session_state:
+        st.session_state.nav_choice = "Dashboard"
+    if "latest_tick" not in st.session_state:
+        st.session_state.latest_tick = None
+    if "ws_thread_started" not in st.session_state:
+        st.session_state.ws_thread_started = False
+
+_init_session()
+
+# ---------------- Utility ----------------
+def fetch_live_ohlc(symbol: str, provider: str = "yfinance", interval: str = "1d", period: str = "1mo"):
     try:
-        response = requests.get(f"{url}/health", timeout=1)
-        return response.status_code == 200
-    except:
-        return False
+        params = {"source": provider, "symbol": symbol, "interval": interval, "period": period}
+        r = requests.get("http://127.0.0.1:8000/marketdata/ohlc", params=params, timeout=15)
+        js = r.json()
+        if "ohlc" not in js:
+            return None
+        o = js["ohlc"]
+        df = pd.DataFrame({
+            "open": o["open"],
+            "high": o["high"],
+            "low": o["low"],
+            "close": o["close"]
+        }, index=pd.to_datetime(o["index"]))
+        return df
+    except Exception:
+        return None
 
-# Display mode indicator
-if is_backend_available():
-    st.success("🔗 Connected to CamboAI Backend API")
-else:
-    st.info("🚀 **Standalone Mode** - Charts & sentiment analysis working independently (Backend API not required)")
+def synthetic_price_df(rows: int = 500):
+    idx = pd.date_range(end=pd.Timestamp.utcnow(), periods=rows, freq="H")
+    base = 100 + np.cumsum(np.random.randn(rows))
+    high = base + np.random.rand(rows)*1.2
+    low = base - np.random.rand(rows)*1.2
+    close = low + (high - low)*np.random.rand(rows)
+    return pd.DataFrame({"open":base, "high":high, "low":low, "close":close}, index=idx)
 
-st.sidebar.header('Control Panel')
-# Basic inputs
-symbol = st.sidebar.text_input('Ticker', value='AAPL').upper()
-interval = st.sidebar.selectbox('Interval', ['1d', '1h', '15m', '5m'], index=0)
-period = st.sidebar.selectbox('History', ['1y', '6mo', '3mo', '1mo'], index=0)
-api_key = st.sidebar.text_input('X-API-Key (optional, for backend calls)', value='', type='password')
-
-show_bands = st.sidebar.checkbox('Show Bollinger Bands', value=True)
-show_rsi = st.sidebar.checkbox('Compute RSI (tooltip only)', value=False)
-show_sentiment = st.sidebar.checkbox('Show Sentiment Panel', value=True)
-
-status_exp = st.sidebar.expander('Backend Status (Optional)', expanded=False)
-with status_exp:
-    st.caption("⚡ App works independently - Backend connection is optional for enhanced features")
-    backend_url = st.text_input('Backend URL', value='http://localhost:8000')
-    if st.button('Test Backend Connection', key='check_backend'):
-        headers = {'X-API-Key': api_key} if api_key else {}
+# ---------------- WebSocket Live Ticker ----------------
+def start_ws_listener(symbol: str, external: bool = False):
+    if websocket is None:
+        return
+    url = f"ws://127.0.0.1:8000/ws/marketdata?symbol={symbol}&interval=15"
+    if external:
+        url += "&external=true"
+    def on_message(_, message):
         try:
-            h = requests.get(f"{backend_url}/health", headers=headers, timeout=3)
-            r = requests.get(f"{backend_url}/ready", headers=headers, timeout=3)
-            st.write('Health:', h.status_code, h.json() if str(h.headers.get('content-type','')).startswith('application/json') else h.text)
-            st.write('Ready:', r.status_code, r.json() if str(r.headers.get('content-type','')).startswith('application/json') else r.text)
-            if h.ok and r.ok:
-                st.success('✅ Backend API connected successfully!')
-            else:
-                st.warning('⚠️ Backend returned non-OK status codes')
-        except Exception as e:
-            st.info(f'ℹ️ Backend not available: {e}\n\n**No worries!** The app works perfectly in standalone mode.')
-
-st.divider()
-
-# Tabs - Full CamboAI TraderStation
-chart_tab, pattern_tab, signal_tab, sentiment_tab, education_tab = st.tabs(["📈 Chart", "🕯️ Patterns", "🧠 AI Signals", "📰 Sentiment", "📚 Education"])
-
-with chart_tab:
-    st.subheader('Price & Volume')
-    import yfinance as yf
-    from modules.chart_module import render_chart
-    with st.spinner('Loading price data...'):
-        try:
-            df = yf.download(symbol, period=period, interval=interval, auto_adjust=True, progress=False)
-            # Fix multi-level columns issue
-            if hasattr(df.columns, 'nlevels') and df.columns.nlevels > 1:
-                df.columns = df.columns.droplevel(1)
-            # Ensure columns are properly named and 1D
-            if not df.empty:
-                expected_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
-                for col in expected_cols:
-                    if col in df.columns:
-                        # Flatten any multi-dimensional columns
-                        df[col] = df[col].squeeze()
-        except Exception as e:
-            df = pd.DataFrame()
-            st.warning(f'Unable to fetch data: {e}')
-    if df is None or df.empty:
-        # Provide a small fallback synthetic dataset
-        st.info('No data received. Showing a small sample dataset.')
-        try:
-            dates = pd.date_range(end=pd.Timestamp.utcnow(), periods=60, freq='D')
-            base = 150.0
-            close = pd.Series(base + pd.Series(range(60)).rolling(5, min_periods=1).mean().fillna(0).values).clip(lower=1)
-            df = pd.DataFrame({
-                'Open': close + 0.5,
-                'High': close + 1.0,
-                'Low': close - 1.0,
-                'Close': close,
-                'Volume': 1_000_000,
-            }, index=dates)
+            js = json.loads(message)
+            if js.get("type") in ("tick","ext_tick"):
+                st.session_state.latest_tick = js["data"]
         except Exception:
-            df = pd.DataFrame()
-    if df is None or df.empty:
-        st.warning('Still no data. Try another symbol or period.')
-    else:
+            pass
+    def run():
         try:
-            fig = render_chart(df, title=f"{symbol} Tactical Chart", show_bands=show_bands, show_rsi=show_rsi)
-            st.plotly_chart(fig, use_container_width=True)
-            st.caption('Overlays: MA50, MA200, optional Bollinger Bands. RSI computed if enabled.')
-        except Exception as e:
-            st.error(f'Chart error: {e}')
+            ws = websocket.WebSocketApp(url, on_message=on_message)
+            ws.run_forever()
+        except Exception:
+            pass
+    if not st.session_state.ws_thread_started:
+        t = threading.Thread(target=run, daemon=True)
+        t.start()
+        st.session_state.ws_thread_started = True
 
-with pattern_tab:
-    st.subheader('🕯️ Candlestick Pattern Detection')
-    if not df.empty:
+# ---------------- Orders WebSocket (optional) ----------------
+def start_orders_ws():
+    if websocket is None:
+        return
+    if st.session_state.get("orders_ws_started"):
+        return
+    url = "ws://127.0.0.1:8000/ws/orders?interval=6"
+    def on_message(_, message):
         try:
-            from modules.pattern_engine import analyze
-            with st.spinner('Analyzing candlestick patterns...'):
-                pattern_result = analyze(df)
-                patterns = pattern_result.get('signals', [])
-                
-            if patterns:
-                st.success(f"🎯 **{len(patterns)} patterns detected** on latest candle")
-                
-                # Display patterns in columns
-                cols = st.columns(min(3, len(patterns)))
-                for i, pattern in enumerate(patterns[:6]):  # Show max 6 patterns
-                    with cols[i % 3]:
-                        direction_emoji = "🟢" if pattern.get('direction') == 'bullish' else "🔴" if pattern.get('direction') == 'bearish' else "🟡"
-                        confidence = pattern.get('confidence', 0.5)
-                        
-                        st.metric(
-                            label=f"{direction_emoji} {pattern.get('type', 'Unknown').replace('_', ' ').title()}",
-                            value=f"{confidence:.1%}",
-                            delta=pattern.get('direction', 'neutral').title()
-                        )
-                        
-                        if pattern.get('meta'):
-                            st.caption(f"Details: {pattern['meta']}")
-                
-                # Pattern summary table
-                st.divider()
-                pattern_df = pd.DataFrame(patterns)
-                st.dataframe(pattern_df[['type', 'direction', 'confidence', 'meta']], use_container_width=True)
-                
-            else:
-                st.info("No significant patterns detected on the latest candle.")
-                
-        except Exception as e:
-            st.error(f'Pattern detection error: {e}')
-    else:
-        st.warning("No price data available for pattern analysis.")
-
-with signal_tab:
-    st.subheader('🧠 AI Trading Signals (Fusion Engine)')
-    if not df.empty:
+            js = json.loads(message)
+            if js.get("type") == "orders":
+                st.session_state.orders_live = js["orders"]
+        except Exception:
+            pass
+    def run():
         try:
-            from modules.ai_engine_switcher import get_signal
-            from modules.news_sentiment import get_headlines, score_headlines
-            
-            # Get sentiment score for fusion
-            sentiment_score = 0.0
-            try:
-                with st.spinner('Getting sentiment data...'):
-                    headlines = get_headlines(symbol)
-                    scored_headlines = score_headlines(headlines)
-                    if scored_headlines:
-                        # Calculate average sentiment
-                        sentiments = [h.get('sentiment_score', 0.0) for h in scored_headlines if h.get('sentiment_score')]
-                        if sentiments:
-                            sentiment_score = sum(sentiments) / len(sentiments)
-            except:
-                sentiment_score = 0.0
-            
-            with st.spinner('Generating AI trading signal...'):
-                signal_result = get_signal(df, sentiment_score)
-            
-            # Display main signal
-            signal_label = signal_result.get('label', 'NEUTRAL')
-            signal_score = signal_result.get('score', 0.0)
-            confidence = signal_result.get('confidence', 0.0)
-            
-            # Color coding
-            if signal_label == 'BUY':
-                color = 'green'
-                emoji = '📈'
-            elif signal_label == 'SELL':
-                color = 'red'
-                emoji = '📉'
-            else:
-                color = 'gray'
-                emoji = '⚖️'
-            
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("🎯 Signal", f"{emoji} {signal_label}", f"Score: {signal_score:.2f}")
-            with col2:
-                st.metric("🔒 Confidence", f"{confidence:.1%}")
-            with col3:
-                st.metric("📊 Sentiment", f"{sentiment_score:.2f}", "Market mood")
-            
-            # Signal breakdown
-            st.divider()
-            detail = signal_result.get('detail', {})
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                st.subheader("Pattern Analysis")
-                pattern_score = detail.get('pattern_score', 0.0)
-                st.write(f"**Pattern Score:** {pattern_score:.2f}")
-                if 'pattern_contributions' in detail:
-                    for contrib in detail['pattern_contributions'][:5]:  # Top 5
-                        st.write(f"• {contrib}")
-            
-            with col2:
-                st.subheader("Signal Details")
-                engine = detail.get('engine', 'unknown')
-                st.write(f"**Engine Used:** {engine.title()}")
-                if 'fallback' in detail:
-                    st.info(f"Fallback mode: {detail['fallback']}")
-                if 'engine_error' in detail:
-                    st.warning(f"Engine error: {detail['engine_error']}")
-            
-            # Risk disclaimer
-            st.divider()
-            st.caption("⚠️ **Risk Disclaimer:** This is AI-generated analysis for educational purposes only. Not financial advice. Always do your own research and consider your risk tolerance.")
-            
-        except Exception as e:
-            st.error(f'AI signal generation error: {e}')
-    else:
-        st.warning("No price data available for AI signal generation.")
+            ws = websocket.WebSocketApp(url, on_message=on_message)
+            ws.run_forever()
+        except Exception:
+            pass
+    st.session_state.orders_live = []
+    threading.Thread(target=run, daemon=True).start()
+    st.session_state.orders_ws_started = True
 
-with sentiment_tab:
-    if show_sentiment:
-        st.subheader('News & Sentiment (FinBERT fallback to heuristics)')
-        from modules.news_sentiment import get_headlines, score_headlines, build_sentiment_zones
-        with st.spinner('Fetching headlines...'):
-            try:
-                items = get_headlines(symbol)
-                scored = score_headlines(items)
-            except Exception as e:
-                scored = []
-                st.error(f'Sentiment error: {e}')
-        if not scored:
-            st.info('No headlines available right now.')
+# ---------------- Pattern Scans ----------------
+def render_pattern_markers(price_df: pd.DataFrame):
+    import pandas as pd
+    st.markdown("### Pattern Markers")
+    scan = st.button("Scan Patterns")
+    if scan:
+        from modules.patterns.calibration import add_candle_metrics, calibrate_confidence
+        from modules.chart_patterns import detect_all_patterns
+        metrics_df = add_candle_metrics(price_df)
+        detections = detect_all_patterns(price_df)
+        detections = calibrate_confidence(detections, metrics_df)
+        if detections:
+            latest = sorted(detections, key=lambda d: d.get("index",0), reverse=True)[:15]
+            badge_html = ""
+            for d in latest:
+                typ = d.get("type","")
+                color = "#35d58b" if typ in ("bullish","bull") else "#ff5f56" if typ in ("bearish","bear") else "#8899aa"
+                badge_html += f'<span style="background:{color}22;border:1px solid {color}55;color:{color};padding:2px 6px;margin:2px 4px;border-radius:5px;font-size:11px;display:inline-block;">{d.get("pattern")}</span>'
+            st.markdown(badge_html, unsafe_allow_html=True)
+            st.dataframe(pd.DataFrame(detections))
         else:
-            st.dataframe(pd.DataFrame([
-                {"time": i.get("time"), "publisher": i.get("publisher"), "tone": f"{i.get('emoji')} {i.get('tone')}", "title": i.get("title"), "link": i.get("link")}
-                for i in scored
-            ]))
-    else:
-        st.info('Enable Sentiment Panel from the sidebar.')
+            st.info("No patterns detected.")
 
-with education_tab:
-    st.subheader('📚 CamboAI Trading Education Hub')
-    
-    # Import education module
-    from modules.education_module import pattern_glossary, TUTORIALS, TIP_MAP
-    
-    tab1, tab2, tab3 = st.tabs(["🔍 Pattern Glossary", "📖 Tutorials", "💡 Tips & Tricks"])
-    
-    with tab1:
-        st.subheader("Candlestick Pattern Reference")
-        glossary = pattern_glossary()
-        
-        # Search functionality
-        search_term = st.text_input("🔍 Search patterns:", placeholder="e.g., hammer, doji, engulfing")
-        
-        if search_term:
-            filtered_glossary = {k: v for k, v in glossary.items() 
-                               if search_term.lower() in k.lower() or search_term.lower() in v.lower()}
+def render_harmonic_outline(df: pd.DataFrame):
+    st.markdown("### Harmonic Engine")
+    harm_names = [p.name for p in pattern_registry.all() if p.family == "Harmonic"]
+    if st.button("Scan Harmonics"):
+        from modules.chart_patterns import detect_all_patterns
+        det = detect_all_patterns(df, include=harm_names)
+        if det:
+            st.success(f"{len(det)} harmonic matches")
+            st.dataframe(pd.DataFrame(det))
         else:
-            filtered_glossary = glossary
-        
-        # Display patterns in expandable cards
-        for pattern_name, description in filtered_glossary.items():
-            with st.expander(f"🕯️ {pattern_name}"):
-                st.write(description)
-                
-                # Add visual indicators for pattern type
-                if "bullish" in description.lower():
-                    st.success("📈 **Bullish Pattern** - Potential upward movement")
-                elif "bearish" in description.lower():
-                    st.error("📉 **Bearish Pattern** - Potential downward movement")
+            st.info("No harmonic matches with current thresholds.")
+
+# ---------------- Ratio Heatmap (Refined) ----------------
+def render_ratio_heatmap():
+    import sqlite3, json, pandas as pd, numpy as np, io
+    st.subheader("Harmonic Ratio Heatmap (Refined)")
+    if plt is None:
+        st.error("matplotlib not installed. Run: pip install matplotlib")
+        return
+    if KMeans is None:
+        st.error("scikit-learn not installed. Run: pip install scikit-learn")
+        return
+    ratio_keys_all = ["B_XA","D_XA","D_XA_ext","AB_CD_equality","AD_BC_ratio"]
+    dbp = st.text_input("DB Path", "data/pattern_detections.db", key="db_heatmap")
+    ratio_keys = st.multiselect("Ratios", ratio_keys_all, default=ratio_keys_all[:3])
+    norm_mode = st.selectbox("Normalization", ["zscore","minmax","none"], index=0)
+    k = st.slider("Clusters (k)", 2, 10, 4)
+    conf_min = st.slider("Min Confidence", 0.0, 1.0, 0.6, 0.01)
+    if not ratio_keys:
+        st.info("Select ratios.")
+        return
+    try:
+        with sqlite3.connect(dbp) as c:
+            rows = c.execute("SELECT pattern, ratios, confidence FROM harmonic_detections").fetchall()
+    except Exception as e:
+        st.error(f"DB error: {e}")
+        return
+    data=[]
+    for pattern, rj, conf in rows:
+        if conf < conf_min: continue
+        try:
+            rdict=json.loads(rj)
+            row={"pattern":pattern,"confidence":conf}
+            for rk in ratio_keys:
+                if rk in rdict: row[rk]=rdict[rk]
+            if len(row)>2: data.append(row)
+        except:
+            pass
+    if not data:
+        st.warning("No data after filters.")
+        return
+    df = pd.DataFrame(data).dropna(subset=ratio_keys)
+    if df.empty:
+        st.info("No rows after NaN drop.")
+        return
+    X = df[ratio_keys].values
+    km = KMeans(n_clusters=k, n_init="auto", random_state=42)
+    df["cluster"] = km.fit_predict(X)
+    piv = df.groupby("pattern")[ratio_keys].mean()
+    if norm_mode == "zscore":
+        M = (piv - piv.mean())/(piv.std(ddof=0)+1e-9)
+    elif norm_mode == "minmax":
+        M = (piv - piv.min())/(piv.max()-piv.min()+1e-9)
+    else:
+        M = piv.copy()
+    fig,ax=plt.subplots(figsize=(1+0.9*len(ratio_keys), 0.5+0.4*len(M)))
+    mat=M.values
+    im=ax.imshow(mat,cmap="coolwarm",aspect="auto")
+    ax.set_yticks(range(len(M.index))); ax.set_yticklabels(M.index,fontsize=7)
+    ax.set_xticks(range(len(ratio_keys))); ax.set_xticklabels(ratio_keys,rotation=35,ha="right",fontsize=7)
+    for i in range(mat.shape[0]):
+        for j in range(mat.shape[1]):
+            val=mat[i,j]
+            ax.text(j,i,f"{val:.2f}",ha="center",va="center",fontsize=6,color="black" if abs(val)<0.9 else "white")
+    plt.colorbar(im,ax=ax,fraction=0.025,pad=0.02)
+    buf=io.BytesIO(); plt.tight_layout(); fig.savefig(buf,format="png",dpi=130)
+    st.image(buf.getvalue())
+    st.dataframe(df[["pattern","cluster","confidence"]+ratio_keys].head(100))
+    c1,c2,c3 = st.columns(3)
+    if c1.button("Export CSV"):
+        st.download_button("Download CSV", df.to_csv(index=False), file_name="ratios_refined.csv")
+    if c2.button("Export JSON"):
+        st.download_button("Download JSON", df.to_json(orient="records"), file_name="ratios_refined.json", mime="application/json")
+    if c3.button("Export Pivot"):
+        st.download_button("Download Pivot CSV", piv.to_csv(), file_name="ratios_pivot.csv")
+
+# ---------------- Education ----------------
+def render_education_tab():
+    st.header("Education")
+    st.write("Quick lessons and references for patterns, risk, and strategies.")
+
+    # Progress tracking (per user session)
+    if "edu_progress" not in st.session_state:
+        st.session_state.edu_progress = {}
+
+    # Search docs
+    query = st.text_input("Search modules", "")
+
+    # Module catalog
+    modules = [
+        ("curriculum", "Curriculum", "d:/CamboAI/docs/education/curriculum.md"),
+        ("technical-analysis", "Technical Analysis", "d:/CamboAI/docs/education/modules/technical-analysis.md"),
+        ("risk-management", "Risk Management", "d:/CamboAI/docs/education/modules/risk-management.md"),
+        ("asset-classes", "Asset Classes", "d:/CamboAI/docs/education/modules/asset-classes.md"),
+        ("scalping", "Scalping Playbook", "d:/CamboAI/docs/education/modules/scalping.md"),
+        ("scalping-advanced", "Scalping Advanced", "d:/CamboAI/docs/education/modules/scalping-advanced.md"),
+        ("trend-swing", "Trend/Swing Playbook", "d:/CamboAI/docs/education/modules/trend-swing-playbook.md"),
+        ("vwap", "VWAP Strategies", "d:/CamboAI/docs/education/modules/vwap-strategies.md"),
+        ("options-basics", "Options Basics", "d:/CamboAI/docs/education/modules/options-basics.md"),
+        ("options-advanced", "Options Advanced", "d:/CamboAI/docs/education/modules/options-advanced.md"),
+        ("fx-futures", "FX/Futures Nuances", "d:/CamboAI/docs/education/modules/fx-futures-nuances.md"),
+        ("backtest-journal", "Backtesting & Journaling", "d:/CamboAI/docs/education/modules/backtesting-journaling.md"),
+    ]
+
+    # Filter by search
+    filtered = modules
+    if query:
+        q = query.lower()
+        filtered = [m for m in modules if q in m[1].lower() or q in m[2].lower()]
+
+    # Module list with progress
+    sel = st.selectbox("Modules", [m[1] for m in filtered])
+
+    # Render selected module
+    chosen = next((m for m in filtered if m[1] == sel), None)
+    content = None
+    if chosen:
+        try:
+            with open(chosen[2], "r", encoding="utf-8") as f:
+                content = f.read()
+        except Exception as e:
+            st.error(f"Failed to load module: {e}")
+    if content:
+        st.markdown(content)
+        k = f"done:{chosen[0]}"
+        done = st.checkbox("Mark completed", value=bool(st.session_state.edu_progress.get(k)), key=k)
+        st.session_state.edu_progress[k] = done
+
+    st.markdown("---")
+    col1,col2 = st.columns(2)
+    with col1:
+        st.subheader("Candlestick Basics")
+        st.markdown("- Bullish/Bearish candles\n- Doji, Hammer, Engulfing\n- Support/Resistance")
+        if st.button("Show Examples"):
+            df = synthetic_price_df(200)
+            st.line_chart(df["close"])    
+    with col2:
+        st.subheader("Risk Management")
+        st.markdown("- Position sizing\n- Stop loss / Take profit\n- Risk/Reward ratio")
+        risk = st.slider("Risk per trade (%)", 0.1, 5.0, 1.0, 0.1)
+        st.info(f"Recommended: Keep risk per trade under {risk:.1f}% based on your plan.")
+
+    st.markdown("---")
+    st.subheader("Pattern Library")
+    try:
+        names = [p.name for p in pattern_registry.all()][:50]
+        st.write(names)
+    except Exception:
+        st.write("Pattern registry not available.")
+
+# ---------------- Screener ----------------
+def render_screener_tab():
+    st.header("Screener")
+    st.write("Scan a watchlist and flag technical conditions.")
+    symbols = st.text_area("Symbols (comma-separated)", "AAPL,MSFT,TSLA,NVDA,SPY").replace(" ","")
+    provider = st.selectbox("Provider", ["yfinance","alpha_vantage"], index=0)
+    interval = st.selectbox("Interval", ["1d","1h","15m"], index=0)
+    period = st.selectbox("Period", ["1mo","3mo","6mo","1y"], index=0)
+    # Filters
+    colf1, colf2, colf3 = st.columns(3)
+    with colf1:
+        rsi_min = st.number_input("RSI min", value=30)
+        rsi_max = st.number_input("RSI max", value=70)
+    with colf2:
+        macd_cross = st.selectbox("MACD", ["any","bullish_cross","bearish_cross"], index=0)
+    with colf3:
+        sort_by = st.selectbox("Sort by", ["symbol","close","rsi","macd_hist","pct_from_ma20","atr_pct"], index=0)
+    # Extra filters
+    colx1, colx2, colx3 = st.columns(3)
+    with colx1:
+        ma_cross = st.selectbox("MA Cross", ["any","price>ma20","price<ma20"], index=0)
+    with colx2:
+        pct_from_ma_thr = st.number_input("% from MA20 (abs <=)", value=5.0)
+    with colx3:
+        atr_pct_thr = st.number_input("ATR % of price (<=)", value=3.0)
+    export_holder = st.empty()
+    if st.button("Run Screener"):
+        rows = []
+        for sym in symbols.split(','):
+            df = fetch_live_ohlc(sym, provider=provider, interval=interval, period=period)
+            if df is None or df.empty:
+                rows.append({"symbol":sym, "status":"no data"})
+                continue
+            close = df["close"].iloc[-1]
+            # Indicators
+            delta = df["close"].diff()
+            gain = (delta.clip(lower=0)).rolling(14).mean()
+            loss = (-delta.clip(upper=0)).rolling(14).mean()
+            rs = gain / (loss + 1e-9)
+            rsi = 100 - (100 / (1 + rs))
+            rsi_val = float(rsi.iloc[-1]) if not rsi.empty else None
+            ema12 = df["close"].ewm(span=12, adjust=False).mean()
+            ema26 = df["close"].ewm(span=26, adjust=False).mean()
+            macd = ema12 - ema26
+            signal = macd.ewm(span=9, adjust=False).mean()
+            hist = macd - signal
+            macd_hist = float(hist.iloc[-1]) if not hist.empty else None
+            macd_cross_sig = None
+            if len(hist) >= 2:
+                prev = hist.iloc[-2]
+                cur = hist.iloc[-1]
+                if prev <= 0 and cur > 0: macd_cross_sig = "bullish_cross"
+                elif prev >= 0 and cur < 0: macd_cross_sig = "bearish_cross"
+                else: macd_cross_sig = "any"
+            ma20 = df["close"].rolling(20).mean().iloc[-1]
+            atr = (df["high"]-df["low"]).rolling(14).mean().iloc[-1]
+            trend = "up" if close > ma20 else "down"
+            pct_from_ma20 = float((close - ma20) / ma20 * 100) if ma20 else None
+            atr_pct = float(atr / close * 100) if close else None
+            row = {"symbol":sym, "close":float(close), "rsi":rsi_val, "macd_hist":macd_hist, "macd_cross":macd_cross_sig, "ma20":float(ma20), "atr":float(atr), "trend":trend, "pct_from_ma20":pct_from_ma20, "atr_pct":atr_pct}
+            # Apply filters
+            ok = True
+            if rsi_val is not None and not (rsi_min <= rsi_val <= rsi_max):
+                ok = False
+            if macd_cross != "any" and macd_cross_sig is not None and macd_cross_sig != macd_cross:
+                ok = False
+            if ma_cross == "price>ma20" and not (close > ma20):
+                ok = False
+            if ma_cross == "price<ma20" and not (close < ma20):
+                ok = False
+            if pct_from_ma20 is not None and abs(pct_from_ma20) > pct_from_ma_thr:
+                ok = False
+            if atr_pct is not None and atr_pct > atr_pct_thr:
+                ok = False
+            if ok:
+                rows.append(row)
+        if rows:
+            df_out = pd.DataFrame(rows)
+            if sort_by in df_out.columns:
+                df_out = df_out.sort_values(sort_by, ascending=True if sort_by in ("symbol","trend") else False)
+            st.dataframe(df_out)
+            csv_bytes = df_out.to_csv(index=False).encode()
+            export_holder.download_button("Download CSV", csv_bytes, file_name="screener.csv")
+
+# ---------------- Debate Room ----------------
+def render_debate_room_tab():
+    st.header("Debate Room")
+    st.write("Collaborative idea board. Share tickers and trade theses.")
+    if "debate_msgs" not in st.session_state:
+        st.session_state.debate_msgs = []
+
+    # Room selector and pagination
+    room = st.selectbox("Room", ["debate","stocks","crypto","options","forex","futures","lounge"], index=0)
+    page = st.number_input("Page", min_value=1, value=1, step=1)
+    page_size = st.selectbox("Page size", [25, 50, 100, 200], index=1)
+
+    if st.button("Refresh Board"):
+        try:
+            r = requests.get(f"http://127.0.0.1:8000/api/community/history/{room}", timeout=10)
+            msgs = r.json()
+            # Simple client-side pagination
+            start = (page-1) * page_size
+            end = start + page_size
+            msgs = msgs[start:end]
+            st.session_state.debate_msgs = [
+                {"user":m.get("user_id","anon"), "ticker":"", "side":"", "text":m.get("text",""), "ts":m.get("timestamp","")}
+                for m in msgs
+            ]
+        except Exception as e:
+            st.warning(f"Refresh failed: {e}")
+
+    with st.form("debate_form"):
+        user = st.text_input("Name", "Trader")
+        ticker = st.text_input("Ticker", "AAPL")
+        thesis = st.text_area("Thesis", "Breakout above resistance with volume.")
+        side = st.selectbox("Bias", ["Bullish","Bearish","Neutral"], index=0)
+        # Attachment placeholder (future: upload to backend)
+        st.file_uploader("Attachment (optional)", type=["png","jpg","pdf"], accept_multiple_files=False, key="debate_attach")
+        submitted = st.form_submit_button("Post")
+        if submitted:
+            try:
+                payload = {"room":room,"user_id":user,"text":f"[{ticker.upper()}][{side}] {thesis}"}
+                r = requests.post("http://127.0.0.1:8000/api/community/post", json=payload, timeout=10)
+                if r.ok:
+                    flags = r.json().get("redactions", {})
+                    if any(flags.values()):
+                        st.warning("Message was sanitized for PII or sensitive content.")
+                    else:
+                        st.success("Posted!")
                 else:
-                    st.info("⚖️ **Neutral Pattern** - Context-dependent interpretation")
-        
-        if not filtered_glossary:
-            st.info("No patterns found matching your search term.")
-    
-    with tab2:
-        st.subheader("Trading Curriculum")
-        
-        # Level filter
-        level_filter = st.selectbox("Filter by level:", ["All", "Beginner", "Intermediate", "Advanced"])
-        
-        filtered_tutorials = TUTORIALS if level_filter == "All" else [t for t in TUTORIALS if t["level"] == level_filter]
-        
-        for i, tutorial in enumerate(filtered_tutorials, 1):
-            level_emoji = {"Beginner": "🌱", "Intermediate": "🚀", "Advanced": "🎯"}.get(tutorial["level"], "📚")
-            
-            with st.expander(f"{i}. {level_emoji} {tutorial['title']} ({tutorial['level']})"):
-                st.write(tutorial["content"])
-                
-                # Progress tracking (simple demo)
-                if st.button(f"Mark as completed", key=f"tutorial_{i}"):
-                    st.success(f"✅ Completed: {tutorial['title']}")
-    
-    with tab3:
-        st.subheader("Professional Trading Tips")
-        
-        tip_category = st.selectbox("Select category:", ["All"] + list(TIP_MAP.keys()))
-        
-        if tip_category == "All":
-            for category, tip in TIP_MAP.items():
-                st.info(f"**{category.title()}**: {tip}")
+                    st.error(f"Post failed: {r.status_code}")
+            except Exception as e:
+                st.error(f"Post failed: {e}")
+            st.session_state.debate_msgs.append({"user":user, "ticker":ticker.upper(), "side":side, "text":thesis, "ts":datetime.utcnow().isoformat()})
+
+    if st.session_state.debate_msgs:
+        st.subheader("Board")
+        st.dataframe(pd.DataFrame(st.session_state.debate_msgs))
+
+# ---------------- Options Tab ----------------
+def render_options_tab():
+    import requests
+    st.header("Options")
+    symbol = st.text_input("Symbol", "AAPL", key="opt_symbol")
+    token = st.text_input("Tradier Token (optional)", type="password")
+    colA,colB,colC = st.columns(3)
+    expiry = st.text_input("Expiry (YYYY-MM-DD optional)")
+    if colA.button("Expirations"):
+        r=requests.get("http://127.0.0.1:8000/options/expirations", params={"symbol":symbol}, headers={"token":token})
+        st.write(r.json())
+    if colB.button("Chain"):
+        r = requests.get("http://127.0.0.1:8000/options/chain", params={"symbol":symbol,"expiry":expiry})
+        js = r.json()
+        st.write(f"Rows: {js.get('rows')}")
+        if js.get("chain"):
+            df = pd.DataFrame(js["chain"])
+            st.dataframe(df.head(50))
+    if colC.button("Chain + Greeks"):
+        r = requests.get("http://127.0.0.1:8000/options/chain/with_greeks", params={"symbol":symbol,"underlying":100,"expiry":expiry})
+        js=r.json()
+        df=pd.DataFrame(js.get("chain",[]))
+        st.dataframe(df.head(50))
+    st.markdown("---")
+    if st.button("Analytics"):
+        r = requests.get("http://127.0.0.1:8000/options/analytics", params={"symbol":symbol,"expiry":expiry})
+        js = r.json()
+        st.subheader("Skew")
+        st.json(js.get("skew"))
+        iv_hist = js.get("iv_history") or []
+        if iv_hist:
+            iv_df = pd.DataFrame(iv_hist)
+            iv_df['ts'] = pd.to_datetime(iv_df['ts'])
+            st.line_chart(iv_df.set_index("ts")["avg_iv"])
+        st.subheader("Greeks Stats")
+        st.json(js.get("greeks_stats"))
+
+# ---------------- Order Ticket ----------------
+def render_order_ticket():
+    from modules.brokers.base import registry as broker_registry
+    st.subheader("Order Ticket")
+    broker = st.selectbox("Broker", broker_registry.names())
+    symbol = st.text_input("Order Symbol", "AAPL")
+    side = st.selectbox("Side", ["buy","sell"])
+    qty = st.number_input("Qty", value=1.0)
+    col1,col2,col3 = st.columns(3)
+    if col1.button("Place"):
+        payload = {"broker":broker,"symbol":symbol,"side":side,"qty":qty}
+        r = requests.post("http://127.0.0.1:8000/orders/place", json=payload)
+        st.json(r.json())
+    if col2.button("List"):
+        r = requests.get("http://127.0.0.1:8000/orders/list")
+        st.json(r.json())
+    if col3.button("Start Orders WS"):
+        start_orders_ws()
+    # Live orders table
+    orders_live = st.session_state.get("orders_live") or []
+    if orders_live:
+        st.markdown("Live Orders (WS)")
+        st.dataframe(pd.DataFrame(orders_live))
+
+# ---------------- Secrets / 2FA UI ----------------
+def render_secrets_section():
+    st.subheader("Broker Secrets / 2FA")
+    code = st.text_input("2FA Code (admin)", type="password")
+    with st.expander("Enable 2FA"):
+        if st.button("Generate 2FA Secret"):
+            r = requests.post("http://127.0.0.1:8000/brokers/secrets/2fa/enable")
+            st.json(r.json())
+    with st.expander("Verify 2FA"):
+        if st.button("Verify Code"):
+            r = requests.get("http://127.0.0.1:8000/brokers/secrets/2fa/verify", params={"code":code})
+            st.json(r.json())
+    with st.expander("Rotate Master Key (requires 2FA)"):
+        if st.button("Rotate Key"):
+            r = requests.post("http://127.0.0.1:8000/brokers/secrets/rotate_master", params={"code":code})
+            st.json(r.json())
+    with st.expander("Export Audit (JSON)"):
+        if st.button("Export Audit"):
+            r = requests.get("http://127.0.0.1:8000/brokers/secrets/audit/export", params={"format":"json","code":code})
+            st.json(r.json())
+
+# ---------------- Settings / Brokerage ----------------
+def render_settings_tab():
+    from modules.brokers.base import registry as broker_registry
+    st.header("Settings / Brokerage / Admin")
+    st.write("Build:", APP_BUILD_TAG)
+    st.subheader("Broker Configure")
+    brokers = broker_registry.names()
+    if not brokers:
+        st.info("No brokers registered.")
+        return
+    broker = st.selectbox("Broker", brokers, key="broker_select")
+    c1,c2,c3,c4 = st.columns(4)
+    key = c1.text_input("API Key", type="password")
+    secret = c2.text_input("Secret", type="password")
+    token = c3.text_input("Token", type="password")
+    paper = c4.checkbox("Paper (Alpaca)", value=True)
+    host = st.text_input("Host", value="127.0.0.1")
+    port = st.number_input("Port", value=4001)
+    twofa = st.text_input("2FA Code (for secrets)", type="password", key="2fa_conf")
+    if st.button("Configure Broker"):
+        payload = {"broker":broker,"key":key,"secret":secret,"token":token,"host":host,"port":port,"paper":paper}
+        r = requests.post("http://127.0.0.1:8000/brokers/configure", json=payload, timeout=10)
+        st.json(r.json())
+    if st.button("Account Info"):
+        r = requests.get(f"http://127.0.0.1:8000/brokers/account/{broker}", timeout=10)
+        st.json(r.json())
+    with st.expander("Store Secret (2FA required)"):
+        b_key_id = st.text_input("Secret Key ID", "API_KEY")
+        b_val = st.text_input("Secret Value", type="password")
+        if st.button("Store Secret"):
+            r = requests.post("http://127.0.0.1:8000/brokers/secrets/set",
+                              params={"broker":broker,"key_id":b_key_id,"value":b_val,"code":twofa})
+            st.json(r.json())
+    render_secrets_section()
+    st.markdown("---")
+    render_order_ticket()
+    st.markdown("---")
+    render_options_tab()
+
+# ---------------- Chart / Dashboard ----------------
+def render_main_chart_section(price_df):
+    st.subheader("Charts")
+    if "chart_symbol" not in st.session_state:
+        st.session_state.chart_symbol = "NASDAQ:AAPL"
+    symbol_in = st.text_input("Symbol (TradingView style)", st.session_state.chart_symbol)
+    st.session_state.chart_symbol = symbol_in
+    c1,c2,c3,c4,c5 = st.columns([1.2,1,1,1,1])
+    with c1:
+        provider = st.selectbox("Data Provider", ["yfinance","ccxt","alpha_vantage"], index=0)
+    with c2:
+        interval = st.selectbox("Interval", ["1d","60","240","1h","4h"], index=0)
+    with c3:
+        multi = st.toggle("Multi View", True)
+    with c4:
+        theme_dark = st.toggle("Dark", True)
+    with c5:
+        ext_ws = st.toggle("External WS", False)
+    base_symbol = symbol_in.split(":")[-1]
+    live_df = fetch_live_ohlc(base_symbol, provider=provider,
+                              interval="1d" if interval == "1d" else ("60" if interval in ("60","1h") else "1d"))
+    data_df = live_df if live_df is not None and not live_df.empty else price_df
+    # TradingView placeholders (assume implemented elsewhere)
+    try:
+        if multi:
+            from modules.chart_providers.tradingview import tradingview_multi
+            tradingview_multi(symbol=symbol_in, intervals=["60","240","D"], theme="dark" if theme_dark else "light")
         else:
-            st.info(f"**{tip_category.title()}**: {TIP_MAP[tip_category]}")
-        
-        st.divider()
-        st.subheader("Quick Reference Card")
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown("""
-            **🟢 Bullish Signals**
-            - Hammer after downtrend
-            - Bullish engulfing
-            - Golden cross (MA)
-            - RSI oversold recovery
-            """)
-        
-        with col2:
-            st.markdown("""
-            **🔴 Bearish Signals**
-            - Shooting star after uptrend
-            - Bearish engulfing
-            - Death cross (MA)
-            - RSI overbought decline
-            """)
-        
-        st.divider()
-        st.markdown("""
-        ### 🎯 **Risk Management Essentials**
-        1. **Position Sizing**: Never risk more than 1-2% per trade
-        2. **Stop Losses**: Always define your exit before entry
-        3. **Risk/Reward**: Target at least 2:1 reward-to-risk ratio
-        4. **Diversification**: Don't put all eggs in one basket
-        5. **Emotional Control**: Stick to your plan, avoid FOMO
-        """)
-        
-        st.caption("💡 Remember: Consistent small wins beat occasional big wins in trading!")
+            from modules.chart_providers.tradingview import tradingview_widget
+            tradingview_widget(symbol=symbol_in, interval="60", theme="dark" if theme_dark else "light")
+    except Exception:
+        st.warning("TradingView widget module not found or errored.")
+    # Live ticker
+    if st.toggle("Live Ticker", value=False, key="live_ticker_toggle"):
+        start_ws_listener(base_symbol, external=ext_ws)
+        tick = st.session_state.get("latest_tick")
+        if tick:
+            st.metric(label=f"{tick['symbol']} Live Close", value=f"{tick.get('close',tick.get('price',0)):.2f}")
+        else:
+            st.write("Waiting for tick...")
+    render_pattern_markers(data_df)
+    render_harmonic_outline(data_df)
+
+# ---------------- Analytics Tab ----------------
+def render_analytics_tab():
+    st.header("Analytics")
+    render_ratio_heatmap()
+
+# ---------------- Navigation ----------------
+def sidebar_nav():
+    st.sidebar.title("CamboAI")
+    st.sidebar.caption(f"Build: {APP_BUILD_TAG}")
+    nav = st.sidebar.radio("Navigation", ["Dashboard","Analytics","Education","Screener","Debate Room","Settings"])
+    st.session_state.nav_choice = nav
+    return nav
+
+nav_choice = sidebar_nav()
+
+# Root synthetic data (fallback)
+base_df = synthetic_price_df()
+
+if nav_choice == "Dashboard":
+    render_main_chart_section(base_df)
+elif nav_choice == "Analytics":
+    render_analytics_tab()
+elif nav_choice == "Education":
+    render_education_tab()
+elif nav_choice == "Screener":
+    render_screener_tab()
+elif nav_choice == "Debate Room":
+    render_debate_room_tab()
+elif nav_choice == "Settings":
+    render_settings_tab()
+else:
+    st.write("Unknown section.")
+
+# Footer
+st.sidebar.markdown("---")
+st.sidebar.write("© 2025 CamboAI (Dev Build)")
