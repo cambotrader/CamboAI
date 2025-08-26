@@ -5,6 +5,7 @@ import numpy as np
 import requests
 import streamlit as st
 
+HEAD
 # External libs for visuals / clustering (guarded)
 try:
     import matplotlib
@@ -13,6 +14,11 @@ try:
 except ImportError:
     matplotlib = None
     plt = None
+# External libs for visuals / clustering
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+main
 
 try:
     from sklearn.cluster import KMeans
@@ -155,6 +161,7 @@ def render_harmonic_outline(df: pd.DataFrame):
 
 # ---------------- Ratio Heatmap (Refined) ----------------
 def render_ratio_heatmap():
+HEAD
     import sqlite3, json, pandas as pd, numpy as np, io
     st.subheader("Harmonic Ratio Heatmap (Refined)")
     if plt is None:
@@ -163,6 +170,9 @@ def render_ratio_heatmap():
     if KMeans is None:
         st.error("scikit-learn not installed. Run: pip install scikit-learn")
         return
+    st.subheader("Harmonic Ratio Heatmap (Refined)")
+    import sqlite3, json
+main
     ratio_keys_all = ["B_XA","D_XA","D_XA_ext","AB_CD_equality","AD_BC_ratio"]
     dbp = st.text_input("DB Path", "data/pattern_detections.db", key="db_heatmap")
     ratio_keys = st.multiselect("Ratios", ratio_keys_all, default=ratio_keys_all[:3])
@@ -196,6 +206,12 @@ def render_ratio_heatmap():
     if df.empty:
         st.info("No rows after NaN drop.")
         return
+HEAD
+=======
+    if KMeans is None:
+        st.error("scikit-learn not installed.")
+        return
+main
     X = df[ratio_keys].values
     km = KMeans(n_clusters=k, n_init="auto", random_state=42)
     df["cluster"] = km.fit_predict(X)
@@ -227,6 +243,7 @@ def render_ratio_heatmap():
     if c3.button("Export Pivot"):
         st.download_button("Download Pivot CSV", piv.to_csv(), file_name="ratios_pivot.csv")
 
+HEAD
 # ---------------- Education ----------------
 def render_education_tab():
     st.header("Education")
@@ -440,6 +457,7 @@ def render_debate_room_tab():
         st.subheader("Board")
         st.dataframe(pd.DataFrame(st.session_state.debate_msgs))
 
+main
 # ---------------- Options Tab ----------------
 def render_options_tab():
     import requests
@@ -613,7 +631,10 @@ def render_analytics_tab():
 def sidebar_nav():
     st.sidebar.title("CamboAI")
     st.sidebar.caption(f"Build: {APP_BUILD_TAG}")
+HEAD
     nav = st.sidebar.radio("Navigation", ["Dashboard","Analytics","Education","Screener","Debate Room","Settings"])
+    nav = st.sidebar.radio("Navigation", ["Dashboard","Analytics","Settings"])
+main
     st.session_state.nav_choice = nav
     return nav
 
@@ -626,12 +647,14 @@ if nav_choice == "Dashboard":
     render_main_chart_section(base_df)
 elif nav_choice == "Analytics":
     render_analytics_tab()
+HEAD
 elif nav_choice == "Education":
     render_education_tab()
 elif nav_choice == "Screener":
     render_screener_tab()
 elif nav_choice == "Debate Room":
     render_debate_room_tab()
+main
 elif nav_choice == "Settings":
     render_settings_tab()
 else:
@@ -639,4 +662,8 @@ else:
 
 # Footer
 st.sidebar.markdown("---")
+HEAD
 st.sidebar.write("© 2025 CamboAI (Dev Build)")
+
+st.sidebar.write("© 2025 CamboAI (Dev Build)")
+main
