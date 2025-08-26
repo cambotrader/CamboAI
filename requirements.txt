@@ -5,3 +5,4 @@ plotly>=5.22.0
 ta>=0.10.2
 setuptools>=65.0.0
 wheel>=0.38.0
+matplotlib
