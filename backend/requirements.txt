@@ -35,7 +35,7 @@ prometheus-client==0.17.1
 loguru==0.7.0
 prometheus-fastapi-instrumentator==5.8.2
 psycopg2-binary==2.9.10
-numpy==1.24.2
+numpy==1.22.4
 
 
 
