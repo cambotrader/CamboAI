@@ -35,3 +35,8 @@ async def create_rule(alert: Alert):
 @router.post("/run")
 async def run_once() -> Dict[str, Any]:
     return await alerts_service.evaluate_once()
+
+@router.get("/triggers")
+async def recent_triggers() -> Dict[str, Any]:
+    # Read last results from log store if available; phase-1 returns empty list
+    return {"items": []}

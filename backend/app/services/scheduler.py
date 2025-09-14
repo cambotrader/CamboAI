@@ -18,6 +18,7 @@ class Scheduler:
         self._running = True
         # Add periodic jobs here
         self._tasks.append(asyncio.create_task(self._job_ingest_specs()))
+        self._tasks.append(asyncio.create_task(self._job_alerts_eval()))
 
     async def _job_ingest_specs(self) -> None:
         # Run every 4 hours
@@ -37,6 +38,21 @@ class Scheduler:
             except Exception as e:
                 log_progress("ingest", "auto_error", details=str(e))
             await asyncio.sleep(interval_sec)
+
+    
+        async def _job_alerts_eval(self) -> None:
+            # Run every 60 seconds
+            interval_sec = 60
+            await asyncio.sleep(10)
+            while self._running:
+                try:
+                    from app.services import alerts_service
+                    res = await alerts_service.evaluate_once()
+                    if res.get("triggered"):
+                        log_progress("alerts", "triggered", details=str(res.get("triggered")[:3]))
+                except Exception as e:
+                    log_progress("alerts", "error", details=str(e))
+                await asyncio.sleep(interval_sec)
 
     async def stop(self) -> None:
         self._running = False

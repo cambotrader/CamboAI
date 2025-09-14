@@ -226,6 +226,10 @@ from .api.options import hedging_router as options_hedging_router
 app.include_router(options_router.router)
 app.include_router(options_hedging_router.router)
 
+# Broker - Alpaca (v1)
+from .api import broker_alpaca_v1 as broker_alpaca_router
+app.include_router(broker_alpaca_router.router)
+
 # Optional v1 community chat (already present under /api/community)
 from .api import community_chat as community_router
 app.include_router(community_router.router)
