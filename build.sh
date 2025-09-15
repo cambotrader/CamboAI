@@ -1,31 +1,18 @@
 #!/bin/bash
 # build.sh for Render deployment
 
-# Exit on error and print commands
-set -ex
+# Exit on error
+set -e
 
-# Install system dependencies
-apt-get update
-apt-get install -y build-essential wget curl libc6-dev
-
-# Download and install TA-Lib
-echo "Downloading TA-Lib..."
-wget -q http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz
-echo "Extracting TA-Lib..."
-tar -xzf ta-lib-0.4.0-src.tar.gz
-cd ta-lib/
-echo "Configuring TA-Lib..."
-./configure --prefix=/usr
-echo "Building TA-Lib..."
-make
-echo "Installing TA-Lib..."
-make install
-cd ..
-rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
+echo "Starting build process..."
 
 # Install Python dependencies
 echo "Upgrading pip and setuptools..."
 pip install --upgrade pip setuptools wheel
+
+# Install TA-Lib using pip
+echo "Installing TA-Lib using pip..."
+pip install TA-Lib
 
 echo "Installing backend requirements..."
 if [ -f "backend/requirements.txt" ]; then
