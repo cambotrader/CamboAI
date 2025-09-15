@@ -10,8 +10,8 @@ pip install --only-binary=numpy numpy==1.24.3
 # Install TA-Lib
 pip install TA-Lib
 
-# Install Uvicorn (this was missing)
-pip install uvicorn
+# Install FastAPI and Uvicorn
+pip install fastapi uvicorn
 
 # Install other requirements
 if [ -f "backend/requirements.txt" ]; then
