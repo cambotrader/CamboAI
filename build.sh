@@ -4,25 +4,6 @@
 # Exit on error and print commands
 set -ex
 
-# Install system dependencies
-apt-get update
-apt-get install -y build-essential wget curl libc6-dev
-
-# Download and install TA-Lib
-echo "Downloading TA-Lib..."
-wget -q http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz
-echo "Extracting TA-Lib..."
-tar -xzf ta-lib-0.4.0-src.tar.gz
-cd ta-lib/
-echo "Configuring TA-Lib..."
-./configure --prefix=/usr
-echo "Building TA-Lib..."
-make
-echo "Installing TA-Lib..."
-make install
-cd ..
-rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
-
 # Install Python dependencies
 echo "Upgrading pip and setuptools..."
 pip install --upgrade pip setuptools wheel
@@ -30,6 +11,10 @@ pip install --upgrade pip setuptools wheel
 # Install NumPy the easy way (binary wheel)
 echo "Installing NumPy binary wheel..."
 pip install --only-binary=numpy numpy==1.24.3
+
+# Install TA-Lib using pip (instead of building from source)
+echo "Installing TA-Lib using pip..."
+pip install TA-Lib
 
 # Install all required packages explicitly
 echo "Installing critical dependencies..."
