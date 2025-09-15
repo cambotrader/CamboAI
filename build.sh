@@ -1,4 +1,3 @@
-Set-Content -Path "d:\CamboAI\build.sh" -Value @"
 #!/bin/bash
 # build.sh for Render deployment
 
@@ -53,4 +52,3 @@ if [ -f "requirements.txt" ]; then
 fi
 
 echo "Build completed successfully!"
-"@
