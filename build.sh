@@ -8,11 +8,11 @@ set -ex
 echo "Upgrading pip and setuptools..."
 pip install --upgrade pip setuptools wheel
 
-# Install NumPy the easy way (binary wheel)
+# Install NumPy first, using a version known to have binary wheels
 echo "Installing NumPy binary wheel..."
-pip install --only-binary=numpy numpy==1.24.3
+pip install numpy==1.22.4 --no-build-isolation
 
-# Install TA-Lib using pip (instead of building from source)
+# Install TA-Lib using pip
 echo "Installing TA-Lib using pip..."
 pip install TA-Lib
 
@@ -23,7 +23,10 @@ pip install fastapi==0.68.0 uvicorn==0.15.0 prometheus-client sentry-sdk slowapi
 # Install backend requirements
 echo "Installing backend requirements..."
 if [ -f "backend/requirements.txt" ]; then
-    pip install -r backend/requirements.txt
+    # Temporarily create a version without numpy (since we already installed it)
+    grep -v "numpy" backend/requirements.txt > backend/requirements_without_numpy.txt
+    pip install -r backend/requirements_without_numpy.txt
+    rm backend/requirements_without_numpy.txt
 else
     echo "WARNING: backend/requirements.txt not found!"
     # Try to find requirements.txt in other locations
@@ -33,7 +36,10 @@ fi
 # Install any additional requirements
 if [ -f "requirements.txt" ]; then
     echo "Installing root requirements..."
-    pip install -r requirements.txt
+    # Temporarily create a version without numpy (since we already installed it)
+    grep -v "numpy" requirements.txt > requirements_without_numpy.txt
+    pip install -r requirements_without_numpy.txt
+    rm requirements_without_numpy.txt
 fi
 
 echo "Build completed successfully!"
