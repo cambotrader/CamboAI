@@ -1,23 +1,56 @@
+Set-Content -Path "d:\CamboAI\build.sh" -Value @"
 #!/bin/bash
-# Simple build script
+# build.sh for Render deployment
 
-# Update pip
+# Exit on error and print commands
+set -ex
+
+# Install system dependencies
+apt-get update
+apt-get install -y build-essential wget curl libc6-dev
+
+# Download and install TA-Lib
+echo "Downloading TA-Lib..."
+wget -q http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz
+echo "Extracting TA-Lib..."
+tar -xzf ta-lib-0.4.0-src.tar.gz
+cd ta-lib/
+echo "Configuring TA-Lib..."
+./configure --prefix=/usr
+echo "Building TA-Lib..."
+make
+echo "Installing TA-Lib..."
+make install
+cd ..
+rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
+
+# Install Python dependencies
+echo "Upgrading pip and setuptools..."
 pip install --upgrade pip setuptools wheel
 
-# Install NumPy the easy way
+# Install NumPy the easy way (binary wheel)
+echo "Installing NumPy binary wheel..."
 pip install --only-binary=numpy numpy==1.24.3
 
-# Install TA-Lib
-pip install TA-Lib
-
 # Install all required packages explicitly
-pip install fastapi uvicorn prometheus_client sentry_sdk
+echo "Installing critical dependencies..."
+pip install fastapi==0.68.0 uvicorn==0.15.0 prometheus-client sentry-sdk slowapi
 
-# Install other requirements
+# Install backend requirements
+echo "Installing backend requirements..."
 if [ -f "backend/requirements.txt" ]; then
     pip install -r backend/requirements.txt
+else
+    echo "WARNING: backend/requirements.txt not found!"
+    # Try to find requirements.txt in other locations
+    find . -name "requirements.txt" -type f
 fi
 
+# Install any additional requirements
 if [ -f "requirements.txt" ]; then
+    echo "Installing root requirements..."
     pip install -r requirements.txt
 fi
+
+echo "Build completed successfully!"
+"@
