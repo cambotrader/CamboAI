@@ -6,11 +6,15 @@
     region: oregon
     repo: https://github.com/cambotrader/CamboAI
     branch: main
-    buildCommand: cd backend && pip install --no-cache-dir -r requirements.txt
-    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
+    services:
+  - type: web
+    name: camboai-traderstation
+    env: python
+    buildCommand: chmod +x ./build.sh && ./build.sh
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
-        value: 3.10.14
+        value: 3.11.7
       - key: ENVIRONMENT
         value: production
       - key: DATABASE_URL
