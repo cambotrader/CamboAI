@@ -11,7 +11,7 @@ pip install --only-binary=numpy numpy==1.24.3
 pip install TA-Lib
 
 # Install all required packages explicitly
-pip install fastapi uvicorn prometheus_client
+pip install fastapi uvicorn prometheus_client sentry_sdk
 
 # Install other requirements
 if [ -f "backend/requirements.txt" ]; then
